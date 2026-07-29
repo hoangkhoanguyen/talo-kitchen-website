@@ -1,0 +1,104 @@
+/* Custom styles for react-datepicker to match web design */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.react-datepicker-popper {
+  z-index: 50;
+}
+
+.react-datepicker {
+  font-family: inherit;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.react-datepicker__header {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0.75rem 0.75rem 0 0;
+  padding: 1rem;
+}
+
+.react-datepicker__current-month {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.react-datepicker__day-name {
+  color: #6b7280;
+  font-weight: 500;
+  width: 2.5rem;
+  line-height: 2.5rem;
+}
+
+.react-datepicker__day {
+  width: 2.5rem;
+  line-height: 2.5rem;
+  margin: 0.166rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.react-datepicker__day:hover {
+  background-color: #fef3e2;
+  border-radius: 0.5rem;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #f59e0b !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.react-datepicker__day--selected:hover,
+.react-datepicker__day--keyboard-selected:hover {
+  background-color: #d97706 !important;
+}
+
+.react-datepicker__day--disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.react-datepicker__day--disabled:hover {
+  background-color: transparent;
+}
+
+.react-datepicker__navigation {
+  top: 1rem;
+}
+
+.react-datepicker__navigation:hover *::before {
+  border-color: #f59e0b;
+}
+
+.react-datepicker__time-container {
+  border-left: 1px solid #e5e7eb;
+}
+
+.react-datepicker__time-list-item {
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+}
+
+.react-datepicker__time-list-item:hover {
+  background-color: #fef3e2;
+}
+
+.react-datepicker__time-list-item--selected {
+  background-color: #f59e0b !important;
+  color: white !important;
+  font-weight: 500;
+}
+
+.react-datepicker__time-list-item--selected:hover {
+  background-color: #d97706 !important;
+}

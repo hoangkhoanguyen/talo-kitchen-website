@@ -1,0 +1,17 @@
+# *
+User-agent: *
+Allow: /
+
+# Disallow admin pages
+User-agent: *
+Disallow: /admin/
+
+# Disallow API routes
+Disallow: /api/
+
+# Disallow checkout pages (private user data)
+Disallow: /checkout/
+Disallow: /cart/
+
+# Sitemap
+Sitemap: https://ltelleeatery.com/sitemap.xml
