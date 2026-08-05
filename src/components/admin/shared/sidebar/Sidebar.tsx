@@ -21,7 +21,7 @@ const Sidebar = () => {
     <div className="bg-slate-900 dark:bg-gray-900 flex flex-col h-full w-64">
       <div className={cn("flex items-center gap-4 pt-4 duration-200 px-5")}>
         <Image
-          src={"/assets/static/square-logo.png"}
+          src={"/talo-logo-bg.svg"}
           width={28}
           height={28}
           alt="TALO Kitchen & Lounge"

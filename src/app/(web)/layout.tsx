@@ -21,7 +21,7 @@ const organizationSchema = {
   "@type": "Restaurant",
   name: APP_NAME,
   url: APP_URL,
-  logo: `${APP_URL}/assets/static/square-logo.png`,
+  logo: `${APP_URL}/talo-logo-bg.svg`,
   description: APP_DESCRIPTION,
   image: `${APP_URL}/assets/static/hero.png`,
 };
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: `${APP_URL}/assets/static/square-logo.png`,
-    apple: `${APP_URL}/assets/static/square-logo.png`,
+    icon: `/talo-logo-bg.svg`,
+    apple: `/talo-logo-bg.svg`,
   },
   // openGraph: {
   //   title: APP_NAME,

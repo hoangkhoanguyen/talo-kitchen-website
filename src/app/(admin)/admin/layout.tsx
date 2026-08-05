@@ -10,6 +10,10 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Admin Dashboard | TALO Kitchen & Lounge",
   description: "Manage your restaurant with TALO Kitchen & Lounge admin dashboard.",
+  icons: {
+    icon: `/talo-logo-bg.svg`,
+    apple: `/talo-logo-bg.svg`,
+  },
   robots: {
     index: false,
     follow: false,
