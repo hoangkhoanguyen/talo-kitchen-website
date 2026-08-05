@@ -37,8 +37,8 @@ export async function generateMetadata(): Promise<Metadata> {
       canonical: url,
     },
     icons: {
-      icon: `${APP_URL}/assets/static/square-logo.png`,
-      apple: `${APP_URL}/assets/static/square-logo.png`,
+      icon: `/talo-logo-bg.svg`,
+      apple: `/talo-logo-bg.svg`,
     },
     openGraph: {
       title: ogTitle,
