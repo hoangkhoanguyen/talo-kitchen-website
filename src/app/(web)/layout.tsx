@@ -21,7 +21,7 @@ const organizationSchema = {
   "@type": "Restaurant",
   name: APP_NAME,
   url: APP_URL,
-  logo: `${APP_URL}/assets/static/light-logo.png`,
+  logo: `${APP_URL}/assets/static/square-logo.png`,
   description: APP_DESCRIPTION,
   image: `${APP_URL}/assets/static/hero.png`,
 };
