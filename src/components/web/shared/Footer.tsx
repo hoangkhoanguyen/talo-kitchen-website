@@ -159,8 +159,8 @@ export default Footer;
 
 function MediaIcon({ icon }: { icon: string }) {
   return (
-    <div className="py-2.5 px-2.5 rounded-full aspect-square flex items-center justify-center bg-white">
-      <Icon icon={icon} className="text-web-secondary-1 text-2xl" />
+    <div className="p-2.5 rounded-full aspect-square flex items-center justify-center border-2 border-web-primary">
+      <Icon icon={icon} className="text-web-primary text-xl" />
     </div>
   );
 }
