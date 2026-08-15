@@ -78,6 +78,9 @@ export const metadata: Metadata = {
   //   description: APP_DESCRIPTION,
   //   images: ["/assets/static/hero.png"],
   // },
+  verification: {
+    google: "BpMkMuDosubcHwvSUW_kq-ADY6RIxIjhx3o-FaVSsys",
+  },
   robots: {
     index: true,
     follow: true,
