@@ -41,8 +41,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: `/talo-logo-bg.svg`,
-    apple: `/talo-logo-bg.svg`,
+    icon: [
+      { url: `/icon.png`, type: "image/png", sizes: "2000x2000" },
+      { url: `/talo-logo-bg.svg`, type: "image/svg+xml" },
+    ],
+    apple: `/icon.png`,
   },
   // openGraph: {
   //   title: APP_NAME,
