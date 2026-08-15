@@ -41,9 +41,21 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: `/talo-logo-bg.svg`,
-    apple: `/talo-logo-bg.svg`,
+    icon: [
+      { url: `/favicon-32.png`, type: "image/png", sizes: "32x32" },
+      { url: `/favicon-96.png`, type: "image/png", sizes: "96x96" },
+      { url: `/favicon-192.png`, type: "image/png", sizes: "192x192" },
+      { url: `/favicon-512.png`, type: "image/png", sizes: "512x512" },
+      { url: `/talo-logo-bg.svg`, type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: `/favicon-180.png`, sizes: "180x180", type: "image/png" },
+    ],
+    other: [
+      { rel: "mask-icon", url: `/talo-logo-bg.svg` },
+    ],
   },
+  manifest: `/site.webmanifest`,
   // openGraph: {
   //   title: APP_NAME,
   //   description: APP_DESCRIPTION,
