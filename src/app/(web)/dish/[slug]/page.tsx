@@ -1,6 +1,6 @@
 import ProductInformation from "@/components/web/features/products/ProductInformation";
 import RelatedProducts from "@/components/web/features/products/RelatedProducts";
-import { APP_URL } from "@/constants/app";
+import { APP_ICONS, APP_URL } from "@/constants/app";
 import {
   getRelatedProductsCached,
   getProductDetailsBySlugCached,
@@ -36,10 +36,7 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
     },
-    icons: {
-      icon: `/talo-logo-bg.svg`,
-      apple: `/talo-logo-bg.svg`,
-    },
+    icons: APP_ICONS,
     openGraph: {
       title,
       description,

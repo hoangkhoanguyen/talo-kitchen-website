@@ -5,7 +5,7 @@ import {
   getAppConfigsByKeyCached,
   getUIConfigsByKeyCached,
 } from "@/services/cached";
-import { APP_URL } from "@/constants/app";
+import { APP_ICONS, APP_URL } from "@/constants/app";
 import { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
@@ -36,10 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: url,
     },
-    icons: {
-      icon: `/talo-logo-bg.svg`,
-      apple: `/talo-logo-bg.svg`,
-    },
+    icons: APP_ICONS,
     openGraph: {
       title: ogTitle,
       description: ogDescription,

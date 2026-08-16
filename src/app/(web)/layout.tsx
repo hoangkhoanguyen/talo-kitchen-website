@@ -13,7 +13,7 @@ import { FullscreenLoading } from "@/components/web/ui/loading";
 import QuickCartModal from "@/components/web/shared/quick-cart/QuickCartModal";
 import FloatingActions from "@/components/web/shared/FloatingActions";
 import type { Metadata } from "next";
-import { APP_DESCRIPTION, APP_NAME, APP_URL } from "@/constants/app";
+import { APP_DESCRIPTION, APP_ICONS, APP_NAME, APP_URL } from "@/constants/app";
 import Script from "next/script";
 
 const organizationSchema = {
@@ -21,7 +21,7 @@ const organizationSchema = {
   "@type": "Restaurant",
   name: APP_NAME,
   url: APP_URL,
-  logo: `${APP_URL}/talo-logo-bg.svg`,
+  logo: `${APP_URL}/favicon-512.png`,
   description: APP_DESCRIPTION,
   image: `${APP_URL}/assets/static/hero.png`,
 };
@@ -40,21 +40,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  icons: {
-    icon: [
-      { url: `/favicon-32.png`, type: "image/png", sizes: "32x32" },
-      { url: `/favicon-96.png`, type: "image/png", sizes: "96x96" },
-      { url: `/favicon-192.png`, type: "image/png", sizes: "192x192" },
-      { url: `/favicon-512.png`, type: "image/png", sizes: "512x512" },
-      { url: `/talo-logo-bg.svg`, type: "image/svg+xml" },
-    ],
-    apple: [
-      { url: `/favicon-180.png`, sizes: "180x180", type: "image/png" },
-    ],
-    other: [
-      { rel: "mask-icon", url: `/talo-logo-bg.svg` },
-    ],
-  },
+  icons: APP_ICONS,
   manifest: `/site.webmanifest`,
   // openGraph: {
   //   title: APP_NAME,
