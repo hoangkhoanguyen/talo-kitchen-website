@@ -5,7 +5,7 @@ import { OurStorySection } from "@/components/web/features/home/OurStorySection"
 import { ReviewsSection } from "@/components/web/features/home/ReviewsSection";
 import { WhyChooseUsSection } from "@/components/web/shared/WhyChooseUsSection";
 import { getUIConfigsByKeyCached } from "@/services/cached";
-import { APP_URL } from "@/constants/app";
+import { APP_ICONS, APP_URL } from "@/constants/app";
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,10 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: APP_URL,
     },
-    icons: {
-      icon: `/talo-logo-bg.svg`,
-      apple: `/talo-logo-bg.svg`,
-    },
+    icons: APP_ICONS,
     openGraph: {
       title: ogTitle,
       description: ogDescription,

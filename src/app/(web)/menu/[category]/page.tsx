@@ -3,7 +3,7 @@ import FoodCategories from "@/components/web/features/menu/FoodCategories";
 import NewFood from "@/components/web/features/menu/NewFood";
 import { WhyChooseUsSection } from "@/components/web/shared/WhyChooseUsSection";
 import { getUIConfigsByKeyCached } from "@/services/cached";
-import { APP_URL } from "@/constants/app";
+import { APP_ICONS, APP_URL } from "@/constants/app";
 import { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
@@ -61,10 +61,7 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
     },
-    icons: {
-      icon: `/talo-logo-bg.svg`,
-      apple: `/talo-logo-bg.svg`,
-    },
+    icons: APP_ICONS,
     openGraph: {
       title: ogTitle,
       description: ogDescription,
