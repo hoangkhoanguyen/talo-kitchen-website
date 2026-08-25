@@ -13,12 +13,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getAllProducts();
 
   const productUrls =
-    products?.map((product) => ({
-      url: `${baseUrl}/dish/${product.id}`,
-      lastModified: product.updatedAt || new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    })) || [];
+    products
+      ?.filter((product) => product.slug)
+      .map((product) => ({
+        url: `${baseUrl}/dish/${product.slug}`,
+        lastModified: product.updatedAt || new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      })) || [];
 
   // Lấy menu categories từ config
   const menuConfig = await getUIConfigsByKeyCached("menu_page");
