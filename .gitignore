@@ -52,3 +52,5 @@ docs/deployment/
 docs/DEPLOYMENT_BACKUP.md
 scripts/dumpdb.sh
 scripts/restore/
+# SDLC workflow — commit .sdlc/ except large visual baselines
+.sdlc/*/*/visual-baseline/
