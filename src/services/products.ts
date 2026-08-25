@@ -237,6 +237,7 @@ export async function getAllProducts() {
   return await db.query.products.findMany({
     columns: {
       id: true,
+      slug: true,
       title: true,
       isActive: true,
       updatedAt: true,

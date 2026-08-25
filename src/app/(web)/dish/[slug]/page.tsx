@@ -6,8 +6,8 @@ import {
   getProductDetailsBySlugCached,
 } from "@/services/cached";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import React, { FC } from "react";
-import NotFound from "@/components/web/shared/NotFound";
 
 export async function generateMetadata({
   params,
@@ -62,7 +62,7 @@ const page: FC<{ params: Promise<{ slug: string }> }> = async ({ params }) => {
   const product = await getProductDetailsBySlugCached(slug);
 
   if (!product) {
-    return <NotFound />;
+    notFound();
   }
 
   const relatedProducts = await getRelatedProductsCached(
