@@ -1,0 +1,126 @@
+{
+  "plugin": "sdlc-workflow",
+  "version": "0.2.0",
+  "installedAt": "2026-08-27T13:08:37.127Z",
+  "target": "project",
+  "components": [
+    "agents",
+    "commands",
+    "skills",
+    "templates",
+    "hooks"
+  ],
+  "files": {
+    "agents/architect.md": {
+      "installedHash": "3337783da004a37dd8ae6c18bddb1cea360a80c12a2e6bcba7172be2f962e1ce"
+    },
+    "agents/bug-fixer.md": {
+      "installedHash": "e4d0257bfc661df460b685a6ea35a150047ec25fcb1146af5445fd07a503f559"
+    },
+    "agents/bug-investigator.md": {
+      "installedHash": "77961603305829b05b33e5f77206c3d2c0bee8bd03a96f5650d3f3bb845e705d"
+    },
+    "agents/bug-reporter.md": {
+      "installedHash": "f2ef4fe5a378351f31d5134a03f6df5fa72b6135efe790108f118099c212de71"
+    },
+    "agents/feature-builder.md": {
+      "installedHash": "5f23bb92b0c2efcc199f15fa8893867015cc58e5c714cb97d9ff96c25839bd4d"
+    },
+    "agents/implement-coordinator.md": {
+      "installedHash": "a11f6d72f8298b42269feafcbef153bd07767505c018a10f1cb2826e5eea5fc4"
+    },
+    "agents/preflight-scout.md": {
+      "installedHash": "362b481de4d2426e37849997af8391db78cb514feb5870f26c64fe3f1ad87a01"
+    },
+    "agents/product-analyst.md": {
+      "installedHash": "45965c62febb56200985230bf254d4ca1576871a83a4f9922b703549469953ed"
+    },
+    "agents/qa-guard.md": {
+      "installedHash": "6ee96d8717f7c70134f92ceacde4c23bdd3f80d3c1ff4dc0fa0dea57196ce5e9"
+    },
+    "agents/reviewer.md": {
+      "installedHash": "df00a9d371213ee46b4b2448ee424d9b6dac62bddb6a6917a69b8a3ac37d0a5b"
+    },
+    "agents/test-strategist.md": {
+      "installedHash": "eeb0b1ce1370687b23554ee91551eacb6298a02cc4a81d008d6bc36dd1971b64"
+    },
+    "agents/ui-designer.md": {
+      "installedHash": "2e9feb3006266ee0e258b36a155154c27edbb8c5ca41fe3a4a888ff8b5ebffe9"
+    },
+    "commands/fix.md": {
+      "installedHash": "4db09a16e859cc7f56addb222853365afc074a22776cf57a073c75f721656e46"
+    },
+    "commands/init-project.md": {
+      "installedHash": "21d5e946e407e6e4bd6e0e6197c08232a91234c361bfb894c6ee1df4c7ced752"
+    },
+    "commands/plan-stack.md": {
+      "installedHash": "ead6f0ffa30bbd10609a8ad101f4f84f641b3a7f7e5939fd8f8e7de599290766"
+    },
+    "commands/sdlc/analyze.md": {
+      "installedHash": "d9f31cdc844da9d7975cd2f21884d393ab03fb524f115b608e247c1c283bd461"
+    },
+    "commands/sdlc/design.md": {
+      "installedHash": "e28702c8cb44b30cd03cb44273a9303973de47b13a569ae0508f8ce36213e792"
+    },
+    "commands/sdlc/execute.md": {
+      "installedHash": "f04f4c16f61705b43b4e10e94034b2457259d6970b7243a7509ed0b626070eb9"
+    },
+    "commands/sdlc/replan.md": {
+      "installedHash": "6797d3612178dc9c73a57eb1e532dd5732f792d9df71296f2dbac7f74b52dc97"
+    },
+    "commands/sdlc/run.md": {
+      "installedHash": "7774c613990b715a732d34d0ea0288ab9f0af3c42685f5963ba130f3a4591508"
+    },
+    "commands/sdlc/sprint-plan.md": {
+      "installedHash": "c9bf83b4894e62f917703eda89c8f9bc247b5935bf088331738721cd915ebadf"
+    },
+    "commands/sdlc/status.md": {
+      "installedHash": "8b020c77e9d19f24fccf599ed58f2a2f899031578037f30eb26947997af1154d"
+    },
+    "commands/sdlc/task.md": {
+      "installedHash": "e28d84f293cfb30121238f05ca9ff63b286956a9ea12b2375f80491d99325ec1"
+    },
+    "commands/sdlc/tasks.md": {
+      "installedHash": "3b31430d6d8f158c83e9a9e58e09ba5dbc219688a9ef258fa4a55ffc43033f24"
+    },
+    "commands/sdlc/test.md": {
+      "installedHash": "46e4ebb5f4839c294d847b79a641c13a4c0fc2a02fc03c44b443861729410f9e"
+    },
+    "skills/brd-writing/SKILL.md": {
+      "installedHash": "471f08b21acb201d0feafcee7867d4830137d2d2f5eb0ace2a46f4a5a088dbfe"
+    },
+    "skills/brd-writing/references/template.md": {
+      "installedHash": "04701d4e4078d0612b582a2e81d7d09fd6da015b4a0a75cd99796f0316eab133"
+    },
+    "skills/design-fidelity/SKILL.md": {
+      "installedHash": "04132eca5a9f0102d74cddaac0b9d9c3a410fdcd539c194d0811658a8f6a7671"
+    },
+    "skills/requirements-analysis/SKILL.md": {
+      "installedHash": "c32266c017a96718b57415cfb7f10e3984f9b7e9e9c1e7653e39e4a35df706e4"
+    },
+    "skills/self-review/SKILL.md": {
+      "installedHash": "9c135b7bdb5062c179aad17bd8a18ef1cd19154763d0db2652ff4d59963c47ba"
+    },
+    "skills/system-design/SKILL.md": {
+      "installedHash": "e709a374126b4c8f85b0a71b3320ebafdcc8d04db4c078cb058c628557aed24d"
+    },
+    "skills/task-breakdown/SKILL.md": {
+      "installedHash": "0e325693df42879d82814a1dc73364ddbbb5102c0a1a9a4f03bb255ec59a3cc9"
+    },
+    "skills/test-strategy/SKILL.md": {
+      "installedHash": "79b5f4aa16b08028693efe32211415a3a2829ef1a10b2ba480a093152a9281e8"
+    },
+    "templates/project-settings.json": {
+      "installedHash": "065fb067cd030b744a6317c2d46fa057e5108616fa96a39dd8104f61167bd650"
+    },
+    "templates/state.template.md": {
+      "installedHash": "d2e8c59706ec64fe9395a4061e3dfdcda0dd2d9902a44f6b697e5863176716f2"
+    },
+    "templates/versions.template.md": {
+      "installedHash": "f15779a411f3a681d5347034e4625acb66a48cc0660d88716b91130b3ce133b4"
+    },
+    "hooks/sdlc-session-start.sh": {
+      "installedHash": "82a7bb3837a3e917b88814908815eed57d5a2bd0ec4507f51469facfdd824572"
+    }
+  }
+}
