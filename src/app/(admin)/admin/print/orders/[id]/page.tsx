@@ -39,6 +39,7 @@ const PrintOrderBillPage = async ({
         amount: addon.price * addon.quantity,
       })),
     })),
+    shippingFee: order.shippingFee,
     total: order.totalPrice,
   };
 
