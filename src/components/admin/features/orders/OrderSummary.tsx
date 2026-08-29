@@ -2,13 +2,15 @@ import { formatCurrency } from "@/lib/utils";
 import { AdminOrderDetails } from "@/types/orders";
 import moment from "moment";
 import React, { FC } from "react";
+import PrintBillButton from "./PrintBillButton";
 
 const OrderSummary: FC<{
+  orderId: number;
   data: Pick<
     AdminOrderDetails,
     "createdAt" | "paymentMethod" | "totalPrice" | "shippingFee"
   >;
-}> = ({ data }) => {
+}> = ({ orderId, data }) => {
   return (
     <div className="card p-5 bg-white">
       <h2 className="card-title">Order Summary</h2>
@@ -41,6 +43,7 @@ const OrderSummary: FC<{
             {formatCurrency(data.totalPrice)}
           </span>
         </div>
+        <PrintBillButton orderId={orderId} className="w-full mt-2" />
       </div>
     </div>
   );
