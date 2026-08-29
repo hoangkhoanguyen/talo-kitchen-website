@@ -8,6 +8,7 @@ import OrderSummary from "@/components/admin/features/orders/OrderSummary";
 import OrderItems from "@/components/admin/features/orders/OrderItems";
 import { AdminOrderAddon, OrderStatus } from "@/types/orders";
 import OrderInternalNote from "@/components/admin/features/orders/OrderInternalNote";
+import PrintBillButton from "@/components/admin/features/orders/PrintBillButton";
 import { EShippingMethod } from "@/types/app-configs";
 import moment from "moment";
 
@@ -30,7 +31,10 @@ const OrderDetailsPage = async ({
 
   return (
     <div>
-      <Header title="Order Details" />
+      <Header
+        title="Order Details"
+        actions={<PrintBillButton orderId={order.id} />}
+      />
       <div className="container py-5">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_320px] gap-5">
           <div className="col-span-1">
