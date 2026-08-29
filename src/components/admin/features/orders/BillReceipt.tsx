@@ -43,6 +43,9 @@ export default function BillReceipt({
   fontClassName?: string;
 }) {
   useEffect(() => {
+    // Khi nhúng trong iframe (nút "In bill"), iframe cha lo việc in → không tự in ở đây
+    if (window.self !== window.top) return;
+
     let printed = false;
     const doPrint = () => {
       if (printed) return;
