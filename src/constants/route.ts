@@ -18,6 +18,7 @@ export const ADMIN_ROUTE = {
   productsApi: "/admin/api/products",
   allProductApi: "/admin/api/products/all",
   ordersApi: "/admin/api/orders",
+  newOrdersApi: "/admin/api/orders/new",
   reservationsApi: "/admin/api/reservations",
   login: "/admin/login",
   register: "/admin/register",
@@ -141,6 +142,10 @@ export const adminRoutes = {
       skipEmptyString: true,
       skipNull: true,
     })}`,
+  newOrdersApi: (since: number | null) =>
+    since === null || since === undefined
+      ? ADMIN_ROUTE.newOrdersApi
+      : `${ADMIN_ROUTE.newOrdersApi}?since=${since}`,
   reservationApi: (query: any) =>
     `${ADMIN_ROUTE.reservationsApi}?${queryString.stringify(query, {
       arrayFormat: "comma",

@@ -18,7 +18,9 @@ import {
 import {
   count,
   desc,
+  asc,
   eq,
+  gt,
   or,
   ilike,
   gte,
@@ -334,6 +336,53 @@ export async function getAdminOrderById(id: number) {
   });
 
   return order;
+}
+
+/**
+ * Lấy các đơn hàng mới hơn con trỏ `sinceId` (dùng cho polling thông báo đơn mới).
+ * - `sinceId === null`: chưa có con trỏ → chỉ trả về `latestId` hiện tại để client
+ *   khởi tạo, KHÔNG trả đơn nào (tránh nổ thông báo cho đơn cũ khi vừa mở trang).
+ * - Ngược lại: trả về các đơn có `id > sinceId` (tối đa 50, sắp xếp id tăng dần).
+ */
+export async function getNewOrdersSince(sinceId: number | null) {
+  const db = getDb();
+
+  // id đơn mới nhất — dùng để khởi tạo con trỏ ở client
+  const [latest] = await db
+    .select({ id: orders.id })
+    .from(orders)
+    .orderBy(desc(orders.id))
+    .limit(1);
+  const latestId = latest?.id ?? 0;
+
+  if (sinceId === null) {
+    return { orders: [], latestId };
+  }
+
+  const rows = await db
+    .select({
+      id: orders.id,
+      code: orders.code,
+      firstName: orders.firstName,
+      lastName: orders.lastName,
+      totalPrice: orders.totalPrice,
+      createdAt: orders.createdAt,
+    })
+    .from(orders)
+    .where(gt(orders.id, sinceId))
+    .orderBy(asc(orders.id))
+    .limit(50);
+
+  return {
+    orders: rows.map((o) => ({
+      id: o.id,
+      code: o.code,
+      customerName: `${o.firstName} ${o.lastName}`.trim(),
+      totalPrice: o.totalPrice,
+      createdAt: o.createdAt,
+    })),
+    latestId,
+  };
 }
 
 // ==================== HELPER FUNCTIONS ====================
