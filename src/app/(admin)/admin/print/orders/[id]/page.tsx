@@ -39,8 +39,8 @@ const PrintOrderBillPage = async ({
         amount: addon.price * addon.quantity,
       })),
     })),
-    shippingFee: order.shippingFee,
-    total: order.totalPrice,
+    // Bill không tính phí ship → trừ phí ship ra khỏi tổng (ship = 0 thì giữ nguyên)
+    total: order.totalPrice - order.shippingFee,
   };
 
   return <BillReceipt data={data} fontClassName={poppins.className} />;

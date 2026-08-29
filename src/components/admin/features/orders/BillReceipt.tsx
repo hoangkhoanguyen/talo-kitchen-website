@@ -21,7 +21,6 @@ export interface BillData {
   code: string;
   dateTime: string;
   items: BillItem[];
-  shippingFee: number;
   total: number;
 }
 
@@ -118,16 +117,10 @@ export default function BillReceipt({
             </tbody>
           </table>
 
-          {/* Shipping + Total */}
-          <div className="bill-summary">
-            <div className="bill-fee-row">
-              <span>Delivery Fee</span>
-              <span>{fmt(data.shippingFee)}</span>
-            </div>
-            <div className="bill-total">
-              <span className="bill-total-label">Total</span>
-              <span className="bill-total-value">{fmt(data.total)}</span>
-            </div>
+          {/* Total */}
+          <div className="bill-total">
+            <span className="bill-total-label">Total</span>
+            <span className="bill-total-value">{fmt(data.total)}</span>
           </div>
 
           {/* Footer */}
@@ -212,24 +205,13 @@ const printStyles = `
 .row-addon td { font-size: 11px; }
 .row-addon td.col-name { padding-left: 6px; }
 
-.bill-summary {
-  border-top: 1px dashed #000;
-  margin-top: 6px;
-  padding-top: 8px;
-}
-
-.bill-fee-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 6px;
-}
-
 .bill-total {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  border-top: 1px dashed #000;
+  margin-top: 6px;
+  padding-top: 8px;
 }
 
 .bill-total-label { font-size: 16px; font-weight: 700; }
