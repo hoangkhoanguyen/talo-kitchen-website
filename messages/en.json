@@ -1,1 +1,23 @@
-{}
+{
+  "common": {
+    "loading": "Loading...",
+    "viewMore": "View more",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "error": "Something went wrong. Please try again."
+  },
+  "header": {},
+  "footer": {},
+  "home": {},
+  "menu": {},
+  "reservation": {},
+  "cart": {},
+  "checkout": {},
+  "products": {},
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "Oops! The page you are looking for could not be found.",
+    "backHome": "Back to Home"
+  }
+}

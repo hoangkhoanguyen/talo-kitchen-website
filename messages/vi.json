@@ -1,1 +1,23 @@
-{}
+{
+  "common": {
+    "loading": "Đang tải...",
+    "viewMore": "Xem thêm",
+    "close": "Đóng",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "error": "Đã có lỗi xảy ra. Vui lòng thử lại."
+  },
+  "header": {},
+  "footer": {},
+  "home": {},
+  "menu": {},
+  "reservation": {},
+  "cart": {},
+  "checkout": {},
+  "products": {},
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "message": "Rất tiếc! Trang bạn đang tìm kiếm không tồn tại.",
+    "backHome": "Về trang chủ"
+  }
+}
