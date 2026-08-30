@@ -1,9 +1,12 @@
+"use client";
 import Icon from "@/components/common/Icon";
 import React, { FC } from "react";
 import { Button } from "../../ui/button";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 const ReservationInformation: FC<{ configs: any }> = ({ configs }) => {
+  const t = useTranslations("reservation");
   return (
     <div className="grid grid-cols-1 gap-10">
       <div className="reservation-card-shadow p-5 bg-white rounded-xl">
@@ -12,7 +15,7 @@ const ReservationInformation: FC<{ configs: any }> = ({ configs }) => {
             <Icon icon={"ph:clock"} className="text-2xl" />
           </div>
           <h3 className="text-web-h3-mobile lg:text-web-h3 text-web-content-1">
-            Reservation Information
+            {t("info.title")}
           </h3>
         </div>
         <ul className="flex flex-col gap-5">
@@ -58,10 +61,10 @@ const ReservationInformation: FC<{ configs: any }> = ({ configs }) => {
 
       <div className="p-5 bg-web-primary rounded-xl">
         <p className="text-web-caption-mobile lg:text-web-caption text-web-background-1 mb-2.5">
-          Need Assistance?
+          {t("info.needAssistance")}
         </p>
         <p className="text-web-body-mobile lg:text-web-body text-web-background-3 mb-12">
-          Get in touch with our reservations team
+          {t("info.getInTouch")}
         </p>
         <div className="flex flex-row items-center gap-2 mb-10">
           <div className="w-[52px] aspect-square rounded-full flex justify-center items-center bg-web-secondary-1 text-web-content-1">
@@ -72,7 +75,7 @@ const ReservationInformation: FC<{ configs: any }> = ({ configs }) => {
               {configs.contact.phone}
             </p>
             <p className="text-web-background-3 text-web-body-mobile lg:text-web-body">
-              Call us directly
+              {t("info.callDirectly")}
             </p>
           </div>
         </div>
@@ -85,7 +88,7 @@ const ReservationInformation: FC<{ configs: any }> = ({ configs }) => {
               {configs.contact.email}
             </p>
             <p className="text-web-background-3 text-web-body-mobile lg:text-web-body">
-              Email for special requests
+              {t("info.emailForRequests")}
             </p>
           </div>
         </div>
@@ -96,7 +99,7 @@ const ReservationInformation: FC<{ configs: any }> = ({ configs }) => {
           variant="secondary1"
           startIcon={<Icon icon="ph:phone" className="text-2xl" />}
         >
-          call now
+          {t("info.callNow")}
         </Button>
       </div>
     </div>

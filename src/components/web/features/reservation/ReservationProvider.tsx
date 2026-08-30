@@ -8,6 +8,7 @@ import {
 } from "@/validations/reservation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import React, { createContext, FC, PropsWithChildren, useContext } from "react";
 import { Control, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ const ReservationProvider: FC<
     reservationConfigs?: any;
   }>
 > = ({ children, reservationConfigs }) => {
+  const t = useTranslations("reservation");
   const [newReservation, setNewReservation] =
     React.useState<ReservationDB | null>(null);
   const { handleSubmit, control } = useForm<CreateReservationType>({
@@ -43,7 +45,7 @@ const ReservationProvider: FC<
     onSuccess(data) {
       if (data.success) {
         toast.success(
-          `Reservation successful! Your code is ${data.reservation!.code}`,
+          t("toast.success", { code: data.reservation!.code }),
         );
         setNewReservation(data.reservation!);
       } else {

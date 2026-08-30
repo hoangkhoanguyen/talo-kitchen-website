@@ -8,11 +8,13 @@ import { useReservationContext } from "./ReservationProvider";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "@/app/(web)/[locale]/reservation/datepicker-custom.css";
+import { useTranslations } from "next-intl";
 
 const ReservationForm: FC<{
   configs: any;
 }> = ({ configs }) => {
   const { control, onSubmit, reservationConfigs } = useReservationContext();
+  const t = useTranslations("reservation");
 
   return (
     <div className="reservation-card-shadow bg-white rounded-xl p-5 @container">
@@ -26,14 +28,14 @@ const ReservationForm: FC<{
               />
             </div>
             <h3 className="text-web-h3-mobile lg:text-web-h3 text-web-content-1">
-              Make a Reservation
+              {t("form.title")}
             </h3>
           </div>
         </div>
 
         <div className="col-span-1 @md:col-span-2">
           <p className="text-web-subtitle-mobile lg:text-web-subtitle text-web-content-2">
-            Please fill out all required fields to secure your dining experience
+            {t("form.subtitle")}
           </p>
         </div>
 
@@ -44,7 +46,7 @@ const ReservationForm: FC<{
               className="text-2xl text-web-secondary-1"
             />
             <h4 className="text-web-h4-mobile lg:text-web-h4 text-web-primary">
-              Reservation Details
+              {t("form.detailsHeading")}
             </h4>
           </div>
         </div>
@@ -52,7 +54,7 @@ const ReservationForm: FC<{
         <div className="col-span-1">
           <div>
             <label className="web-reservation-label">
-              Preferred Date (GMT +7) *
+              {t("form.dateLabel")}
             </label>
             <Controller
               control={control}
@@ -80,7 +82,7 @@ const ReservationForm: FC<{
                       "web-input w-full",
                       !!error && " web-input-error",
                     )}
-                    placeholderText="Select date"
+                    placeholderText={t("form.datePlaceholder")}
                   />
                   {error?.message && (
                     <p className="text-web-error text-xs mt-1">
@@ -96,7 +98,7 @@ const ReservationForm: FC<{
         <div className="col-span-1">
           <div>
             <label className="web-reservation-label">
-              Preferred Time (GMT +7) *
+              {t("form.timeLabel")}
             </label>
             <Controller
               control={control}
@@ -124,13 +126,13 @@ const ReservationForm: FC<{
                     showTimeSelect
                     showTimeSelectOnly
                     timeIntervals={15}
-                    timeCaption="Time"
+                    timeCaption={t("form.timeCaption")}
                     dateFormat="h:mm aa"
                     className={cn(
                       "web-input w-full",
                       !!error && " web-input-error",
                     )}
-                    placeholderText="Select time"
+                    placeholderText={t("form.timePlaceholder")}
                   />
                   {error?.message && (
                     <p className="text-web-error text-xs mt-1">
@@ -145,7 +147,9 @@ const ReservationForm: FC<{
 
         <div className="col-span-1 @md:col-span-2">
           <div>
-            <label className="web-reservation-label">Number of Guests *</label>
+            <label className="web-reservation-label">
+              {t("form.guestsLabel")}
+            </label>
             <Controller
               control={control}
               name="numberOfPeople"
@@ -170,7 +174,7 @@ const ReservationForm: FC<{
                       ),
                     )}
                     <option hidden value={""}>
-                      Please choose an option
+                      {t("form.guestsPlaceholder")}
                     </option>
                   </select>
                   {error?.message && (
@@ -190,14 +194,16 @@ const ReservationForm: FC<{
           <div className="flex items-center gap-2">
             <Icon icon="ph:phone" className="text-2xl text-web-secondary-1" />
             <h4 className="text-web-h4-mobile lg:text-web-h4 text-web-primary">
-              Contact Details
+              {t("form.contactHeading")}
             </h4>
           </div>
         </div>
 
         <div className="col-span-1 @md:col-span-2">
           <div>
-            <label className="web-reservation-label">Full Name *</label>
+            <label className="web-reservation-label">
+              {t("form.fullNameLabel")}
+            </label>
             <Controller
               control={control}
               name="customerFullName"
@@ -209,7 +215,7 @@ const ReservationForm: FC<{
                       "web-input w-full",
                       !!error && " web-input-error",
                     )}
-                    placeholder="Enter your full name"
+                    placeholder={t("form.fullNamePlaceholder")}
                     {...field}
                   />
                   {error?.message && (
@@ -226,7 +232,7 @@ const ReservationForm: FC<{
         <div className="col-span-1 @md:col-span-2">
           <div>
             <label className="web-reservation-label">
-              Phone Number at Vietnam *
+              {t("form.phoneLabel")}
             </label>
             <Controller
               control={control}
@@ -239,7 +245,7 @@ const ReservationForm: FC<{
                       "web-input w-full",
                       !!error && " web-input-error",
                     )}
-                    placeholder="Enter your phone number"
+                    placeholder={t("form.phonePlaceholder")}
                     {...field}
                   />
                   {error?.message && (
@@ -262,7 +268,7 @@ const ReservationForm: FC<{
               className="text-2xl text-web-secondary-1"
             />
             <h4 className="text-web-h4-mobile lg:text-web-h4 text-web-primary">
-              Special Request
+              {t("form.specialRequestHeading")}
             </h4>
           </div>
         </div>
@@ -270,7 +276,7 @@ const ReservationForm: FC<{
         <div className="col-span-1 @md:col-span-2">
           <div>
             <label className="web-reservation-label">
-              Additional Information (Optional)
+              {t("form.notesLabel")}
             </label>
             <Controller
               control={control}
@@ -283,7 +289,7 @@ const ReservationForm: FC<{
                       "web-input bg-web-background-2 w-full",
                       !!error && " web-input-error",
                     )}
-                    placeholder="Tell us about dietary restrictions, celebrations, seating preferences, or any other special requirements..."
+                    placeholder={t("form.notesPlaceholder")}
                     {...field}
                   ></textarea>
                   {error?.message && (
@@ -305,7 +311,7 @@ const ReservationForm: FC<{
             type="button"
             onClick={onSubmit}
           >
-            Submit Reservation Request
+            {t("form.submitButton")}
           </Button>
         </div>
 
