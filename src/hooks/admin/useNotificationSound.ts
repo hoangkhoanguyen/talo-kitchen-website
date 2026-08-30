@@ -2,7 +2,11 @@
 import { useCallback, useEffect, useRef } from "react";
 
 /**
- * Phát tiếng "pip" thông báo bằng Web Audio API (không cần file audio).
+ * Phát âm báo động đơn mới bằng Web Audio API (không cần file audio).
+ *
+ * Nhà hàng thường mở nhạc nền nên âm báo được thiết kế to & chói (sawtooth layer
+ * 2 tần số, đẩy qua limiter để to nhất mà không vỡ tiếng), gồm 3 hồi "beep-beep"
+ * cao-thấp liên tiếp cho dễ nhận biết.
  *
  * Trình duyệt chặn autoplay âm thanh cho tới khi có tương tác đầu tiên của người
  * dùng. Hook tự lắng nghe pointerdown/keydown để "mở khoá" (resume) AudioContext;
@@ -36,25 +40,53 @@ export function useNotificationSound() {
     // autoplay còn bị khoá → im lặng, không ném lỗi
     if (!ctx || ctx.state !== "running") return;
 
-    const beepAt = (start: number) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      // triangle nghe rõ/đầy hơn sine ở cùng âm lượng
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(880, start);
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.9, start + 0.02);
-      gain.gain.setValueAtTime(0.9, start + 0.16);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.26);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(start);
-      osc.stop(start + 0.28);
+    const now = ctx.currentTime;
+
+    // Master + limiter: cho phép đẩy âm lượng kịch mà tránh vỡ tiếng khó chịu
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(1, now);
+    const limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.setValueAtTime(-4, now);
+    limiter.knee.setValueAtTime(0, now);
+    limiter.ratio.setValueAtTime(20, now);
+    limiter.attack.setValueAtTime(0.002, now);
+    limiter.release.setValueAtTime(0.1, now);
+    master.connect(limiter);
+    limiter.connect(ctx.destination);
+
+    // 1 tiếng: layer 2 oscillator sawtooth (tần số gốc + bội) cho to & chói
+    const tone = (start: number, freq: number, dur: number) => {
+      [
+        { f: freq, peak: 0.95 },
+        { f: freq * 1.5, peak: 0.55 },
+      ].forEach(({ f, peak }) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(f, start);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(peak, start + 0.01);
+        gain.gain.setValueAtTime(peak, start + dur - 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(start);
+        osc.stop(start + dur + 0.02);
+      });
     };
 
-    const now = ctx.currentTime;
-    beepAt(now); // "pip"
-    beepAt(now + 0.32); // "pip"
+    // 1 hồi = 2 tiếng cao-thấp gấp gáp ("beep-beep")
+    const burst = (start: number) => {
+      tone(start, 1200, 0.14);
+      tone(start + 0.16, 900, 0.14);
+    };
+
+    // 3 hồi liên tiếp
+    const BURSTS = 3;
+    const BURST_GAP = 0.42;
+    for (let i = 0; i < BURSTS; i++) {
+      burst(now + i * BURST_GAP);
+    }
   }, [getCtx]);
 
   useEffect(() => {
