@@ -2,6 +2,7 @@ import { FieldType } from "@/types/settings";
 import {
   booleanSettingSchema,
   imageSettingSchema,
+  localizedTextSchema,
   numberSettingSchema,
   textareaSettingSchema,
   textSettingSchema,
@@ -11,11 +12,23 @@ import z from "zod";
 export function generateSettingFieldSchema(item: FieldType): z.ZodTypeAny {
   switch (item.type) {
     case "text":
+      if (item.localized) {
+        return localizedTextSchema({
+          isRequired: item.isRequired,
+          variant: "text",
+        });
+      }
       return item.isRequired
         ? textSettingSchema.min(1, { error: "Nội dung không được để trống" })
         : textSettingSchema;
 
     case "textarea":
+      if (item.localized) {
+        return localizedTextSchema({
+          isRequired: item.isRequired,
+          variant: "textarea",
+        });
+      }
       return item.isRequired
         ? textareaSettingSchema.min(1, {
             error: "Nội dung không được để trống",
