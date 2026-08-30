@@ -57,6 +57,7 @@ const fields: FieldType[] = [
     description: "Mô tả ngắn gọn về phần Reviews",
     isRequired: false,
     placeholder: "Nhập mô tả",
+    localized: true,
   },
   {
     key: "reviews_list",
@@ -126,6 +127,7 @@ const fields: FieldType[] = [
         description: "Tiêu đề hiển thị trong box bên dưới",
         isRequired: true,
         placeholder: "Nhập tiêu đề",
+        localized: true,
       },
       {
         key: "description",
@@ -134,6 +136,7 @@ const fields: FieldType[] = [
         description: "Mô tả hiển thị trong box bên dưới",
         isRequired: true,
         placeholder: "Nhập mô tả",
+        localized: true,
       },
     ],
   },

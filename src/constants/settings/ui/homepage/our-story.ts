@@ -57,6 +57,7 @@ const fields: FieldType[] = [
     description: "Enter để xuống dòng",
     isRequired: true,
     placeholder: "Nhập nội dung",
+    localized: true,
   },
   {
     key: "image",

@@ -58,6 +58,7 @@ const fields: FieldType[] = [
     description: "Mô tả ngắn gọn về phần Contact",
     isRequired: false,
     placeholder: "Nhập mô tả",
+    localized: true,
   },
   {
     key: "location",
@@ -74,6 +75,7 @@ const fields: FieldType[] = [
         description: "Địa chỉ cửa hàng",
         isRequired: false,
         placeholder: "Nhập địa chỉ",
+        localized: true,
       },
       {
         key: "ggmap_link",
@@ -138,6 +140,7 @@ const fields: FieldType[] = [
           description: "Phần text in đậm",
           isRequired: true,
           placeholder: "Nhập tiêu đề nhóm",
+          localized: true,
         },
         {
           key: "items",
@@ -158,6 +161,7 @@ const fields: FieldType[] = [
                 description: "Ví dụ: Thứ 2 - Thứ 6",
                 isRequired: true,
                 placeholder: "Nhập nhãn",
+                localized: true,
               },
               {
                 key: "value",
@@ -181,6 +185,7 @@ const fields: FieldType[] = [
           description: "Dòng ghi chú nhỏ hiển thị bên dưới danh sách giờ",
           isRequired: false,
           placeholder: "Nhập ghi chú...",
+          localized: true,
         },
       ],
     },
