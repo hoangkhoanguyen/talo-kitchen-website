@@ -52,3 +52,10 @@ docs/deployment/
 docs/DEPLOYMENT_BACKUP.md
 scripts/dumpdb.sh
 scripts/restore/
+# SDLC visual baselines (large, machine-generated)
+.sdlc/*/*/visual-baseline/
+# Playwright test output
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
