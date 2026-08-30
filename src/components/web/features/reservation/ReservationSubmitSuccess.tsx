@@ -4,7 +4,7 @@ import { Button } from "../../ui/button";
 import ReservationInformation from "./ReservationInformation";
 import { ReservationDB } from "@/db/schemas";
 import moment from "moment";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 
 const ReservationSubmitSuccess: FC<{

@@ -4,7 +4,7 @@ import { ReviewsSliders } from "./ReviewsSliders";
 import { Button } from "../../ui/button";
 import SectionSubTitleFromConfigs from "../../shared/SectionSubTitleFromConfigs";
 import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import { getGoogleMapReviews } from "@/lib/gg-map-reviews";
 

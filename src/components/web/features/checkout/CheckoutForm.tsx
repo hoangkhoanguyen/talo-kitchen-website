@@ -7,7 +7,7 @@ import { Button } from "../../ui/button";
 import { cn, formatCurrencyWebsite } from "@/lib/utils";
 import { EShippingMethod } from "@/types/app-configs";
 import Icon from "@/components/common/Icon";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import GoToMenuButton from "../../shared/GoToMenuButton";
 

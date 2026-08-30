@@ -1,6 +1,6 @@
 import { webRoutes } from "@/constants/route";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import React, { FC } from "react";
 import ProductCard from "../../shared/ProductCard";
 import SectionSubTitleFromConfigs from "../../shared/SectionSubTitleFromConfigs";

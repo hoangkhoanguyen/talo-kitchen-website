@@ -1,7 +1,7 @@
 import Icon from "@/components/common/Icon";
 import { Button } from "./Button";
 import { QuantityButtons } from "./QuantityButtons";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export * from "./Button";
 export * from "./QuantityButtons";

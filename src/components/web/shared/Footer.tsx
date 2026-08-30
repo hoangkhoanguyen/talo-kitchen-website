@@ -2,7 +2,7 @@ import Icon from "@/components/common/Icon";
 import { webRoutes } from "@/constants/route";
 import { splitTextByNewLine } from "@/lib/utils";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import React, { FC } from "react";
 
 const Footer: FC<{ configs: any }> = ({ configs }) => {

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React, { FC } from "react";
 import ProductCard from "../../shared/ProductCard";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
 import SectionSubTitleFromConfigs from "../../shared/SectionSubTitleFromConfigs";
 import { splitTextByNewLine } from "@/lib/utils";

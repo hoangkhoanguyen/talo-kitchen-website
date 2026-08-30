@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import React, { FC } from "react";
 import CartButton from "./CartButton";
 import MobileMenuButton from "./MobileMenuButton";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 
 interface IMenuItem {
   href: string;

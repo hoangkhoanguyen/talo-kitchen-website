@@ -1,8 +1,7 @@
 "use client";
 import { useMobileMenu } from "@/hooks/web/ui/mobile-menu";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import React, { FC, useEffect } from "react";
 
 const MobileMenu: FC<{ menu: any[] }> = ({ menu }) => {

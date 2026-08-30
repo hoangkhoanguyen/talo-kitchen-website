@@ -1,8 +1,14 @@
 import { webRoutes } from "@/constants/route";
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/navigation";
 
-const page = () => {
-  redirect(webRoutes.menu("all"));
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+const page = async ({ params }: PageProps) => {
+  const { locale } = await params;
+
+  redirect({ href: webRoutes.menu("all"), locale });
 };
 
 export default page;

@@ -4,7 +4,7 @@ import CheckoutForm from "./CheckoutForm";
 import CheckoutSummary from "./CheckoutSummary";
 import Icon from "@/components/common/Icon";
 import { Button } from "../../ui/button";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import OrderItem from "./OrderItem";
 import { useCheckoutContext } from "./CheckoutProvider";

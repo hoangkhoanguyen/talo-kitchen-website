@@ -2,7 +2,7 @@ import Icon from "@/components/common/Icon";
 import React, { FC } from "react";
 import { Button } from "../../ui/button";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 
 export const HeroSection: FC<{ configs: any }> = ({ configs }) => {

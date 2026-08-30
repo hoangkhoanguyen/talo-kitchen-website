@@ -5,7 +5,7 @@ import { webRoutes } from "@/constants/route";
 import { useCartStore } from "@/hooks/web/cart/store";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useEffect, useMemo, useRef } from "react";
 
 const CartButton = () => {

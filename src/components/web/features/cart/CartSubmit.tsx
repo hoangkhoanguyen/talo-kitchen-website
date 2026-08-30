@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Button } from "../../ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import { useCartContext } from "./CartProvider";
 import { formatCurrencyWebsite } from "@/lib/utils";

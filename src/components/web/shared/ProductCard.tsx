@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React, { FC } from "react";
 import QuickCartButton from "./quick-cart/QuickCartButton";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import { WebProduct } from "@/types/products";
 import { formatCurrencyWebsite } from "@/lib/utils";
