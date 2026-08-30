@@ -98,6 +98,7 @@ export const newProductMeta: MetaValue = {
       description: "Mô tả hiển thị trên phần Sản phẩm mới",
       isRequired: true,
       placeholder: "Nhập mô tả",
+      localized: true,
     },
     {
       key: "product_slug",
@@ -122,6 +123,7 @@ export const newProductMeta: MetaValue = {
       description: "Nhãn hiển thị trên sản phẩm mới",
       isRequired: true,
       placeholder: "Nhập nhãn sản phẩm mới",
+      localized: true,
     },
     {
       key: "sub_label",
@@ -130,6 +132,7 @@ export const newProductMeta: MetaValue = {
       description: "Nhãn phụ hiển thị trên sản phẩm mới",
       isRequired: true,
       placeholder: "Nhập nhãn phụ sản phẩm mới",
+      localized: true,
     },
   ],
 };

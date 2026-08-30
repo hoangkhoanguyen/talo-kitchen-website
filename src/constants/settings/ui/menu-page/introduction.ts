@@ -84,6 +84,7 @@ export const introductionMeta: MetaValue = {
       description: "Mô tả hiển thị trên phần Giới thiệu",
       isRequired: true,
       placeholder: "Nhập mô tả",
+      localized: true,
     },
   ],
 };
