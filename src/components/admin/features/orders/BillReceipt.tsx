@@ -236,6 +236,8 @@ const printStyles = `
     margin: 0 !important;
     padding: 0 !important;
     background: #fff !important;
+    height: auto !important;
+    min-height: 0 !important;
   }
   /* Chỉ in phần bill, ẩn mọi thứ khác (toaster, loading...) */
   body { visibility: hidden; }
@@ -247,9 +249,7 @@ const printStyles = `
     min-height: 0;
     height: auto;
     display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
+    position: static;
   }
   /* padding-bottom 40mm: chừa ~4cm để xé/cắt giấy */
   .bill { width: 80mm; padding: 3mm 3mm 40mm; }
