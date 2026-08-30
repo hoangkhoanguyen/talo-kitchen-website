@@ -4,12 +4,12 @@ import { useCallback, useEffect, useRef } from "react";
 /** File âm báo đơn mới trong public/ */
 const SOUND_URL = "/assets/universfield-new-notification-036-485897.mp3";
 /** Số lần phát liên tiếp mỗi khi có đơn mới */
-const REPEAT = 3;
+const REPEAT = 1;
 /** Khuếch đại to hơn mức 100% của file để xuyên nhạc nền nhà hàng */
 const GAIN = 2.5;
 
 /**
- * Phát âm báo đơn mới từ file mp3 trong public/, lặp 3 lần liên tiếp.
+ * Phát âm báo đơn mới từ file mp3 trong public/ (số lần phát = REPEAT).
  *
  * Âm thanh được đẩy qua Web Audio (GainNode + limiter) để to hơn mức gốc của
  * file mà không vỡ tiếng. Trình duyệt chặn autoplay cho tới khi có tương tác đầu
