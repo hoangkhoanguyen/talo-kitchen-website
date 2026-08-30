@@ -3,6 +3,7 @@ import { HeaderContacts } from "./HeaderContacts";
 import Logo from "./Logo";
 import DesktopMenu from "./DesktopMenu";
 import MobileMenu from "./MobileMenu";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header({ configs }: { configs: any }) {
   return (
@@ -18,9 +19,12 @@ export default function Header({ configs }: { configs: any }) {
                   phone={configs.phone}
                 />
               </div>
-              <span className="text-web-body text-web-content-1 hidden md:block">
-                {configs.welcom_text}
-              </span>
+              <div className="flex items-center gap-4">
+                <span className="text-web-body text-web-content-1 hidden md:block">
+                  {configs.welcom_text}
+                </span>
+                <LanguageSwitcher />
+              </div>
             </div>
             {/* below header */}
             <div className="pt-4 pb-5 flex justify-between items-center">
