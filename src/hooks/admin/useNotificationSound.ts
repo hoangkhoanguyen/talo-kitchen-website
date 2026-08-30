@@ -39,20 +39,22 @@ export function useNotificationSound() {
     const beepAt = (start: number) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "sine";
+      // triangle nghe rõ/đầy hơn sine ở cùng âm lượng
+      osc.type = "triangle";
       osc.frequency.setValueAtTime(880, start);
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.25, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.9, start + 0.02);
+      gain.gain.setValueAtTime(0.9, start + 0.16);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.26);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(start);
-      osc.stop(start + 0.2);
+      osc.stop(start + 0.28);
     };
 
     const now = ctx.currentTime;
     beepAt(now); // "pip"
-    beepAt(now + 0.25); // "pip"
+    beepAt(now + 0.32); // "pip"
   }, [getCtx]);
 
   useEffect(() => {
