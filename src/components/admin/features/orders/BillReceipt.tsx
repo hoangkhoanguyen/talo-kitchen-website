@@ -228,6 +228,7 @@ const printStyles = `
   font-size: 13px;
   font-weight: 600;
   margin-top: 16px;
+  padding-bottom: 2px;
 }
 
 @media print {
@@ -247,6 +248,6 @@ const printStyles = `
     left: 0;
     top: 0;
   }
-  .bill { width: 80mm; padding: 3mm; }
+  .bill { width: 80mm; padding: 3mm 3mm 0; }
 }
 `;
