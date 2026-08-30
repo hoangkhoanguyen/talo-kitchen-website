@@ -6,11 +6,13 @@ import ProductCard from "../../shared/ProductCard";
 import SectionSubTitleFromConfigs from "../../shared/SectionSubTitleFromConfigs";
 import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
 import { getProductsByCategorySlugCached } from "@/services/cached";
+import { getTranslations } from "next-intl/server";
 
 const FoodCategories: FC<{ activeCategoryKey: string; configs: any }> = async ({
   activeCategoryKey,
   configs,
 }) => {
+  const t = await getTranslations("menu");
   const products = await getProductsByCategorySlugCached(activeCategoryKey);
 
   const categoryLabel = configs.categories_to_show.find(
@@ -37,7 +39,7 @@ const FoodCategories: FC<{ activeCategoryKey: string; configs: any }> = async ({
                 : "text-web-content-2 border border-web-content-2",
             )}
           >
-            All
+            {t("all")}
           </Link>
           {configs.categories_to_show.map((category: any) => (
             <Link
