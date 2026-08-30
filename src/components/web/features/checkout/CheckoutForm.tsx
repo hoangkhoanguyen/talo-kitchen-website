@@ -10,9 +10,11 @@ import Icon from "@/components/common/Icon";
 import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import GoToMenuButton from "../../shared/GoToMenuButton";
+import { useTranslations } from "next-intl";
 
 const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
   const { control, onCheckout, totalPrice, cartItems } = useCheckoutContext();
+  const t = useTranslations("checkout");
 
   const shippingMethod = useWatch({
     control,
@@ -23,7 +25,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
     <div className="grid grid-cols-1 gap-10">
       <div className="grid grid-cols-1 gap-5">
         <h2 className="text-web-h2-mobile lg:text-web-h2 text-web-content-1">
-          Contact
+          {t("form.contactTitle")}
         </h2>
 
         <Controller
@@ -35,7 +37,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
                 {...field}
                 type="tel"
                 className={cn("web-input", !!error && " web-input-error")}
-                placeholder="Phone number in Vietnam"
+                placeholder={t("form.phonePlaceholder")}
               />
               {error?.message && (
                 <p className="text-web-error text-xs mt-1">{error.message}</p>
@@ -52,7 +54,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
                 {...field}
                 type="text"
                 className={cn("web-input", !!error && " web-input-error")}
-                placeholder="First name"
+                placeholder={t("form.firstNamePlaceholder")}
               />
               {error?.message && (
                 <p className="text-web-error text-xs mt-1">{error.message}</p>
@@ -69,7 +71,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
                 {...field}
                 type="text"
                 className={cn("web-input", !!error && " web-input-error")}
-                placeholder="Last name"
+                placeholder={t("form.lastNamePlaceholder")}
               />
               {error?.message && (
                 <p className="text-web-error text-xs mt-1">{error.message}</p>
@@ -79,7 +81,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
         />
 
         <h2 className="text-web-h2-mobile lg:text-web-h2 text-web-content-1">
-          Payment Method
+          {t("form.paymentMethodTitle")}
         </h2>
         <Controller
           control={control}
@@ -88,7 +90,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
             <RadioItem
               checked={field.value === "cash"}
               onChange={() => field.onChange("cash")}
-              label="Only Cash"
+              label={t("form.onlyCash")}
             />
           )}
         />
@@ -96,7 +98,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
 
       <div className="grid grid-cols-1 gap-5">
         <h2 className="text-web-h2-mobile lg:text-web-h2 text-web-content-1">
-          Shipping Method
+          {t("form.shippingMethodTitle")}
         </h2>
         <Controller
           control={control}
@@ -127,11 +129,10 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
         )}
       >
         <h2 className="text-web-h2-mobile lg:text-web-h2 text-web-content-1">
-          Delivery
+          {t("form.deliveryTitle")}
         </h2>
         <p className="text-web-subtitle-mobile lg:text-web-subtitle text-web-content-2">
-          We will deliver within a 10km radius. If your address is too far from
-          the restaurant, we will call to confirm with you.
+          {t("form.deliveryNote")}
         </p>
         <Controller
           control={control}
@@ -142,7 +143,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
                 {...field}
                 type="text"
                 className={cn("web-input", !!error && " web-input-error")}
-                placeholder="Delivery address"
+                placeholder={t("form.deliveryAddressPlaceholder")}
               />
               {error?.message && (
                 <p className="text-web-error text-xs mt-1">{error.message}</p>
@@ -160,7 +161,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
                 {...field}
                 type="text"
                 className={cn("web-input", !!error && " web-input-error")}
-                placeholder="Apartment, Homestay, etc (optional)"
+                placeholder={t("form.addressNotePlaceholder")}
               />
               {error?.message && (
                 <p className="text-web-error text-xs mt-1">{error.message}</p>
@@ -178,7 +179,9 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
           className="w-full text-web-button-mobile lg:text-web-button py-5 text-web-background-1"
           variant={"secondary1"}
         >
-          Complete the Order &bull; {formatCurrencyWebsite(totalPrice)}
+          {t("form.completeOrder", {
+            amount: formatCurrencyWebsite(totalPrice),
+          })}
         </Button>
       </div>
     </div>

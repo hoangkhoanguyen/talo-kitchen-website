@@ -4,9 +4,11 @@ import { Button } from "../../ui/button";
 import Icon from "@/components/common/Icon";
 import { useCheckoutContext } from "./CheckoutProvider";
 import { useController } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 const Note = () => {
   const { control } = useCheckoutContext();
+  const t = useTranslations("checkout");
 
   const {
     field: { value = "", onChange },
@@ -31,7 +33,7 @@ const Note = () => {
   return (
     <div className="bg-web-background-3 rounded-lg p-5">
       <p className="text-web-h4-mobile lg:text-web-h4 text-web-content-2">
-        Note ({value.length}/300)
+        {t("note.title", { count: value.length })}
       </p>
 
       {isEditing ? (
@@ -62,7 +64,7 @@ const Note = () => {
           variant={"secondary1"}
           className="text-web-background-1 text-web-button-mobile lg:text-web-button ms-auto rounded-full"
         >
-          {isEditing ? "Save" : "Fill in note"}
+          {isEditing ? t("note.save") : t("note.fillInNote")}
         </Button>
         {isEditing && (
           <Button
@@ -70,7 +72,7 @@ const Note = () => {
             variant={"white"}
             className="text-web-content-2 rounded-full text-web-button-mobile lg:text-web-button"
           >
-            Cancel
+            {t("note.cancel")}
           </Button>
         )}
       </div>
