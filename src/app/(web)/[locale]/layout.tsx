@@ -15,6 +15,10 @@ import FloatingActions from "@/components/web/shared/FloatingActions";
 import type { Metadata } from "next";
 import { APP_DESCRIPTION, APP_ICONS, APP_NAME, APP_URL } from "@/constants/app";
 import Script from "next/script";
+import { notFound } from "next/navigation";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -97,11 +101,24 @@ const allogist = localFont({
 
 export const dynamic = "force-dynamic";
 
-const Layout: FC<PropsWithChildren> = async ({ children }) => {
+type LayoutProps = PropsWithChildren<{
+  params: Promise<{ locale: string }>;
+}>;
+
+const Layout: FC<LayoutProps> = async ({ children, params }) => {
+  const { locale } = await params;
+
+  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
+    notFound();
+  }
+
+  setRequestLocale(locale);
+
+  const messages = await getMessages();
   const configs = await getUIConfigsByKeyCached("layout");
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <head>
         {/* Google Tag Manager */}
         <Script strategy="beforeInteractive" src="/assets/js/script.js" />
@@ -134,34 +151,36 @@ const Layout: FC<PropsWithChildren> = async ({ children }) => {
             style={{ display: "none", visibility: "hidden" }}
           ></iframe>
         </noscript>
-        <WebsiteQueryProvider>
-          <AnimationHeaderScroll>
-            <Header configs={configs?.value.header || {}} />
-          </AnimationHeaderScroll>
-          <main className="pt-[149px] lg:pt-[146px] flex-1">{children}</main>
-          <Footer configs={configs?.value.footer || {}} />
-          <FloatingActions configs={configs?.value.floating_actions || {}} />
-          <Toaster
-            visibleToasts={3}
-            position="top-center"
-            icons={{
-              success: (
-                <Icon
-                  icon="ph:check-circle-fill"
-                  className="text-xl text-web-secondary-1"
-                />
-              ),
-              error: (
-                <Icon
-                  icon="ph:x-circle-fill"
-                  className="text-xl text-web-error"
-                />
-              ),
-            }}
-          />
-          <QuickCartModal />
-          <FullscreenLoading />
-        </WebsiteQueryProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <WebsiteQueryProvider>
+            <AnimationHeaderScroll>
+              <Header configs={configs?.value.header || {}} />
+            </AnimationHeaderScroll>
+            <main className="pt-[149px] lg:pt-[146px] flex-1">{children}</main>
+            <Footer configs={configs?.value.footer || {}} />
+            <FloatingActions configs={configs?.value.floating_actions || {}} />
+            <Toaster
+              visibleToasts={3}
+              position="top-center"
+              icons={{
+                success: (
+                  <Icon
+                    icon="ph:check-circle-fill"
+                    className="text-xl text-web-secondary-1"
+                  />
+                ),
+                error: (
+                  <Icon
+                    icon="ph:x-circle-fill"
+                    className="text-xl text-web-error"
+                  />
+                ),
+              }}
+            />
+            <QuickCartModal />
+            <FullscreenLoading />
+          </WebsiteQueryProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

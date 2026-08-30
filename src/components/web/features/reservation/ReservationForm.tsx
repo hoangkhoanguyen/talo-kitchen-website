@@ -7,7 +7,7 @@ import { Controller } from "react-hook-form";
 import { useReservationContext } from "./ReservationProvider";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "@/app/(web)/reservation/datepicker-custom.css";
+import "@/app/(web)/[locale]/reservation/datepicker-custom.css";
 
 const ReservationForm: FC<{
   configs: any;
