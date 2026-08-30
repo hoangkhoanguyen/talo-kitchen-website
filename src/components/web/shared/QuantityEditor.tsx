@@ -1,16 +1,20 @@
+"use client";
 import React, { FC } from "react";
 import { QuantityButtons } from "../ui/button";
 import { formatCurrencyWebsite } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const QuantityEditor: FC<{
   price: number;
   quantity: number;
   onChangeQuantity(quantity: number): void;
 }> = ({ price, quantity, onChangeQuantity }) => {
+  const t = useTranslations("common");
+
   return (
     <div>
       <p className="text-web-h3-mobile lg:text-web-h3 mb-5 text-web-content-1">
-        Amount
+        {t("amount")}
       </p>
       <div className="flex justify-between items-center gap-5">
         <QuantityButtons

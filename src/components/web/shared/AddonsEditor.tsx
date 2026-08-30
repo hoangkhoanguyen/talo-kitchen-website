@@ -2,6 +2,7 @@
 import { FC } from "react";
 import { QuantityButtons } from "../ui/button";
 import { formatCurrencyWebsite } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const AddonsEditor: FC<{
   addons: {
@@ -12,10 +13,12 @@ const AddonsEditor: FC<{
   }[];
   onChangeQuantity(id: number, quantity: number): void;
 }> = ({ addons, onChangeQuantity }) => {
+  const t = useTranslations("common");
+
   return (
     <div className="">
       <p className="text-web-h3-mobile lg:text-web-h3 text-web-content-1 mb-5">
-        Add Extras
+        {t("addExtras")}
       </p>
       <div className="flex flex-col gap-6 items-stretch">
         {addons.map((addon) => (
