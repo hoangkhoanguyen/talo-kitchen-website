@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useTranslations } from "next-intl";
 import CartSubmit from "./CartSubmit";
 import { useCartContext } from "./CartProvider";
 import { formatCurrencyWebsite } from "@/lib/utils";
@@ -7,6 +8,7 @@ import GoToMenuButton from "../../shared/GoToMenuButton";
 
 const CartSummary = () => {
   const { totalPrice } = useCartContext();
+  const t = useTranslations("cart");
   return (
     <div>
       <hr className="border-t border-web-content-3 mb-1" />
@@ -16,14 +18,14 @@ const CartSummary = () => {
         <div className="">
           <div className="flex justify-between items-center gap-5">
             <span className="text-web-h2-mobile lg:text-web-h2 text-web-content-1">
-              Subtotal
+              {t("summary.subtotal")}
             </span>
             <span className="uppercase text-web-h2-mobile lg:text-web-h2 text-web-secondary-1">
               {formatCurrencyWebsite(totalPrice)}
             </span>
           </div>
           <p className="text-web-caption-mobile lg:text-web-caption text-web-content-1">
-            Shipping calculated at checkout
+            {t("summary.shippingNote")}
           </p>
           <div className="mt-10 hidden lg:block">
             <CartSubmit />

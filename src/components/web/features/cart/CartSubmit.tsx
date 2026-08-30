@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "../../ui/button";
 import { useRouter } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
@@ -8,6 +9,7 @@ import { formatCurrencyWebsite } from "@/lib/utils";
 
 const CartSubmit = () => {
   const router = useRouter();
+  const t = useTranslations("cart");
 
   const { totalPrice } = useCartContext();
 
@@ -21,7 +23,7 @@ const CartSubmit = () => {
       variant={"secondary1"}
       onClick={onGoCheckout}
     >
-      Checkout &bull; {formatCurrencyWebsite(totalPrice)}
+      {t("checkout", { total: formatCurrencyWebsite(totalPrice) })}
     </Button>
   );
 };
