@@ -12,6 +12,7 @@ import {
 import ReservationTable from "@/components/admin/features/reservations/ReservationTable";
 import ReservationFilter from "@/components/admin/features/reservations/ReservationFilter";
 import moment from "moment";
+import { formatDateVN } from "@/lib/date";
 
 const ProductPage = () => {
   const { query, setQuery } = useOrdersParams();
@@ -29,7 +30,7 @@ const ProductPage = () => {
           "DD/MM/YYYY",
         ),
         status: item.status as EReservationStatus,
-        createdAt: moment(item.createdAt).format("YYYY-MM-DD hh:mm A"),
+        createdAt: formatDateVN(item.createdAt, "YYYY-MM-DD hh:mm A"),
         note: item.note,
       })) || [],
     [data],

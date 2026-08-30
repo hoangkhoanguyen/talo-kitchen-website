@@ -6,6 +6,7 @@ import Header from "@/components/admin/shared/header/Header";
 import Icon from "@/components/common/Icon";
 import { getAdminReservationById } from "@/services/reservations";
 import { EReservationStatus } from "@/types/reservations";
+import { formatDateVN } from "@/lib/date";
 import moment from "moment";
 import React from "react";
 
@@ -70,7 +71,8 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                   code: reservation.code,
                   customerName: reservation.customerFullName,
                   customerPhone: reservation.customerPhone,
-                  createdAt: moment(reservation.createdAt).format(
+                  createdAt: formatDateVN(
+                    reservation.createdAt,
                     "YYYY-MM-DD hh:mm A",
                   ),
                 }}

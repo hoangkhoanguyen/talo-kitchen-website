@@ -1,6 +1,6 @@
 import { getAdminOrderById } from "@/services/orders";
 import { notFound } from "next/navigation";
-import moment from "moment";
+import { formatDateVN } from "@/lib/date";
 import { Poppins } from "next/font/google";
 import BillReceipt, {
   BillData,
@@ -26,7 +26,7 @@ const PrintOrderBillPage = async ({
 
   const data: BillData = {
     code: order.code,
-    dateTime: moment(order.createdAt).format("MM/DD/YYYY   HH:mm:ss"),
+    dateTime: formatDateVN(order.createdAt, "MM/DD/YYYY   HH:mm:ss"),
     items: order.items.map((item) => ({
       name: item.productName,
       qty: item.quantity,

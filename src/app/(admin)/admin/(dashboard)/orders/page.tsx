@@ -9,7 +9,7 @@ import useOrdersParams from "@/hooks/admin/features/orders/useOrdersParams";
 import React, { useMemo } from "react";
 import { AdminOrderTable, OrderStatus } from "@/types/orders";
 import { EShippingMethod } from "@/types/app-configs";
-import moment from "moment";
+import { formatDateVN } from "@/lib/date";
 
 const ProductPage = () => {
   const { query, setQuery } = useOrdersParams();
@@ -26,9 +26,7 @@ const ProductPage = () => {
         orderTypeLabel: item.orderTypeLabel || "",
         paymentMethod: item.paymentMethod,
         status: item.status as OrderStatus,
-        createdAt: moment(item.createdAt)
-          .add(7, "hours")
-          .format("YYYY-MM-DD hh:mm A"),
+        createdAt: formatDateVN(item.createdAt, "YYYY-MM-DD hh:mm A"),
         code: item.code,
         note: item.note,
         deliveryAddress: item.deliveryAddress,

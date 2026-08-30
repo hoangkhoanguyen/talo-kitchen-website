@@ -1,6 +1,6 @@
 "use client";
 import { Icon } from "@iconify/react";
-import moment from "moment";
+import { formatDateVN } from "@/lib/date";
 import { adminRoutes } from "@/constants/route";
 import { formatCurrency } from "@/lib/utils";
 import { useNewOrdersStore } from "@/store/new-orders";
@@ -45,7 +45,7 @@ const NewOrderPopup = () => {
                   #{order.code}
                 </span>
                 <span className="shrink-0 text-xs text-gray-400">
-                  {moment(order.createdAt).format("HH:mm")}
+                  {formatDateVN(order.createdAt, "HH:mm")}
                 </span>
               </div>
               <div className="truncate text-sm text-gray-600">
