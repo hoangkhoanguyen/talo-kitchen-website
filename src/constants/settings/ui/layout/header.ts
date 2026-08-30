@@ -54,6 +54,7 @@ export const headerMeta: MetaValue = {
       description: "Văn bản chào mừng hiển thị trên header bên phải",
       isRequired: false,
       placeholder: "Nhập văn bản chào mừng",
+      localized: true,
     },
     {
       key: "nav_bar",
@@ -78,6 +79,7 @@ export const headerMeta: MetaValue = {
             description: "Nhãn hiển thị trên thanh điều hướng",
             isRequired: true,
             placeholder: "Nhập nhãn",
+            localized: true,
           },
           {
             key: "href",
@@ -95,6 +97,7 @@ export const headerMeta: MetaValue = {
             description: "Tốt cho SEO",
             isRequired: true,
             placeholder: "Nhập tiêu đề (Dùng để SEO)",
+            localized: true,
           },
         ],
       },
