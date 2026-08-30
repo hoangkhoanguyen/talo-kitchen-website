@@ -7,6 +7,7 @@ import { Icon } from "@iconify/react";
 import { useLogout } from "@/hooks/admin/features/auth/useLogout";
 import { useAdminConfigs } from "@/store";
 import { Dialog, DialogPanel } from "@headlessui/react";
+import NotificationSoundSetting from "./NotificationSoundSetting";
 
 const Sidebar = () => {
   const isOpenSidebar = useAdminConfigs((state) => state.isSidebarOpen);
@@ -39,6 +40,11 @@ const Sidebar = () => {
       {/* Menu items - takes remaining space */}
       <div className="flex-1">
         <Menu />
+      </div>
+
+      {/* Cài đặt âm báo đơn mới */}
+      <div className="px-4 pt-2">
+        <NotificationSoundSetting />
       </div>
 
       {/* Logout button at bottom */}
