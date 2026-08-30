@@ -243,6 +243,9 @@ const printStyles = `
   .bill-root {
     background: #fff;
     padding: 0;
+    margin: 0;
+    min-height: 0;
+    height: auto;
     display: block;
     position: absolute;
     left: 0;
