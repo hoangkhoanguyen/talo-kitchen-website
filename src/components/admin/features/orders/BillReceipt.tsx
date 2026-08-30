@@ -251,6 +251,7 @@ const printStyles = `
     left: 0;
     top: 0;
   }
-  .bill { width: 80mm; padding: 3mm 3mm 0; }
+  /* padding-bottom 40mm: chừa ~4cm để xé/cắt giấy */
+  .bill { width: 80mm; padding: 3mm 3mm 40mm; }
 }
 `;
