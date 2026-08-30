@@ -2,7 +2,7 @@
 
 - **version**: v1
 - **current_sprint**: sprint-1-i18n-foundation
-- **current_phase**: test
+- **current_phase**: qa
 - **current_task**: none
 - **updated_at**: 2026-08-30 23:59
 
@@ -14,7 +14,7 @@
 - tasks:         done
 - execute:       done
 - test:          done
-- qa:            todo
+- qa:            done
 
 ## Human approval gates
 
@@ -24,7 +24,7 @@
 
 ## Resume pointer
 
-- **next_action**: Test leg xong (64/64 Playwright test pass, visual baseline tạo mới ở visual-baseline/). Chạy QA gate cho sprint-1-i18n-foundation. Xem `.sdlc/v1/sprint-1-i18n-foundation/test-report.md` cho phần "Needs manual verification" (5 mục) trước khi user manual test.
+- **next_action**: QA gate DONE (0 fix rounds needed — build/tsc/64 Playwright tests all clean, happy paths + regression + edge cases verified live via curl/Playwright on dev server, no bugs found). Ready to hand off to user manual test. Caller should mark sprint `done` in sprints.md + update versions.md.
 - **blockers**: none
 
 ## Context loaded this run (so the next run knows what to re-read)
