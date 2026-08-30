@@ -8,8 +8,8 @@ import { useNotificationSound } from "@/hooks/admin/useNotificationSound";
 
 type NewOrdersResponse = { orders: NewOrderNotice[]; latestId: number };
 
-/** khoảng thời gian poll (ms) — 10 giây */
-const POLL_INTERVAL = 10_000;
+/** khoảng thời gian poll (ms) — 5 giây */
+const POLL_INTERVAL = 5_000;
 
 /**
  * Poll API đơn mới định kỳ. Lần đầu (chưa có con trỏ) chỉ lấy `latestId` để làm
