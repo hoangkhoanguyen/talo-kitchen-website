@@ -174,7 +174,7 @@
   Test: mỗi entry có alternates.languages en (no-prefix) + vi (`/vi`); tập URL gốc không đổi; DB null
     không crash. Verify `tsc --noEmit`.
 
-- [ ] TASK-11  (todo)
+- [x] TASK-11  (done)
   Description: Cập nhật 9 callsite CLIENT của `formatCurrencyWebsite` truyền `locale` từ `useLocale()`
     (next-intl client): `AddToCartButton`, `CheckoutForm`, `CheckoutSummary`, `CheckoutRender`,
     `CartItem`, `CartSubmit`, `CartSummary`, `QuantityEditor`, `AddonsEditor`. Giá tiền hiển thị đúng
