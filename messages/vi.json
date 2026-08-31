@@ -186,5 +186,33 @@
     "title": "Không tìm thấy trang",
     "message": "Rất tiếc! Trang bạn đang tìm kiếm không tồn tại.",
     "backHome": "Về trang chủ"
+  },
+  "metadata": {
+    "home": {
+      "title": "TALO Kitchen & Lounge - Trang chủ",
+      "description": "Chào mừng bạn đến với TALO Kitchen & Lounge, nơi sự tinh tế trong ẩm thực hòa quyện cùng không gian ấm cúng, thân thiện."
+    },
+    "reservation": {
+      "title": "Đặt bàn | TALO Kitchen & Lounge",
+      "description": "Đặt bàn tại TALO Kitchen & Lounge. Trải nghiệm ẩm thực tinh tế với nguyên liệu tươi ngon và hương vị chuẩn vị trong không gian ấm áp."
+    },
+    "checkout": {
+      "title": "Thanh toán | TALO Kitchen & Lounge",
+      "description": "Hoàn tất đơn hàng của bạn tại TALO Kitchen & Lounge. Quy trình thanh toán an toàn."
+    },
+    "cart": {
+      "title": "Giỏ hàng | TALO Kitchen & Lounge",
+      "description": "Xem lại các món trong giỏ hàng trước khi thanh toán tại TALO Kitchen & Lounge."
+    },
+    "menu": {
+      "allLabel": "Tất cả",
+      "allMenuTitle": "Toàn bộ thực đơn",
+      "titleFallback": "Thực đơn - {category}",
+      "description": "Khám phá thực đơn {category} hấp dẫn tại TALO Kitchen & Lounge. Nguyên liệu tươi ngon, hương vị chuẩn vị."
+    },
+    "dish": {
+      "notFound": "Không tìm thấy sản phẩm",
+      "descriptionFallback": "Khám phá {title} tại TALO Kitchen & Lounge"
+    }
   }
 }

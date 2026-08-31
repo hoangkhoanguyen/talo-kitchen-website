@@ -186,5 +186,33 @@
     "title": "Page Not Found",
     "message": "Oops! The page you are looking for could not be found.",
     "backHome": "Back to Home"
+  },
+  "metadata": {
+    "home": {
+      "title": "TALO Kitchen & Lounge - Home",
+      "description": "Welcome to TALO Kitchen & Lounge, where culinary excellence meets a warm and inviting atmosphere."
+    },
+    "reservation": {
+      "title": "Reservation | TALO Kitchen & Lounge",
+      "description": "Reserve your table at TALO Kitchen & Lounge. Experience fine dining with fresh ingredients and authentic flavors in a warm atmosphere."
+    },
+    "checkout": {
+      "title": "Checkout | TALO Kitchen & Lounge",
+      "description": "Complete your order at TALO Kitchen & Lounge. Secure checkout process."
+    },
+    "cart": {
+      "title": "Shopping Cart | TALO Kitchen & Lounge",
+      "description": "Review your order items before checkout at TALO Kitchen & Lounge."
+    },
+    "menu": {
+      "allLabel": "All",
+      "allMenuTitle": "All Menu",
+      "titleFallback": "Menu - {category}",
+      "description": "Explore our delicious {category} menu at TALO Kitchen & Lounge. Fresh ingredients, authentic flavors."
+    },
+    "dish": {
+      "notFound": "Product Not Found",
+      "descriptionFallback": "Discover {title} at TALO Kitchen & Lounge"
+    }
   }
 }
