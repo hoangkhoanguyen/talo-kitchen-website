@@ -9,11 +9,20 @@ import { APP_ICONS, APP_URL } from "@/constants/app";
 import { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
+import type { Locale } from "@/types/configs";
 
 // export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const reservationConfig = await getUIConfigsByKeyCached("reservation_page");
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const reservationConfig = await getUIConfigsByKeyCached(
+    "reservation_page",
+    locale as Locale,
+  );
   const seo = (reservationConfig?.value as any)?.seo;
 
   const title = seo?.title || "Reservation | TALO Kitchen & Lounge";
@@ -56,8 +65,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const page = async () => {
-  const configsDb = await getUIConfigsByKeyCached("reservation_page");
+const page = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) => {
+  const { locale } = await params;
+  const configsDb = await getUIConfigsByKeyCached(
+    "reservation_page",
+    locale as Locale,
+  );
 
   const reservationConfigs = await getAppConfigsByKeyCached("reservation");
 

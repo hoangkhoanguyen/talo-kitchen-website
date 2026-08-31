@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { getAllProducts } from "@/services/products";
 import { getUIConfigsByKeyCached } from "@/services/cached";
 import { APP_URL } from "@/constants/app";
+import { routing } from "@/i18n/routing";
 
 // Force dynamic để không chạy lúc build (vì cần DB connection)
 export const dynamic = "force-dynamic";
@@ -23,7 +24,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })) || [];
 
   // Lấy menu categories từ config
-  const menuConfig = await getUIConfigsByKeyCached("menu_page");
+  const menuConfig = await getUIConfigsByKeyCached(
+    "menu_page",
+    routing.defaultLocale,
+  );
   const categories =
     (menuConfig?.value as any)?.food_categories?.categories_to_show || [];
 

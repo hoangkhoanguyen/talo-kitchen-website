@@ -7,9 +7,15 @@ import { WhyChooseUsSection } from "@/components/web/shared/WhyChooseUsSection";
 import { getUIConfigsByKeyCached } from "@/services/cached";
 import { APP_ICONS, APP_URL } from "@/constants/app";
 import { Metadata } from "next";
+import type { Locale } from "@/types/configs";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const homeConfig = await getUIConfigsByKeyCached("homepage");
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const homeConfig = await getUIConfigsByKeyCached("homepage", locale as Locale);
 
   const seo = homeConfig?.value?.seo as any;
 
@@ -55,8 +61,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const HomePage = async () => {
-  const homeConfig = await getUIConfigsByKeyCached("homepage");
+const HomePage = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) => {
+  const { locale } = await params;
+  const homeConfig = await getUIConfigsByKeyCached("homepage", locale as Locale);
 
   return (
     <div>

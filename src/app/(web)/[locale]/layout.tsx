@@ -19,6 +19,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import type { Locale } from "@/types/configs";
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -115,7 +116,7 @@ const Layout: FC<LayoutProps> = async ({ children, params }) => {
   setRequestLocale(locale);
 
   const messages = await getMessages();
-  const configs = await getUIConfigsByKeyCached("layout");
+  const configs = await getUIConfigsByKeyCached("layout", locale as Locale);
 
   return (
     <html lang={locale}>

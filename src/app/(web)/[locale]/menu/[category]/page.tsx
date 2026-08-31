@@ -7,18 +7,19 @@ import { APP_ICONS, APP_URL } from "@/constants/app";
 import { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
+import type { Locale } from "@/types/configs";
 
 // export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ category: string }>;
+  params: Promise<{ category: string; locale: string }>;
 }): Promise<Metadata> {
-  const { category } = await params;
+  const { category, locale } = await params;
 
   // Lấy config để tìm label của category
-  const menuConfig = await getUIConfigsByKeyCached("menu_page");
+  const menuConfig = await getUIConfigsByKeyCached("menu_page", locale as Locale);
   const categories =
     (menuConfig?.value as any)?.food_categories?.categories_to_show || [];
   const seo = (menuConfig?.value as any)?.seo;
@@ -81,10 +82,14 @@ export async function generateMetadata({
   };
 }
 
-const page = async ({ params }: { params: Promise<{ category: string }> }) => {
-  const { category } = await params;
+const page = async ({
+  params,
+}: {
+  params: Promise<{ category: string; locale: string }>;
+}) => {
+  const { category, locale } = await params;
 
-  const dbConfigs = await getUIConfigsByKeyCached("menu_page");
+  const dbConfigs = await getUIConfigsByKeyCached("menu_page", locale as Locale);
 
   const configs = dbConfigs?.value as any;
 
