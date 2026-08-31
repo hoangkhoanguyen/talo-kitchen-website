@@ -1,20 +1,20 @@
 # SDLC State
 
 - **version**: v1
-- **current_sprint**: sprint-3-entity-i18n
-- **current_phase**: qa
-- **current_task**: none
-- **updated_at**: 2026-08-31 22:40
+- **current_sprint**: sprint-4-i18n-polish
+- **current_phase**: execute
+- **current_task**: TASK-05..13 (Wave 2, in progress)
+- **updated_at**: 2026-09-01 01:10
 
 ## Phase status (current sprint)
 
 - analyze:       done
 - design_system: done
-- design_ui:     done
+- design_ui:     n/a
 - tasks:         done
-- execute:       done
-- test:          done
-- qa:            done
+- execute:       doing
+- test:          todo
+- qa:            todo
 
 ## Human approval gates
 
@@ -24,7 +24,12 @@
 
 ## Resume pointer
 
-- **next_action**: sprint-3-entity-i18n TEST LEG DONE — unit (21/21) + Playwright user-facing (16/16) +
+- **next_action**: sprint-4-i18n-polish IMPLEMENT in progress — Wave 1 done (TASK-01 i18n-meta.ts,
+  TASK-02 metadata namespace en/vi, TASK-03 date-web.ts TZ-safe, TASK-04 formatCurrencyWebsite locale
+  param), commits 8a1f5fc/ddba8df/d973612/8691ce7. Now running Wave 2 (TASK-05..13, metadata pages +
+  sitemap + currency callsites + ReservationSubmitSuccess) in parallel via feature-builder. Wave 3
+  (TASK-14 fallback sweep + build gate) after. See below (old sprint-3 note kept for history).
+- (sprint-3-entity-i18n TEST LEG DONE, historical) — unit (21/21) + Playwright user-facing (16/16) +
   Playwright admin LocaleTabStrip (15/15, run `--workers=1`, shares fixture row PRODUCT_ID=18) +
   visual-baseline (6/6) all green; full `tests/i18n/` regression suite (114/114) + tsc (0 lỗi) + `next build`
   PASS. Found + fixed 1 real bug during test leg: LocaleTabStrip's dynamically-named Controllers
@@ -64,7 +69,9 @@
 - DECISION (2026-08-31, user): đổi `localePrefix` từ `always` → **`as-needed`** (en KHÔNG prefix, giữ URL cũ `/menu`; chỉ `/vi/...` có prefix) để giảm xáo trộn SEO khi cắt prod. Áp SAU khi vá build sprint-2, TRƯỚC Test/QA sprint-2. Cần: sửa `src/i18n/routing.ts` localePrefix; rà middleware `proxy.ts` + language switcher; CẬP NHẬT test sprint-1 (routing.spec/middleware-detect.spec đang assert `/`→`/en` kiểu always) + architecture.md. EC-03 (locale không hợp lệ) vẫn phải 404.
 - DEPLOY STRATEGY (user context): web trên Vercel, DB Supabase, prod dùng schema `prod` (DB_SCHEMA mặc định). Khuyến nghị blue/green theo schema: clone prod→prod_v2, migrate trên đó, Vercel preview trỏ DB_SCHEMA=prod_v2, cắt bằng đổi env, rollback = flip về prod. Chạy migrate:configs-i18n với DB_SCHEMA=prod (sprint-2) + Drizzle migration bảng *_translations (sprint-3) trên prod. Verify helper resolve coi string chưa migrate = bản en (backward-compat) trong QA.
 - sprint_1_done: sprint-1-i18n-foundation hoàn tất. next-intl + [locale] routing (as-needed) + messages en/vi + language switcher.
-- sprint_2_done: sprint-2-config-i18n hoàn tất (commit tới 2264543). Config ui localized `{en,vi}` + migration đã chạy trên dev_multi_lang + renderer admin tab strip + service resolve per-locale + cache per-locale. Backward-compat verified (string chưa migrate = en). Fix bug revalidate.ts (revalidateTag expire:0). CÒN LẠI: products/categories/addons CHƯA localize (sprint-3).
+- sprint_2_done: sprint-2-config-i18n hoàn tất (commit tới 2264543). Config ui localized `{en,vi}` + migration đã chạy trên dev_multi_lang + renderer admin tab strip + service resolve per-locale + cache per-locale. Backward-compat verified (string chưa migrate = en). Fix bug revalidate.ts (revalidateTag expire:0).
+- sprint_3_done: sprint-3-entity-i18n hoàn tất (commit ddb34aa→ec26f5d). 3 bảng translation (product/category/addon) + migration schema THẬT + seed en (40/4/15) trên dev_multi_lang; service resolve theo locale + fallback cột gốc + cache per-locale; admin LocaleTabStrip cho product/category/addon form; cart/quick-cart/API localize. orders KHÔNG đụng (snapshot text). 158 test pass.
+- DEPLOY ORDER (khác nhau giữa 2 sprint!): sprint-2 (config JSON) = deploy code TRƯỚC, migrate SAU đều được (resolver coi string = en). sprint-3 (entity tables) = PHẢI migrate+seed TRƯỚC rồi mới deploy code (query relational `with translations` lỗi nếu bảng chưa tồn tại). Trên prod: db:migrate → seed:entities-i18n → deploy code → migrate:configs-i18n (config có thể sau).
 - known_issue: role DB dev_multi_lang thiếu quyền sequence users_id_seq/refresh_tokens_id_seq → không INSERT users/refresh_tokens (không login admin thủ công được trên dev). Không chặn SDLC (configs OK). Cần GRANT hoặc seed admin.
 - known_issue (mở rộng, sprint-3 TASK-02): role `dev_test_user` cũng thiếu quyền trên `__drizzle_migrations_id_seq`
   (sequence này còn trỏ tới schema `prod` cũ — không tồn tại/không truy cập được từ role hiện tại) VÀ thiếu quyền
