@@ -24,7 +24,14 @@ import {
   resolveAddon,
   resolveCategoryFields,
   resolveProductFields,
+  upsertAddonTranslations,
+  upsertCategoryTranslations,
+  upsertProductTranslations,
+  type AddonTranslationUpsertRecord,
+  type CategoryTranslationUpsertRecord,
+  type ProductTranslationUpsertRecord,
 } from "@/services/products/translations";
+import { routing } from "@/i18n/routing";
 import { eq, inArray, count, ilike, and, or, desc, ne, asc } from "drizzle-orm";
 // Disabled cache imports - using direct DB calls now
 // import {
@@ -33,14 +40,31 @@ import { eq, inArray, count, ilike, and, or, desc, ne, asc } from "drizzle-orm";
 // } from "@/lib/cache-utils";
 // import { CACHE_TAGS } from "@/constants/cache";
 
-export async function addProductCategory(categoryData: NewProductCategoryDB) {
+export async function addProductCategory(
+  categoryData: NewProductCategoryDB,
+  translations: CategoryTranslationUpsertRecord,
+) {
   const db = getDb();
-  const [newCategory] = await db
-    .insert(productCategories)
-    .values(categoryData)
-    .returning();
+  const defaultLocaleFields = translations[routing.defaultLocale];
 
-  return newCategory;
+  return await db.transaction(async (tx) => {
+    const [newCategory] = await tx
+      .insert(productCategories)
+      .values({
+        ...categoryData,
+        ...(defaultLocaleFields
+          ? {
+              name: defaultLocaleFields.name,
+              description: defaultLocaleFields.description ?? null,
+            }
+          : {}),
+      })
+      .returning();
+
+    await upsertCategoryTranslations(newCategory.id, translations, tx);
+
+    return newCategory;
+  });
 }
 
 export async function getAllProductCategories() {
@@ -48,16 +72,33 @@ export async function getAllProductCategories() {
   return await db.select().from(productCategories);
 }
 
-export async function createProduct(productData: NewProductDB) {
+export async function createProduct(
+  productData: NewProductDB,
+  translations: ProductTranslationUpsertRecord,
+) {
   const db = getDb();
-  const [newProduct] = await db
-    .insert(products)
-    .values({
-      ...productData,
-    })
-    .returning();
+  const defaultLocaleFields = translations[routing.defaultLocale];
 
-  return newProduct;
+  return await db.transaction(async (tx) => {
+    const [newProduct] = await tx
+      .insert(products)
+      .values({
+        ...productData,
+        ...(defaultLocaleFields
+          ? {
+              title: defaultLocaleFields.title,
+              description: defaultLocaleFields.description ?? null,
+              subDescription: defaultLocaleFields.subDescription ?? null,
+              allergenInfo: defaultLocaleFields.allergenInfo ?? null,
+            }
+          : {}),
+      })
+      .returning();
+
+    await upsertProductTranslations(newProduct.id, translations, tx);
+
+    return newProduct;
+  });
 }
 
 export async function getAdminProductTable({
@@ -348,6 +389,7 @@ export async function updateProductImages(
 export async function updateProductById({
   id,
   productData,
+  translations,
   newAddons,
   oldAddons,
   newImages,
@@ -355,20 +397,32 @@ export async function updateProductById({
 }: {
   id: number;
   productData: Partial<NewProductDB>;
-  newAddons: NewProductAddOnDB[];
-  oldAddons: (UpdateProductAddOnDB & { id: number })[];
+  translations: ProductTranslationUpsertRecord;
+  newAddons: (NewProductAddOnDB & {
+    translations: AddonTranslationUpsertRecord;
+  })[];
+  oldAddons: (UpdateProductAddOnDB & {
+    id: number;
+    translations: AddonTranslationUpsertRecord;
+  })[];
   newImages: NewProductImageDB[];
   oldImages: (UpdateProductImageDB & { id: number })[];
 }) {
   const db = getDb();
   return await db.transaction(async (tx) => {
-    await Promise.all([
+    const newAddonsData: NewProductAddOnDB[] = newAddons.map(
+      ({ translations: _translations, ...addon }) => addon,
+    );
+    const oldAddonsData: (UpdateProductAddOnDB & { id: number })[] =
+      oldAddons.map(({ translations: _translations, ...addon }) => addon);
+
+    const [insertedAddons] = await Promise.all([
       // update addons
-      newAddons.length > 0
-        ? addProductAddons(newAddons, tx)
+      newAddonsData.length > 0
+        ? addProductAddons(newAddonsData, tx)
         : Promise.resolve([]),
-      oldAddons.length > 0
-        ? updateProductAddons(oldAddons, tx)
+      oldAddonsData.length > 0
+        ? updateProductAddons(oldAddonsData, tx)
         : Promise.resolve([]),
       // update images
       newImages.length > 0
@@ -379,11 +433,43 @@ export async function updateProductById({
         : Promise.resolve([]),
     ]);
 
+    // upsert product-level translations
+    await upsertProductTranslations(id, translations, tx);
+
+    // upsert new addons' translations (need the addon id from the INSERT
+    // returning, EC-08 — addon translation can only be upserted after the
+    // addon row exists).
+    for (let i = 0; i < newAddons.length; i++) {
+      const insertedAddon = insertedAddons[i];
+      if (insertedAddon) {
+        await upsertAddonTranslations(
+          insertedAddon.id,
+          newAddons[i].translations,
+          tx,
+        );
+      }
+    }
+
+    // upsert existing addons' translations
+    for (const addon of oldAddons) {
+      await upsertAddonTranslations(addon.id, addon.translations, tx);
+    }
+
+    const defaultLocaleFields = translations[routing.defaultLocale];
+
     // update product
     const [updatedProduct] = await tx
       .update(products)
       .set({
         ...productData,
+        ...(defaultLocaleFields
+          ? {
+              title: defaultLocaleFields.title,
+              description: defaultLocaleFields.description ?? null,
+              subDescription: defaultLocaleFields.subDescription ?? null,
+              allergenInfo: defaultLocaleFields.allergenInfo ?? null,
+            }
+          : {}),
         updatedAt: new Date(),
       })
       .where(eq(products.id, id))
@@ -503,19 +589,31 @@ export async function getCategoryWithProducts(id: number) {
 export async function updateProductCategory(
   id: number,
   categoryData: Partial<NewProductCategoryDB>,
+  translations: CategoryTranslationUpsertRecord,
 ) {
   const db = getDb();
+  const defaultLocaleFields = translations[routing.defaultLocale];
 
-  const [updatedCategory] = await db
-    .update(productCategories)
-    .set({
-      ...categoryData,
-      updatedAt: new Date(),
-    })
-    .where(eq(productCategories.id, id))
-    .returning();
+  return await db.transaction(async (tx) => {
+    const [updatedCategory] = await tx
+      .update(productCategories)
+      .set({
+        ...categoryData,
+        ...(defaultLocaleFields
+          ? {
+              name: defaultLocaleFields.name,
+              description: defaultLocaleFields.description ?? null,
+            }
+          : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(productCategories.id, id))
+      .returning();
 
-  return updatedCategory;
+    await upsertCategoryTranslations(id, translations, tx);
+
+    return updatedCategory;
+  });
 }
 
 /**
