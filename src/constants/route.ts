@@ -179,6 +179,8 @@ export const webRoutes = {
       skipNull: true,
     })}`,
   checkout: () => WEB_ROUTE.checkout,
-  productQuickApi: (id: string | number) =>
-    generateRoute("web", "productQuickApi", { id }),
+  productQuickApi: (id: string | number, locale?: string) => {
+    const base = generateRoute("web", "productQuickApi", { id });
+    return locale ? `${base}?locale=${locale}` : base;
+  },
 };
