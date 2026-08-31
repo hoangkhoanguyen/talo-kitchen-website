@@ -39,7 +39,7 @@ test.describe("Dish detail page — locale resolve + fallback", () => {
     expect(html).not.toMatch(/Application error/i);
   });
 
-  test("AC-04.6/RULE-02: non-translated fields (price, image) identical across locale", async ({
+  test("AC-04.6/RULE-02: non-translated fields (price) hold the SAME numeric value across locale (sprint-4-i18n-polish AC-05.1/AC-05.2/ASM-09: display grouping now intentionally differs per locale — vi uses '.' grouping, en uses ',' grouping — only the parsed number must match, not the string)", async ({
     page,
   }) => {
     await page.goto(`/dish/${KNOWN_PRODUCT_SLUG}`);
@@ -51,7 +51,12 @@ test.describe("Dish detail page — locale resolve + fallback", () => {
     const viPriceMatch = viHtml.match(/[\d.,]+\s*(đ|VND|₫)/i);
 
     expect(enPriceMatch?.[0]).toBeTruthy();
-    expect(enPriceMatch?.[0]).toBe(viPriceMatch?.[0]);
+    expect(viPriceMatch?.[0]).toBeTruthy();
+
+    const parseAmount = (s: string) =>
+      Number(s.replace(/(đ|VND|₫)/i, "").replace(/[.,]/g, "").trim());
+
+    expect(parseAmount(enPriceMatch![0])).toBe(parseAmount(viPriceMatch![0]));
   });
 
   test("generateMetadata reads locale (design.md fix): en/vi both produce a non-crashing <title> containing product name", async ({
