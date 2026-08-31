@@ -25,20 +25,22 @@ export interface BillData {
 }
 
 const RESTAURANT = {
-  name: "TALONKITCHENHG",
+  name: "TALO Kitchen & Lounge",
   addressLine1: "69 Nguyen Thai Hoc Street - Ha Giang 2 Ward",
   addressLine2: "Tuyen Quang Province -  Vietnam",
   tel: "Tel: +84 98 082 138",
-  website: "talokitchenhg.com",
 };
 
 const fmt = (n: number) => Math.round(n).toLocaleString("vi-VN");
 
 export default function BillReceipt({
   data,
+  qrSvg = "",
   fontClassName = "",
 }: {
   data: BillData;
+  /** SVG markup của QR review (sinh sẵn ở server). Rỗng => ẩn khối QR. */
+  qrSvg?: string;
   fontClassName?: string;
 }) {
   useEffect(() => {
@@ -77,7 +79,7 @@ export default function BillReceipt({
             <div className="bill-shop-name">{RESTAURANT.name}</div>
             <div className="bill-shop-line">{RESTAURANT.addressLine1}</div>
             <div className="bill-shop-line">{RESTAURANT.addressLine2}</div>
-            <div className="bill-shop-line">{RESTAURANT.tel}</div>
+            <div className="bill-shop-line bill-shop-tel">{RESTAURANT.tel}</div>
           </div>
 
           <div className="bill-center bill-title">PAYMENT RECEIPT</div>
@@ -123,10 +125,28 @@ export default function BillReceipt({
             <span className="bill-total-value">{fmt(data.total)}</span>
           </div>
 
-          {/* Footer */}
-          <div className="bill-center bill-thanks">THANK YOU FOR YOUR VISIT !</div>
-          <div className="bill-center bill-thanks">PLEASE COME AGAIN</div>
-          <div className="bill-center bill-website">{RESTAURANT.website}</div>
+          {/* VAT + lời cảm ơn */}
+          <div className="bill-center bill-vat">YOUR BILL INCLUDES VAT.</div>
+          <div className="bill-center bill-thanks">
+            THANK YOU FOR VISITING TALO! SEE YOU
+          </div>
+
+          {/* Review Google Maps */}
+          {qrSvg && (
+            <div className="bill-review">
+              <div className="bill-center bill-review-lead">
+                Enjoyed your meal? We&rsquo;d be delighted if you could leave
+                TALO a review on Google Maps.
+              </div>
+              <div
+                className="bill-qr"
+                dangerouslySetInnerHTML={{ __html: qrSvg }}
+              />
+              <div className="bill-center bill-review-foot">
+                Please, scan the QR code to share your experience with TALO!
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -159,18 +179,20 @@ const printStyles = `
 .bill-center { text-align: center; }
 
 .bill-shop-name {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
 }
 
-.bill-shop-line { font-size: 12px; font-weight: 500; }
+.bill-shop-line { font-size: 12px; font-weight: 500; line-height: 1.5; }
+.bill-shop-tel { margin-top: 4px; }
 
 .bill-title {
   font-size: 18px;
   font-weight: 700;
-  margin: 12px 0 8px;
+  letter-spacing: 0.5px;
+  margin: 14px 0 8px;
 }
 
 .bill-meta { font-size: 12px; font-weight: 500; }
@@ -178,7 +200,7 @@ const printStyles = `
 .bill-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 12px;
+  margin-top: 14px;
   table-layout: fixed;
 }
 
@@ -215,20 +237,47 @@ const printStyles = `
 }
 
 .bill-total-label { font-size: 16px; font-weight: 700; }
-.bill-total-value { font-size: 18px; font-weight: 700; }
+.bill-total-value { font-size: 20px; font-weight: 700; }
+
+.bill-vat {
+  font-style: italic;
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 16px;
+}
 
 .bill-thanks {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   margin-top: 4px;
 }
-.bill-thanks:first-of-type { margin-top: 18px; }
 
-.bill-website {
-  font-size: 13px;
-  font-weight: 600;
-  margin-top: 16px;
-  padding-bottom: 2px;
+/* Khối review + QR */
+.bill-review { margin-top: 22px; }
+
+.bill-review-lead {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.bill-qr {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.bill-qr svg {
+  width: 42mm;
+  height: 42mm;
+  display: block;
+}
+
+.bill-review-foot {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  margin-top: 4px;
 }
 
 @media print {
