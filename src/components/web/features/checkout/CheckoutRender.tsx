@@ -9,11 +9,13 @@ import { webRoutes } from "@/constants/route";
 import OrderItem from "./OrderItem";
 import { useCheckoutContext } from "./CheckoutProvider";
 import { formatCurrencyWebsite } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
   const { successOrder } = useCheckoutContext();
   const t = useTranslations("checkout");
+  const locale = resolveLocale(useLocale());
 
   if (!successOrder)
     return (
@@ -69,6 +71,7 @@ const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1">
             {formatCurrencyWebsite(
               successOrder.order.totalPrice - successOrder.order.shippingFee,
+              locale,
             )}
           </span>
         </li>
@@ -78,7 +81,7 @@ const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
           </span>
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1">
             {successOrder.order.shippingFee
-              ? formatCurrencyWebsite(successOrder.order.shippingFee)
+              ? formatCurrencyWebsite(successOrder.order.shippingFee, locale)
               : t("summary.free")}
           </span>
         </li>
@@ -87,7 +90,7 @@ const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
             {t("summary.total")}
           </span>
           <span className="text-web-h2-mobile lg:text-web-h2 text-web-secondary-1">
-            {formatCurrencyWebsite(successOrder.order.totalPrice)}
+            {formatCurrencyWebsite(successOrder.order.totalPrice, locale)}
           </span>
         </li>
       </ul>

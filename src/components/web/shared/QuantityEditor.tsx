@@ -2,7 +2,8 @@
 import React, { FC } from "react";
 import { QuantityButtons } from "../ui/button";
 import { formatCurrencyWebsite } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const QuantityEditor: FC<{
   price: number;
@@ -10,6 +11,7 @@ const QuantityEditor: FC<{
   onChangeQuantity(quantity: number): void;
 }> = ({ price, quantity, onChangeQuantity }) => {
   const t = useTranslations("common");
+  const locale = resolveLocale(useLocale());
 
   return (
     <div>
@@ -22,7 +24,7 @@ const QuantityEditor: FC<{
           quantity={quantity}
         />
         <p className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1">
-          {formatCurrencyWebsite(price)}
+          {formatCurrencyWebsite(price, locale)}
         </p>
       </div>
     </div>

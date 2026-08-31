@@ -4,11 +4,13 @@ import CheckoutItems from "./CheckoutItems";
 import Note from "./Note";
 import { useCheckoutContext } from "./CheckoutProvider";
 import { formatCurrencyWebsite } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const CheckoutSummary = () => {
   const { totalPrice, subTotalPrice, shippingFee } = useCheckoutContext();
   const t = useTranslations("checkout");
+  const locale = resolveLocale(useLocale());
   return (
     <div className="grid grid-cols-1 gap-5">
       <h2 className="text-web-h2-mobile lg:text-web-h2 text-web-content-1">
@@ -26,7 +28,7 @@ const CheckoutSummary = () => {
             {t("summary.subtotal")}
           </span>
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1">
-            {formatCurrencyWebsite(subTotalPrice)}
+            {formatCurrencyWebsite(subTotalPrice, locale)}
           </span>
         </div>
         <div className="flex justify-between items-center">
@@ -34,7 +36,7 @@ const CheckoutSummary = () => {
             {t("summary.shipping")}
           </span>
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1">
-            {formatCurrencyWebsite(shippingFee)}
+            {formatCurrencyWebsite(shippingFee, locale)}
           </span>
         </div>
       </div>
@@ -44,7 +46,7 @@ const CheckoutSummary = () => {
           {t("summary.total")}
         </span>
         <span className="text-web-h2-mobile lg:text-web-h2 text-web-secondary-1">
-          {formatCurrencyWebsite(totalPrice)}
+          {formatCurrencyWebsite(totalPrice, locale)}
         </span>
       </div>
     </div>

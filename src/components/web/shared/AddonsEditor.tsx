@@ -2,7 +2,8 @@
 import { FC } from "react";
 import { QuantityButtons } from "../ui/button";
 import { formatCurrencyWebsite } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const AddonsEditor: FC<{
   addons: {
@@ -50,6 +51,8 @@ function AddOnsItem({
   quantity: number;
   onChangeQuantity: (value: number) => void;
 }) {
+  const locale = resolveLocale(useLocale());
+
   return (
     <div className="flex justify-between items-center">
       <QuantityButtons
@@ -62,7 +65,7 @@ function AddOnsItem({
           {name}
         </p>
         <p className="text-web-button-mobile lg:text-web-button text-web-secondary-1 text-end">
-          + {formatCurrencyWebsite(price)}
+          + {formatCurrencyWebsite(price, locale)}
         </p>
       </div>
     </div>

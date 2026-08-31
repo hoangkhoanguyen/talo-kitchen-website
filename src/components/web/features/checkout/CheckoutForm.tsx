@@ -10,11 +10,13 @@ import Icon from "@/components/common/Icon";
 import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import GoToMenuButton from "../../shared/GoToMenuButton";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
   const { control, onCheckout, totalPrice, cartItems } = useCheckoutContext();
   const t = useTranslations("checkout");
+  const locale = resolveLocale(useLocale());
 
   const shippingMethod = useWatch({
     control,
@@ -180,7 +182,7 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
           variant={"secondary1"}
         >
           {t("form.completeOrder", {
-            amount: formatCurrencyWebsite(totalPrice),
+            amount: formatCurrencyWebsite(totalPrice, locale),
           })}
         </Button>
       </div>
