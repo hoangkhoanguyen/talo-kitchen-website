@@ -6,10 +6,12 @@ import {
   getUIConfigsByKeyCached,
 } from "@/services/cached";
 import { APP_ICONS, APP_URL } from "@/constants/app";
+import { buildAlternates, getOgLocale } from "@/lib/i18n-meta";
+import { resolveLocale } from "@/lib/locale";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import React from "react";
-import type { Locale } from "@/types/configs";
 
 // export const dynamic = "force-dynamic";
 
@@ -18,18 +20,21 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+
+  const t = await getTranslations({ locale, namespace: "metadata" });
+
   const reservationConfig = await getUIConfigsByKeyCached(
     "reservation_page",
-    locale as Locale,
+    locale,
   );
   const seo = (reservationConfig?.value as any)?.seo;
 
-  const title = seo?.title || "Reservation | TALO Kitchen & Lounge";
-  const description =
-    seo?.description ||
-    "Reserve your table at TALO Kitchen & Lounge. Experience fine dining with fresh ingredients and authentic flavors in a warm atmosphere.";
-  const url = `${APP_URL}/reservation`;
+  const title = seo?.title || t("reservation.title");
+  const description = seo?.description || t("reservation.description");
+  const alternates = buildAlternates(locale, "/reservation");
+  const url = alternates.canonical;
   const keywords = seo?.keywords?.map((k: any) => k.keyword) || [];
   const ogTitle = seo?.og_title || title;
   const ogDescription = seo?.og_description || description;
@@ -42,9 +47,7 @@ export async function generateMetadata({
     title,
     description,
     keywords,
-    alternates: {
-      canonical: url,
-    },
+    alternates,
     icons: APP_ICONS,
     openGraph: {
       title: ogTitle,
@@ -59,7 +62,7 @@ export async function generateMetadata({
           alt: ogImageAlt,
         },
       ],
-      locale: "en_US",
+      locale: getOgLocale(locale),
       type: "website",
     },
   };
@@ -70,11 +73,9 @@ const page = async ({
 }: {
   params: Promise<{ locale: string }>;
 }) => {
-  const { locale } = await params;
-  const configsDb = await getUIConfigsByKeyCached(
-    "reservation_page",
-    locale as Locale,
-  );
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+  const configsDb = await getUIConfigsByKeyCached("reservation_page", locale);
 
   const reservationConfigs = await getAppConfigsByKeyCached("reservation");
 
