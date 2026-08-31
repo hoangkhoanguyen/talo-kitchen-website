@@ -8,7 +8,8 @@ import { routing } from "@/i18n/routing";
 /**
  * next-intl middleware cho các route web user.
  * Detect locale theo thứ tự: path prefix > cookie NEXT_LOCALE > Accept-Language > defaultLocale
- * (RULE-03). `localePrefix: 'always'` nên path thiếu prefix sẽ được redirect (RULE-02).
+ * (RULE-03). `localePrefix: 'as-needed'`: locale mặc định (en) KHÔNG có prefix trong URL,
+ * chỉ locale không mặc định (vi) mới có prefix. Path `/en/...` bị redirect bỏ prefix về `/...`.
  */
 const intlMiddleware = createIntlMiddleware(routing);
 

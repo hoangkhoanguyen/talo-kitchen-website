@@ -3,34 +3,44 @@ import { test, expect } from "@playwright/test";
 /**
  * Story-02 (URL reflects language) + Story-04 (<html lang>) + RULE-01/02/05/06
  * AC-02.1, AC-02.2, AC-02.3, AC-04.1, AC-04.2, AC-04.3, EC-01, EC-03, EC-12
+ *
+ * `localePrefix: 'as-needed'`: default locale (en) has NO prefix in the URL,
+ * only the non-default locale (vi) is prefixed.
  */
 
 test.describe("Routing / locale prefix", () => {
-  test("AC-02.1/EC-01: '/' with no cookie/Accept-Language redirects to default locale /en", async ({
+  test("AC-02.1/EC-01: '/' with no cookie/Accept-Language renders default locale en directly, no redirect", async ({
     request,
   }) => {
     const res = await request.get("/", {
       maxRedirects: 0,
       headers: { "Accept-Language": "" },
     });
-    expect(res.status()).toBe(307);
-    expect(res.headers()["location"]).toMatch(/\/en$/);
+    expect(res.status()).toBe(200);
   });
 
-  test("AC-02.1: unlocalized path redirects to locale-prefixed path, preserving rest of path", async ({
-    request,
-  }) => {
-    const res = await request.get("/dish/orange-juice", { maxRedirects: 0 });
-    expect(res.status()).toBe(307);
-    expect(res.headers()["location"]).toMatch(/\/en\/dish\/orange-juice$/);
-  });
-
-  test("AC-02.2: '/en/menu/all' renders English, no redirect (200)", async ({
+  test("AC-02.1: unlocalized path renders English directly (no redirect, default locale has no prefix)", async ({
     page,
   }) => {
-    const res = await page.goto("/en/menu/all");
+    const res = await page.goto("/dish/orange-juice");
     expect(res?.status()).toBe(200);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  });
+
+  test("AC-02.2: '/menu/all' renders English with no locale prefix (200)", async ({
+    page,
+  }) => {
+    const res = await page.goto("/menu/all");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  });
+
+  test("as-needed: '/en/menu/all' (redundant default-locale prefix) redirects to unprefixed '/menu/all'", async ({
+    request,
+  }) => {
+    const res = await request.get("/en/menu/all", { maxRedirects: 0 });
+    expect(res.status()).toBe(307);
+    expect(res.headers()["location"]).toBe("/menu/all");
   });
 
   test("AC-02.3/AC-04.1: '/vi/menu/all' renders with Vietnamese <html lang>", async ({
@@ -41,20 +51,19 @@ test.describe("Routing / locale prefix", () => {
     await expect(page.locator("html")).toHaveAttribute("lang", "vi");
   });
 
-  test("AC-04.2/AC-04.3: '/en/...' has <html lang='en'>, no hardcoded lang left over", async ({
+  test("AC-04.2/AC-04.3: '/' has <html lang='en'>, no hardcoded lang left over", async ({
     page,
   }) => {
-    await page.goto("/en");
+    await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });
 
   const subRoutes = [
-    "/en/menu",
-    "/en/menu/all",
-    "/en/dish/orange-juice",
-    "/en/reservation",
-    "/en/checkout",
-    "/en/cart",
+    "/menu/all",
+    "/dish/orange-juice",
+    "/reservation",
+    "/checkout",
+    "/cart",
     "/vi/menu/all",
     "/vi/dish/orange-juice",
     "/vi/reservation",
