@@ -8,8 +8,18 @@ import {
   updateProductStatus,
   getAdminProductById,
 } from "@/services/products";
+import type {
+  AddonTranslationUpsertRecord,
+  ProductTranslationUpsertRecord,
+} from "@/services/products/translations";
 import { verifyAdminAuthSimple } from "@/services/auth";
-import { AdminEditProductForm, NewProductDB } from "@/types/products";
+import {
+  AdminCreateProductForm,
+  AdminEditProductForm,
+  NewProductDB,
+} from "@/types/products";
+import type { Locale } from "@/types/configs";
+import { routing } from "@/i18n/routing";
 import { revalidatePath } from "next/cache";
 import {
   revalidateProductCreate,
@@ -17,7 +27,47 @@ import {
   revalidateImageChange,
 } from "@/lib/revalidate";
 
-export async function createProductAction(data: NewProductDB) {
+/**
+ * Convert the zod-validated `translations` branch (en required, vi optional
+ * fields per RULE-19) into the `Partial<Record<Locale, {...}>>` shape the
+ * upsert service expects (TASK-07 / TASK-19).
+ */
+function toProductTranslationRecord(
+  translations: AdminCreateProductForm["translations"],
+): ProductTranslationUpsertRecord {
+  const record: ProductTranslationUpsertRecord = {};
+
+  (Object.keys(translations) as Locale[]).forEach((locale) => {
+    const value = translations[locale];
+    if (!value) return;
+
+    record[locale] = {
+      title: value.title ?? "",
+      description: value.description ?? null,
+      subDescription: value.subDescription ?? null,
+      allergenInfo: value.allergenInfo ?? null,
+    };
+  });
+
+  return record;
+}
+
+function toAddonTranslationRecord(
+  translations: AdminEditProductForm["addons"][number]["translations"],
+): AddonTranslationUpsertRecord {
+  const record: AddonTranslationUpsertRecord = {};
+
+  (Object.keys(translations) as Locale[]).forEach((locale) => {
+    const value = translations[locale];
+    if (!value) return;
+
+    record[locale] = { name: value.name ?? "" };
+  });
+
+  return record;
+}
+
+export async function createProductAction(data: AdminCreateProductForm) {
   try {
     // Xác thực token trước khi thực hiện action
     const authResult = await verifyAdminAuthSimple("/admin/products");
@@ -29,7 +79,9 @@ export async function createProductAction(data: NewProductDB) {
       };
     }
 
-    const isExisSlug = await isExistingSlug(data.slug);
+    const { translations, ...rest } = data;
+
+    const isExisSlug = await isExistingSlug(rest.slug);
 
     if (isExisSlug) {
       return {
@@ -39,7 +91,12 @@ export async function createProductAction(data: NewProductDB) {
       };
     }
 
-    const newProduct = await createProduct(data);
+    // `title`/`description`/... are derived from `translations[defaultLocale]`
+    // inside `createProduct` (TASK-07) — không duplicate ở đây.
+    const newProduct = await createProduct(
+      rest as NewProductDB,
+      toProductTranslationRecord(translations),
+    );
 
     // Revalidate cache
     revalidateProductCreate(newProduct.categoryId);
@@ -105,7 +162,7 @@ export async function deleteProductImagesAction(
 }
 
 export async function updateProductAction({
-  data: { images, addons, relatedProducts, ...rest },
+  data: { images, addons, relatedProducts, translations, ...rest },
   id,
 }: {
   data: AdminEditProductForm;
@@ -125,15 +182,22 @@ export async function updateProductAction({
     // Lấy thông tin product cũ để revalidate
     const oldProduct = await getAdminProductById(id);
 
+    // altText dùng title bản mặc định (en) — cột gốc `title` khớp translations[en]
+    const defaultLocaleTitle =
+      translations[routing.defaultLocale as Locale]?.title ?? "";
+
     const imagesWithOrder = images.map((item, index) => ({
       ...item,
       sortOrder: index + 1,
-      altText: rest.title,
+      altText: defaultLocaleTitle,
     }));
 
     const addonsWithOrder = addons.map((item, index) => ({
       ...item,
       sortOrder: index + 1,
+      // `name` cột gốc addon lấy từ bản mặc định (en) — addProductAddons
+      // không tự derive từ translations (không như product/category).
+      name: item.translations[routing.defaultLocale as Locale]?.name ?? "",
     }));
 
     await updateProductById({
@@ -142,18 +206,21 @@ export async function updateProductAction({
         ...rest,
         relatedProductIds: relatedProducts.map((item) => item.id),
       },
+      translations: toProductTranslationRecord(translations),
       newAddons: addonsWithOrder
         .filter((item) => !item.id)
-        .map((item) => ({
+        .map(({ translations: addonTranslations, ...item }) => ({
           ...item,
           productId: id,
+          translations: toAddonTranslationRecord(addonTranslations),
         })),
       oldAddons: addonsWithOrder
         .filter((item) => item.id)
-        .map((item) => ({
+        .map(({ translations: addonTranslations, ...item }) => ({
           ...item,
           id: item.id!,
           productId: id,
+          translations: toAddonTranslationRecord(addonTranslations),
         })),
       newImages: imagesWithOrder
         .filter((item) => !item.id)
