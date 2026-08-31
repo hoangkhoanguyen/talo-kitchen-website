@@ -208,7 +208,7 @@
   Suggested skill:
   Test: build; các component render đúng số tiền theo locale. Verify `tsc --noEmit`.
 
-- [ ] TASK-13  (todo)
+- [x] TASK-13  (done)
   Description: Sửa `ReservationSubmitSuccess.tsx`: bỏ `import moment`, thay 2 chỗ format
     `arrivalDate`/`arrivalTime` bằng `formatReservationDate`/`formatReservationTime` từ `date-web.ts`,
     lấy locale qua `useLocale()`. Giữ nguyên hiển thị mã/khách/ghi chú/layout; chỉ đổi CÁCH format,
