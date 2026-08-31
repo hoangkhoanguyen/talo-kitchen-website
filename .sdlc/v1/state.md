@@ -2,7 +2,7 @@
 
 - **version**: v1
 - **current_sprint**: sprint-4-i18n-polish
-- **current_phase**: test
+- **current_phase**: qa
 - **current_task**: none
 - **updated_at**: 2026-08-31
 
@@ -14,7 +14,7 @@
 - tasks:         done
 - execute:       done
 - test:          done
-- qa:            todo
+- qa:            done
 
 ## Human approval gates
 
@@ -84,6 +84,60 @@
      re-run migration 0000) — nếu tạo migration mới trong tương lai, snapshot này là baseline đúng, không cần
      sửa lại.
 - (sprint-2-config-i18n) next_action cũ: QA gate DONE (1 fix round). Full checklist re-run clean: 25/25 unit + 83/83 Playwright pass, `tsc --noEmit` sạch, `next build` PASS, migration re-run trên dev_multi_lang idempotent + English 100% nguyên vẹn + config app/non-localized không đụng (verify trực tiếp bằng SQL). Backward-compat helper (`normalizeLocalized`/`resolveLocalizedString` coi string chưa migrate = bản en, không crash) đã confirm là điều kiện đủ để deploy code trước / migrate sau trên prod. Đã tự fix 1 cosmetic bug (`SettingNumberField.tsx` leak `isRequired` xuống DOM) vì trivial 1-file fix, re-run full suite xanh lại sau fix, đã commit. Sprint sẵn sàng handoff cho manual test.
+- **qa_notes (sprint-4-i18n-polish, 2026-08-31, qa-guard, LAST sprint of v1)**: QA gate DONE, 1/6 fix
+  rounds used (Sonnet, no Opus escalation), commit `5f1673d`. Re-ran full checklist: `npx tsc --noEmit`
+  0 lỗi; `npx next build` PASS (23 route, includes new `/[locale]/[...rest]`); unit `tests/unit/*.test.ts`
+  51/52 (1 pre-existing `entity-translations.test.ts` harness-only failure, re-confirmed identical via
+  `git stash` diff against HEAD — NOT a sprint-4 regression); Playwright `tests/i18n/*` full regression
+  `--workers=1` 135/135 pass (re-run AFTER the fix below, still green). Verified via real HTTP/HTML
+  (curl on `next build && next start`, not just reading test code): all 6 in-scope pages
+  (home/menu/dish/reservation/checkout/cart) × 2 locales have correct `<title>`, `og:locale`
+  (en_US/vi_VN), self-referencing `canonical`, full `alternates.languages` (en/vi/x-default,
+  as-needed URL scheme), `<html lang>` matching locale; `sitemap.xml` has `xhtml:link` alternates on
+  every entry, category label "All" confirmed never leaks into XML output (only `key` reaches the URL);
+  currency renders `449,000 VND` (en) vs `449.000 VND` (vi) on the real menu page, same underlying
+  value; admin `formatCurrency`/`formatDateVN` confirmed untouched (0 admin files in sprint-4 diff,
+  admin callsites don't pass `locale` so keep default `vi-VN` behavior); admin login/dashboard
+  redirect-to-login behavior intact (regression OK).
+  **Found + fixed 1 real bug** (round 1/6): a genuinely unmatched URL under a locale prefix
+  (e.g. `/vi/some-typo`, `/some-typo` — the single most common 404 a real user hits, distinct from
+  the EC-01 "product not found" case sprint-4's test leg already fixed) matched NO route at all under
+  `(web)/[locale]/**`, so Next.js never entered the `[locale]` layout tree and fell back to the app's
+  ROOT `src/app/not-found.tsx` — hardcoded English title/body, no `<html lang>` attribute at all,
+  regardless of the `/vi/...` URL the user typed. Fixed by adding
+  `src/app/(web)/[locale]/[...rest]/page.tsx` (calls `notFound()`) so any unmatched path is captured
+  inside the `[locale]` segment and correctly resolves to the already locale-aware
+  `(web)/[locale]/not-found.tsx` boundary (verified: en → "Page Not Found", vi → "Không tìm thấy
+  trang"). Re-ran the full checklist after the fix — still 100% green, no regression on the 6 real
+  pages or on `next build` route list.
+  **Known limitation, NOT fixed (framework-level, pre-existing, out of proportionate scope)**: for
+  ANY page reached via `notFound()` (both the fixed generic case above AND the pre-existing
+  dish/[slug] "product not found" case from the test leg), Next.js 16's App Router renders a minimal
+  `<html id="__next_error__">` shell that does NOT carry the `lang` attribute from the `[locale]`
+  layout — confirmed identically in `next build && next start` (not a dev-only artifact) and
+  identically for en/vi (so it's an a11y/NFR-06 gap, not a locale-CORRECTNESS bug — the title/body
+  text IS correctly localized in both cases). This does not affect any of the 6 required
+  Story-01..04 pages (confirmed `<html lang>` correct on all 12 combinations via curl). Flagging for
+  the team; would need a deeper Next.js-version-specific investigation to fix and is not part of this
+  sprint's AC/EC scope (the 6 listed metadata pages + EC-01's specific "product not found" wording).
+  Manual-verification carryover unchanged from test-report.md (reservation E2E visual, social-share
+  preview, GSC hreflang — all genuinely un-automatable pre-deploy).
+  **v1 ACCEPTANCE (whole version) confirmed**: language switcher changes URL as-needed + persists via
+  `NEXT_LOCALE` cookie on refresh (sprint-1 regression, 15/15 pass); all content types (product/
+  category/section/menu/reservation/buttons/SEO) resolve per locale with safe English fallback
+  (sprint-2/3 regression, config-i18n + entity-i18n suites all green); admin remains Vietnamese-only,
+  can input en+vi for product/category/addon (LocaleTabStrip) + every settings page (sprint-2/3
+  regression); old English data intact (unchanged by any sprint-4 diff — 0 migration/schema in this
+  sprint); no leftover English hardcode user-side (`static-checks.spec.ts` green + manual scan of
+  `src/app/(web)/[locale]/**`, `src/components/web/**` — only 2 pre-existing DEAD/unreachable files
+  flagged in earlier sprints, confirmed still unreachable).
+  **Whole-version deploy readiness**: code-complete and QA-clean on all 4 sprints. Two OPS (not code)
+  blockers carry over unchanged: (1) dev DB role permission gap blocks manual admin login on
+  `dev_multi_lang` (pre-existing, see `known_issue` below — needs a GRANT or a seeded admin account
+  to manually test admin flows); (2) real Vietnamese content for `seo.*`/product/category/addon
+  fields has not been entered by admin yet (content/ops task, not a code gap — fallback-to-English
+  is verified working in the meantime). Deploy order for prod unchanged from sprint-2/3 notes below:
+  `db:migrate` → `seed:entities-i18n` → deploy code → `migrate:configs-i18n`.
 - **blockers**: none
 - **qa_notes**: report đầy đủ ở `.sdlc/v1/sprint-2-config-i18n/test-report.md` (test leg) + báo cáo QA trong hội thoại /sdlc:test agent qa-guard (2026-08-31). Còn lại cho user verify thủ công: (1) login admin thật trên dev_multi_lang bị chặn bởi lỗi quyền DB role (permission denied sequence refresh_tokens_id_seq/users_id_seq) — pre-existing, KHÔNG phải do sprint-2; cần cấp quyền INSERT/sequence cho role dev hoặc seed sẵn tài khoản admin để test tay được. (2) Nội dung vi thật cho toàn bộ field RULE-20..23 chưa được nhập (đúng — đây là content/ops task, không phải code task của sprint này).
 - **qa_notes (sprint-3-entity-i18n, 2026-08-31, qa-guard)**: QA gate DONE, 0 fix rounds needed (test leg đã sạch từ trước, không tìm thêm bug). Re-run toàn bộ checklist: `npx tsc --noEmit` 0 lỗi; `npx next build` PASS (22 route); unit `tests/unit/entity-translations.test.ts` 21/21 + `tests/unit/localized-config.test.ts` 25/25; Playwright `tests/i18n/` (toàn bộ, `--workers=1`) 120/120 pass (gồm entity-i18n-admin 15, entity-i18n-user 16, entity-i18n-visual-baseline 6, + regression sprint-1/2 đầy đủ). Xác nhận trực tiếp bằng SQL trên `dev_multi_lang`: `products`=40/`product_translations(en)`=40, `product_categories`=4/`product_category_translations(en)`=4, `product_addons`=15/`product_addon_translations(en)`=15 (1:1, AC-06.2); migration SQL (`src/db/migration/0001_flashy_morbius.sql`) CHỈ có `CREATE TABLE`+`ALTER...ADD CONSTRAINT FK CASCADE`, KHÔNG đụng cột gốc (AC-06.1/NFR-03); vi row test fixture (product id=18) đã cleanup đúng (empty string, không xoá row, EN base column "Orange Juice" nguyên vẹn). Xác nhận fix bug LocaleTabStrip remount (`key={...-${activeLocale}}`) có mặt ở cả 5 file (ProductEditForm/AddonsEditor/CreateProduct/CreateCategory/UpdateCategory). Scan sạch: không TODO/FIXME mới trong sprint-3 diff, không hardcode secret/URL, `console.log` chỉ ở CLI scripts (intentional output) + 5 chỗ trong `actions/admin/{product,category}.ts` là pattern lỗi PRE-EXISTING (không phải sprint-3 gây ra, verify bằng git show ở commit trước sprint). Addon add-remove-before-save (AC-02.3) xác nhận KHÔNG orphan by construction (đọc code `updateProductById`: `upsertAddonTranslations` chỉ gọi SAU khi có `insertedAddon.id` từ tx INSERT, addon bị xoá ở client trước submit không bao giờ vào `newAddons`). Backward-compat "deploy code trước, migrate sau" = **BẮT BUỘC migrate schema TRƯỚC khi deploy code sprint-3** (không như sprint-2): resolver không throw với giá trị null/rỗng/thiếu row, NHƯNG nếu 3 bảng `*_translations` chưa tồn tại, Drizzle relational `with: { translations }` sẽ lỗi ở tầng query (bảng không tồn tại) — đây là ops/deploy-order concern, không phải code-level guard. Thứ tự deploy đúng: `db:generate`+`db:migrate` (tạo 3 bảng) → `seed:entities-i18n` (backup + idempotent) → deploy code mới. Không tìm thấy lỗi nào cần fix (0/6 fix rounds dùng). Sprint sẵn sàng handoff cho manual test.
