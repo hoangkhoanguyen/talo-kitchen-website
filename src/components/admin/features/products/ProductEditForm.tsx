@@ -105,6 +105,7 @@ const ProductEditForm = () => {
                 />
                 <div className="grid grid-cols-1 gap-4">
                   <Controller
+                    key={`title-${activeLocale}`}
                     control={control}
                     name={translatedPath(activeLocale, "title")}
                     render={({
@@ -119,6 +120,7 @@ const ProductEditForm = () => {
                     )}
                   />
                   <Controller
+                    key={`allergenInfo-${activeLocale}`}
                     control={control}
                     name={translatedPath(activeLocale, "allergenInfo")}
                     render={({
@@ -133,6 +135,7 @@ const ProductEditForm = () => {
                     )}
                   />
                   <Controller
+                    key={`subDescription-${activeLocale}`}
                     control={control}
                     name={translatedPath(activeLocale, "subDescription")}
                     render={({
@@ -147,6 +150,7 @@ const ProductEditForm = () => {
                     )}
                   />
                   <Controller
+                    key={`description-${activeLocale}`}
                     control={control}
                     name={translatedPath(activeLocale, "description")}
                     render={({

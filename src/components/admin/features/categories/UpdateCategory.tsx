@@ -188,6 +188,7 @@ const UpdateCategory = memo(
               />
 
               <Controller
+                key={`name-${activeLocale}`}
                 control={control}
                 name={translatedPath(activeLocale, "name")}
                 render={({
@@ -207,6 +208,7 @@ const UpdateCategory = memo(
               />
 
               <Controller
+                key={`description-${activeLocale}`}
                 control={control}
                 name={translatedPath(activeLocale, "description")}
                 render={({

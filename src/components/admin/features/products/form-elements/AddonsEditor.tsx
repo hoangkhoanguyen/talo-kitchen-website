@@ -57,6 +57,7 @@ const AddonsEditor = () => {
                 )}
               />
               <Controller
+                key={`addon-name-${index}-${activeLocale}`}
                 control={control}
                 name={
                   `addons.${index}.translations.${activeLocale}.name` as FieldPath<AdminEditProductForm>

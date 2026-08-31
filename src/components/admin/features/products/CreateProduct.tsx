@@ -77,6 +77,7 @@ const CreateProduct = () => {
           />
           <div className="grid grid-cols-1 gap-2 mb-2">
             <Controller
+              key={`title-${activeLocale}`}
               control={control}
               name={
                 `translations.${activeLocale}.title` as FieldPath<AdminCreateProductForm>

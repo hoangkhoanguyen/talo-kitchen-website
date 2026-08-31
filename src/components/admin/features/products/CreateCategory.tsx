@@ -88,6 +88,7 @@ const CreateCategory = memo(
               className="mb-3"
             />
             <Controller
+              key={`name-${activeLocale}`}
               control={control}
               name={translatedNamePath(activeLocale)}
               render={({
