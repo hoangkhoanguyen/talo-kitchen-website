@@ -31,13 +31,21 @@ export default function PrintBillButton({
         window.setTimeout(() => iframe.remove(), 500);
       });
 
-      const fonts = (
-        win.document as Document & { fonts?: { ready?: Promise<unknown> } }
-      ).fonts;
-      if (fonts?.ready) {
-        fonts.ready.then(() => win.print());
-      } else {
+      // BillReceipt tự đo chiều cao & set @page khít nội dung, rồi bắn
+      // sự kiện "bill-ready". Chờ tín hiệu đó mới in để giấy không bị dư.
+      let printed = false;
+      const startPrint = () => {
+        if (printed) return;
+        printed = true;
         win.print();
+      };
+      const w = win as Window & { __billReady?: boolean };
+      if (w.__billReady) {
+        startPrint();
+      } else {
+        win.addEventListener("bill-ready", startPrint, { once: true });
+        // Fallback: lỡ không nhận được tín hiệu thì vẫn in sau 1.5s
+        window.setTimeout(startPrint, 1500);
       }
     };
 

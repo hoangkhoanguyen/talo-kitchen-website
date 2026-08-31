@@ -43,27 +43,64 @@ export default function BillReceipt({
   fontClassName?: string;
 }) {
   useEffect(() => {
-    // Khi nhúng trong iframe (nút "In bill"), iframe cha lo việc in → không tự in ở đây
-    if (window.self !== window.top) return;
+    // Khi nhúng trong iframe (nút "In bill"), iframe cha lo việc gọi print()
+    const isEmbedded = window.self !== window.top;
 
-    let printed = false;
-    const doPrint = () => {
-      if (printed) return;
-      printed = true;
-      window.print();
+    // Đo chiều cao THẬT của bill rồi set @page khít đúng chiều cao đó.
+    // Nếu để `size: ... auto`, trình duyệt lấy chiều cao trang = chiều dài khổ
+    // giấy (210/297/3274mm) → máy in nhả cả khúc giấy trắng thừa phía dưới.
+    const applyExactPageHeight = () => {
+      const bill = document.querySelector(".bill") as HTMLElement | null;
+      if (!bill) return;
+      const heightPx = bill.getBoundingClientRect().height;
+      if (!heightPx) return; // đo lỗi → giữ nguyên `@page auto` làm fallback
+      // px (96dpi) → mm, cộng 2mm đệm cho dao cắt/xé
+      const heightMm = Math.ceil((heightPx * 25.4) / 96) + 2;
+      let styleEl = document.getElementById(
+        "bill-page-size",
+      ) as HTMLStyleElement | null;
+      if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = "bill-page-size";
+        document.head.appendChild(styleEl);
+      }
+      styleEl.textContent = `@page { size: 80mm ${heightMm}mm; margin: 0; }`;
     };
+
+    // Đợi ảnh QR load xong mới đo (QR chiếm chiều cao đáng kể)
+    const waitQr = () =>
+      new Promise<void>((resolve) => {
+        const img = document.querySelector(
+          ".bill-qr img",
+        ) as HTMLImageElement | null;
+        if (!img || img.complete) return resolve();
+        img.addEventListener("load", () => resolve(), { once: true });
+        img.addEventListener("error", () => resolve(), { once: true });
+      });
 
     const fonts = (
       document as Document & { fonts?: { ready?: Promise<unknown> } }
     ).fonts;
-    if (fonts?.ready) {
-      fonts.ready.then(() => window.setTimeout(doPrint, 50));
-    } else {
-      window.setTimeout(doPrint, 400);
-    }
+    const fontsReady = fonts?.ready ?? Promise.resolve();
+
+    let printed = false;
+    Promise.all([fontsReady, waitQr()]).then(() => {
+      window.setTimeout(() => {
+        applyExactPageHeight();
+        // Báo cho iframe cha biết đã đo xong, sẵn sàng in
+        (window as Window & { __billReady?: boolean }).__billReady = true;
+        window.dispatchEvent(new Event("bill-ready"));
+        if (!isEmbedded && !printed) {
+          printed = true;
+          window.print();
+        }
+      }, 30);
+    });
 
     // Tự đóng tab in (chỉ hiệu lực khi tab được mở bằng window.open)
-    const handleAfterPrint = () => window.close();
+    const handleAfterPrint = () => {
+      if (!isEmbedded) window.close();
+    };
     window.addEventListener("afterprint", handleAfterPrint);
     return () => window.removeEventListener("afterprint", handleAfterPrint);
   }, []);
@@ -300,7 +337,7 @@ const printStyles = `
     display: block;
     position: static;
   }
-  /* padding-bottom 40mm: chừa ~4cm để xé/cắt giấy */
-  .bill { width: 80mm; padding: 3mm 3mm 40mm; }
+  /* @page đã đo khít chiều cao → chỉ chừa 6mm đáy cho dao cắt/xé */
+  .bill { width: 80mm; padding: 3mm 3mm 6mm; }
 }
 `;
