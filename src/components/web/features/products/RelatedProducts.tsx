@@ -3,9 +3,11 @@ import { getTranslations } from "next-intl/server";
 import RelatedProductsSlider from "./RelatedProductsSlider";
 import { WebProduct } from "@/types/products";
 import ProductCard from "../../shared/ProductCard";
+import type { Locale } from "@/types/configs";
 
-const RelatedProducts: FC<{ products: WebProduct[] }> = async ({
+const RelatedProducts: FC<{ products: WebProduct[]; locale?: Locale }> = async ({
   products,
+  locale,
 }) => {
   const t = await getTranslations("products");
   return (
@@ -17,7 +19,7 @@ const RelatedProducts: FC<{ products: WebProduct[] }> = async ({
         <div>
           <RelatedProductsSlider>
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} locale={locale} />
             ))}
           </RelatedProductsSlider>
         </div>

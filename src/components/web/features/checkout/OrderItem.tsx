@@ -2,11 +2,13 @@ import { cn, formatCurrencyWebsite } from "@/lib/utils";
 import { CartItemDisplay } from "@/types/cart";
 import Image from "next/image";
 import React, { FC } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const OrderItem: FC<{ item: Omit<CartItemDisplay, "id"> }> = ({ item }) => {
   const addons = item.addons.filter((addon) => addon.quantity > 0);
   const t = useTranslations("checkout");
+  const locale = resolveLocale(useLocale());
   return (
     <li className="pb-5 border-b border-web-content-3 flex flex-col gap-5">
       <div className="flex justify-between items-start gap-3">
@@ -34,7 +36,7 @@ const OrderItem: FC<{ item: Omit<CartItemDisplay, "id"> }> = ({ item }) => {
           </p>
         </div>
         <p className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1 shrink-0 pt-3">
-          {formatCurrencyWebsite(item.price * item.quantity)}
+          {formatCurrencyWebsite(item.price * item.quantity, locale)}
         </p>
       </div>
       {addons.length > 0 && (
@@ -48,7 +50,7 @@ const OrderItem: FC<{ item: Omit<CartItemDisplay, "id"> }> = ({ item }) => {
                 +{addon.quantity} {addon.name}
               </span>
               <span className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1 shrink-0">
-                {formatCurrencyWebsite(addon.price * addon.quantity)}
+                {formatCurrencyWebsite(addon.price * addon.quantity, locale)}
               </span>
             </li>
           ))}

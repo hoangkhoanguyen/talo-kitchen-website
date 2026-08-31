@@ -80,6 +80,7 @@ const page: FC<{ params: Promise<{ slug: string; locale: string }> }> = async ({
   return (
     <div>
       <ProductInformation
+        locale={locale}
         product={{
           id: product.id,
           title: product.title,
@@ -95,6 +96,7 @@ const page: FC<{ params: Promise<{ slug: string; locale: string }> }> = async ({
       />
       {relatedProducts.length > 0 && (
         <RelatedProducts
+          locale={locale}
           products={relatedProducts.map((relatedProduct) => ({
             ...relatedProduct,
             images: relatedProduct.images || [],

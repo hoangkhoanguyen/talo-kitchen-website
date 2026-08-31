@@ -68,6 +68,7 @@ const FoodCategories: FC<{
               key={product.id}
               product={product}
               categoryLabel={categoryLabel || ""}
+              locale={locale}
             />
           ))}
         </div>

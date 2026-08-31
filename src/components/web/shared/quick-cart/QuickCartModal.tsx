@@ -9,6 +9,7 @@ import { webRoutes } from "@/constants/route";
 import { WebProductDetails } from "@/types/products";
 import QuickCartForm from "./QuickCartForm";
 import { useLocale } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const QuickCartModal = () => {
   const isOpen = useQuickCartModalStore((state) => state.isOpen);
@@ -48,7 +49,13 @@ const QuickCartModal = () => {
       );
     }
 
-    return <QuickCartForm product={data} closeModal={closeModal} />;
+    return (
+      <QuickCartForm
+        product={data}
+        closeModal={closeModal}
+        locale={resolveLocale(locale)}
+      />
+    );
   };
 
   return (

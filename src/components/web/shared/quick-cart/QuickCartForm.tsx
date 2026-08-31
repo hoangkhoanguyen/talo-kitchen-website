@@ -7,6 +7,7 @@ import { Button } from "../../ui/button";
 import { WebProductDetails } from "@/types/products";
 import { useCartStore } from "@/hooks/web/cart/store";
 import Image from "next/image";
+import type { Locale } from "@/types/configs";
 
 const QuickCartForm: FC<{
   product: Pick<
@@ -14,7 +15,8 @@ const QuickCartForm: FC<{
     "id" | "title" | "price" | "category" | "allergenInfo" | "addons" | "images"
   >;
   closeModal: () => void;
-}> = ({ product, closeModal }) => {
+  locale?: Locale;
+}> = ({ product, closeModal, locale }) => {
   const addToCart = useCartStore((state) => state.actions.addToCart);
   const tCart = useTranslations("cart");
   const tProducts = useTranslations("products");
@@ -81,7 +83,7 @@ const QuickCartForm: FC<{
                 {tCart("item.priceLabel")}
               </span>
               <span className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1">
-                {formatCurrencyWebsite(price)}
+                {formatCurrencyWebsite(price, locale)}
               </span>
             </p>
           </div>
@@ -134,7 +136,7 @@ const QuickCartForm: FC<{
             {tCart("item.total")}
           </span>
           <span className="text-web-h3-mobile lg:text-web-h3 text-web-secondary-1">
-            {formatCurrencyWebsite(totalPrice)}
+            {formatCurrencyWebsite(totalPrice, locale)}
           </span>
         </div>
       </div>
@@ -145,7 +147,9 @@ const QuickCartForm: FC<{
           variant={"secondary1"}
           className="w-full text-web-background-1 text-web-button-mobile lg:text-web-button py-4.5"
         >
-          {tProducts("addToCart", { price: formatCurrencyWebsite(totalPrice) })}
+          {tProducts("addToCart", {
+            price: formatCurrencyWebsite(totalPrice, locale),
+          })}
         </Button>
       </div>
     </>

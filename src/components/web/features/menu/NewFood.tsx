@@ -83,7 +83,7 @@ const NewFood: FC<{ configs: any; locale: Locale }> = async ({
             </div>
           </div>
 
-          <ProductCard product={product} />
+          <ProductCard product={product} locale={locale} />
         </div>
       </div>
     </section>

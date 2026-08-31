@@ -60,7 +60,7 @@ const CartItem: FC<{ item: CartItemDisplay }> = ({ item }) => {
             <CardItemAddons cartId={item.id} cartAddons={item.addons} />
           )}
           <hr className="border-web-content-3" />
-          <CartItemTotalPrice totalPrice={item.totalPrice} />
+          <CartItemTotalPrice totalPrice={item.totalPrice} locale={locale} />
         </div>
       </div>
       <CartItemNote cartId={item.id} note={item.notes} />

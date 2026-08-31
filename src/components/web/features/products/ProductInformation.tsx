@@ -8,9 +8,11 @@ import AddToCartButton from "./AddToCartButton";
 import { WebProductDetails } from "@/types/products";
 import { formatCurrencyWebsite, splitTextByNewLine } from "@/lib/utils";
 import ProductEditorProvider from "./ProductEditorProvider";
+import type { Locale } from "@/types/configs";
 
-const ProductInformation: FC<{ product: WebProductDetails }> = async ({
+const ProductInformation: FC<{ product: WebProductDetails; locale?: Locale }> = async ({
   product,
+  locale,
 }) => {
   const t = await getTranslations("products");
   return (
@@ -56,7 +58,7 @@ const ProductInformation: FC<{ product: WebProductDetails }> = async ({
                   {product.title}
                 </h1>
                 <p className="text-web-h2-mobile lg:text-web-h2 text-web-secondary-1 mb-5">
-                  {formatCurrencyWebsite(product.price)}
+                  {formatCurrencyWebsite(product.price, locale)}
                 </p>
                 <aside className="rounded-lg bg-web-background-3 p-3 mb-5">
                   <h2 className="text-web-h4-mobile lg:text-web-h4 text-web-content-2 mb-2">
