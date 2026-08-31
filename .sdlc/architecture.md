@@ -59,3 +59,56 @@ Tài liệu tham chiếu kiến trúc xuyên version cho các agent SDLC. Mô t�
 - **Admin không resolve**: `getConfigsByKey` (không cache) trả object `{en,vi}` đầy đủ để form nhập 2 bản.
 - **Thêm ngôn ngữ thứ 3**: chỉ sửa `routing.ts` + chạy migration bổ sung; không sửa type/service/renderer.
 - **Không đụng**: schema bảng DB, config `config_type='app'`, entity DB (sprint-3), label admin.
+
+## Entity i18n — localized DB entities (sprint-3)
+- **Chiến lược**: bảng translation riêng (KHÁC sprint-2 dùng JSON). 3 bảng mới trong `dbSchema`:
+  `product_translations`, `product_category_translations`, `product_addon_translations`. Mỗi bảng: FK →
+  bảng cha `ON DELETE CASCADE`, `UNIQUE(entity_id, locale)`, cột `locale varchar(10)` (không enum DB,
+  validate ở service — locale-agnostic ASM-01). Cột dịch khớp kiểu cột gốc.
+- **Cột gốc = English chính thức + fallback cuối**: cột gốc trên bảng chính (`products.title`,
+  `product_categories.name`, `product_addons.name`, …) GIỮ NGUYÊN, không bỏ. Row `locale='en'` seed từ
+  cột gốc. Resolve fallback LUÔN về cột gốc.
+- **Migration 2 phần**: (a) Drizzle forward migration (`db:generate` + `db:migrate`) tạo 3 bảng; (b) seed
+  script tsx idempotent (backup trước, guard `DB_SCHEMA`/`DATABASE_URL`) tạo row `en` từ cột gốc. Drizzle
+  forward-only → rollback = SQL thủ công `DROP TABLE ... CASCADE` (cột gốc còn nguyên → không mất en).
+- **Resolve theo locale** (user-facing): relational query `with: { translations: { where locale } }` (kèm
+  addon/category translations lồng nhau) → 1 round-trip, KHÔNG N+1; COALESCE(translation.field, cột gốc)
+  in-memory. Shape service trả về GIỮ NGUYÊN (component không đổi).
+- **Cache per-locale**: thêm `locale` vào key parts của service cached; tag GIỮ NGUYÊN không kèm locale
+  (`PRODUCTS.BY_SLUG/BY_CATEGORY/ALL`) → revalidate 1 lần xoá mọi locale (nhất quán sprint-2).
+- **API `/api/products/*` (ngoài `[locale]`)**: tự xác định locale — `?locale=` → cookie `NEXT_LOCALE` →
+  `Accept-Language` → `en` (helper `getRequestLocale`, `src/lib/locale.ts`). Server action cart nhận
+  `locale` từ client (`useLocale()`).
+- **Order snapshot**: `order_items.productName` + `order_item_addons.addonName` lưu snapshot text tại thời
+  điểm đặt → KHÔNG dịch lại lịch sử. Chỉ hiển thị realtime (cart/quick-cart trước khi đặt) theo locale.
+- **Admin không resolve**: service admin trả entity kèm TẤT CẢ translation (`{en, vi}`) để form nhập 2 bản;
+  save upsert `(entity_id, locale)` trong transaction + set cột gốc = bản `en`.
+- **Thêm ngôn ngữ thứ 3**: thêm vào `routing.ts` + seed row translation locale mới; KHÔNG đổi schema/type/
+  service/renderer.
+- **Không đụng**: config (sprint-2), label admin UI, cột gốc bảng chính, FK bảng chính hiện có.
+
+## SEO / i18n metadata + format theo locale (sprint-4)
+- **Helper metadata dùng chung** (`src/lib/i18n-meta.ts`, locale-agnostic, không server-only để test được):
+  - `buildLocalizedUrl(locale, path)`: scheme `as-needed` — `defaultLocale` KHÔNG prefix (`${APP_URL}${path}`),
+    locale khác có prefix (`${APP_URL}/${locale}${path}`). `path` = pathname KHÔNG prefix (home = `""`).
+  - `buildAlternates(currentLocale, path)`: `languages` loop `routing.locales` + `x-default` (= defaultLocale),
+    `canonical` self-referencing per-locale. KHÔNG hardcode 2 mục; thêm locale = tự có mục mới.
+  - `buildSitemapLanguages(path)`: `{[loc]: url}` loop locales (không x-default — format sitemap).
+  - `getOgLocale(locale)`: map literal `{ en:"en_US", vi:"vi_VN" }`, miss → `undefined` (omit, không crash).
+- **generateMetadata 6 trang `[locale]`** (home, menu/[category], dish/[slug], reservation, checkout, cart):
+  `resolveLocale(rawLocale)` → truyền vào cached service sprint-2/3 (0 DB round-trip mới, hưởng cùng cache
+  per-locale) → build metadata qua helper. cart/checkout chuyển `export const metadata` static → `async
+  generateMetadata`. Fallback khi service trống → namespace `metadata` trong messages (brand name giữ nguyên);
+  fallback description menu dùng ICU `{category}` (word-order safe cho vi). KHÔNG generateMetadata nào throw.
+- **sitemap.ts**: giữ `force-dynamic` + tập URL gốc (bản defaultLocale) + đọc `menu_page` theo defaultLocale;
+  chỉ THÊM `alternates.languages` mỗi entry.
+- **Format tiền/ngày phía WEB USER** (tách biệt admin):
+  - `formatCurrencyWebsite(amount, locale?)` (`src/lib/utils.ts`): `toLocaleString(locale)` + hậu tố "VND"
+    (en `1,000,000 VND`, vi `1.000.000 VND`); default vi-VN (backward-compat). `formatCurrency` (admin, vi-VN)
+    KHÔNG đụng.
+  - `src/lib/date-web.ts` (NEW): `Intl.DateTimeFormat(locale)` cho reservation (vi `DD/MM/YYYY`+24h, en
+    `MM/DD/YYYY`+12h); wall-clock, KHÔNG áp tz offset. `lib/date.ts formatDateVN` (admin) KHÔNG đụng.
+  - Client lấy locale từ `useLocale()`; server component nhận prop/`getLocale()`.
+- **Locale-agnostic**: thêm locale thứ 3 chỉ cần sửa `routing.ts` + 1 nhánh `getOgLocale` + messages +
+  1 bảng map format nếu cần; KHÔNG sửa logic metadata/format.
+- **Không đụng**: routing/middleware/cache/service sprint-1/2/3, label admin, `formatCurrency`, `formatDateVN`.
