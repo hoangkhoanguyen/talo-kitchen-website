@@ -6,24 +6,26 @@ import { ReviewsSection } from "@/components/web/features/home/ReviewsSection";
 import { WhyChooseUsSection } from "@/components/web/shared/WhyChooseUsSection";
 import { getUIConfigsByKeyCached } from "@/services/cached";
 import { APP_ICONS, APP_URL } from "@/constants/app";
+import { buildAlternates, getOgLocale } from "@/lib/i18n-meta";
+import { resolveLocale } from "@/lib/locale";
 import { Metadata } from "next";
-import type { Locale } from "@/types/configs";
+import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
-  const homeConfig = await getUIConfigsByKeyCached("homepage", locale as Locale);
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+  const homeConfig = await getUIConfigsByKeyCached("homepage", locale);
 
   const seo = homeConfig?.value?.seo as any;
+  const t = await getTranslations({ locale, namespace: "metadata" });
 
   // Fallback values
-  const title = seo?.title || "TALO Kitchen & Lounge - Home";
-  const description =
-    seo?.description ||
-    "Welcome to TALO Kitchen & Lounge, where culinary excellence meets a warm and inviting atmosphere.";
+  const title = seo?.title || t("home.title");
+  const description = seo?.description || t("home.description");
   const keywords = seo?.keywords?.map((k: any) => k.keyword) || [
     "TALO Kitchen & Lounge",
     "restaurant",
@@ -33,19 +35,18 @@ export async function generateMetadata({
   const ogDescription = seo?.og_description || description;
   const ogImage = seo?.og_image?.url || `${APP_URL}/assets/static/hero.png`;
   const ogImageAlt = seo?.og_image?.alt || "TALO Kitchen & Lounge";
+  const alternates = buildAlternates(locale, "");
 
   return {
     title,
     description,
     keywords,
-    alternates: {
-      canonical: APP_URL,
-    },
+    alternates,
     icons: APP_ICONS,
     openGraph: {
       title: ogTitle,
       description: ogDescription,
-      url: APP_URL,
+      url: alternates.canonical,
       siteName: "TALO Kitchen & Lounge",
       images: [
         {
@@ -55,7 +56,7 @@ export async function generateMetadata({
           alt: ogImageAlt,
         },
       ],
-      locale: "en_US",
+      locale: getOgLocale(locale),
       type: "website",
     },
   };
@@ -66,8 +67,9 @@ const HomePage = async ({
 }: {
   params: Promise<{ locale: string }>;
 }) => {
-  const { locale } = await params;
-  const homeConfig = await getUIConfigsByKeyCached("homepage", locale as Locale);
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+  const homeConfig = await getUIConfigsByKeyCached("homepage", locale);
 
   return (
     <div>
