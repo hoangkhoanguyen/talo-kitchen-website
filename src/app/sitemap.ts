@@ -3,6 +3,7 @@ import { getAllProducts } from "@/services/products";
 import { getUIConfigsByKeyCached } from "@/services/cached";
 import { APP_URL } from "@/constants/app";
 import { routing } from "@/i18n/routing";
+import { buildSitemapLanguages } from "@/lib/i18n-meta";
 
 // Force dynamic để không chạy lúc build (vì cần DB connection)
 export const dynamic = "force-dynamic";
@@ -21,6 +22,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: product.updatedAt || new Date(),
         changeFrequency: "weekly" as const,
         priority: 0.7,
+        alternates: {
+          languages: buildSitemapLanguages(`/dish/${product.slug}`),
+        },
       })) || [];
 
   // Lấy menu categories từ config
@@ -41,6 +45,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: menuConfig?.updatedAt || new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.85,
+      alternates: {
+        languages: buildSitemapLanguages(`/menu/${cat.key}`),
+      },
     }));
 
   return [
@@ -49,6 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1,
+      alternates: { languages: buildSitemapLanguages("") },
     },
     ...menuCategoryUrls,
     {
@@ -56,6 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
+      alternates: { languages: buildSitemapLanguages("/reservation") },
     },
     ...productUrls,
   ];
