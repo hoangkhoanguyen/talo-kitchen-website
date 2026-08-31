@@ -2,6 +2,10 @@ import clsx from "clsx";
 import { ClassValue } from "clsx";
 import { createTailwindMerge, getDefaultConfig } from "tailwind-merge";
 
+import { routing } from "@/i18n/routing";
+
+type Locale = (typeof routing.locales)[number];
+
 // Tạo 1 instance twm duy nhất ở module scope theo docs createTailwindMerge
 const twm = createTailwindMerge(() => {
   const defaultConfig = getDefaultConfig();
@@ -109,6 +113,15 @@ export function splitTextByNewLine(text: string) {
   return text.split(/\r?\n/);
 }
 
-export function formatCurrencyWebsite(amount: number) {
-  return `${amount.toLocaleString("vi-VN")} VND`;
+const WEBSITE_LOCALE_MAP: Record<Locale, string> = {
+  en: "en-US",
+  vi: "vi-VN",
+};
+
+function intlOf(locale?: Locale) {
+  return locale ? WEBSITE_LOCALE_MAP[locale] : "vi-VN";
+}
+
+export function formatCurrencyWebsite(amount: number, locale?: Locale) {
+  return `${amount.toLocaleString(intlOf(locale))} VND`;
 }
