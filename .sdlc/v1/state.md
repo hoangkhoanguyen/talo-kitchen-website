@@ -2,9 +2,9 @@
 
 - **version**: v1
 - **current_sprint**: sprint-2-config-i18n
-- **current_phase**: test
+- **current_phase**: qa
 - **current_task**: none
-- **updated_at**: 2026-08-31 15:30
+- **updated_at**: 2026-08-31 16:10
 
 ## Phase status (current sprint)
 
@@ -14,7 +14,7 @@
 - tasks:         done
 - execute:       done
 - test:          done
-- qa:            todo
+- qa:            done
 
 ## Human approval gates
 
@@ -24,9 +24,9 @@
 
 ## Resume pointer
 
-- **next_action**: Test leg sprint-2-config-i18n DONE — 25/25 unit test + 83/83 Playwright pass (kể cả toàn bộ regression sprint-1), `tsc --noEmit` sạch, `next build` PASS. Migration re-run trên dev_multi_lang xác nhận idempotent. Tìm + tự fix 1 bug thật trong lúc test (xem test-report.md): `src/lib/revalidate.ts` gọi `revalidateTag(tag, "default")` không thực sự invalidate cache `unstable_cache` (Next 16 coi "default" là cache-life profile không tồn tại → rơi vào nhánh soft-revalidate) — chặn EC-11/AC-05.2 (và thật ra chặn MỌI revalidate trong app từ trước, không riêng sprint-2). Đã sửa thành `revalidateTag(tag, { expire: 0 })`, verify lại bằng real admin save → /vi round trip + full suite xanh lại. Sẵn sàng chuyển sang QA gate cho sprint-2-config-i18n.
+- **next_action**: QA gate sprint-2-config-i18n DONE (1 fix round). Full checklist re-run clean: 25/25 unit + 83/83 Playwright pass, `tsc --noEmit` sạch, `next build` PASS, migration re-run trên dev_multi_lang idempotent + English 100% nguyên vẹn + config app/non-localized không đụng (verify trực tiếp bằng SQL). Backward-compat helper (`normalizeLocalized`/`resolveLocalizedString` coi string chưa migrate = bản en, không crash) đã confirm là điều kiện đủ để deploy code trước / migrate sau trên prod. Đã tự fix 1 cosmetic bug (`SettingNumberField.tsx` leak `isRequired` xuống DOM) vì trivial 1-file fix, re-run full suite xanh lại sau fix, đã commit. Sprint sẵn sàng handoff cho manual test.
 - **blockers**: none
-- **test_leg_notes**: report đầy đủ ở `.sdlc/v1/sprint-2-config-i18n/test-report.md` (AC/EC/NFR/DAC → test mapping, needs-manual-verification, undefined edge cases). Cần biết cho QA: (1) login admin thật trên dev_multi_lang đang lỗi "permission denied for sequence refresh_tokens_id_seq/users_id_seq" — KHÔNG phải do sprint-2, là quyền DB role trên schema dev; test admin dùng cookie JWT tự ký (cùng secret `ACCESS_TOKEN_JWT_SECRET`) để bypass, đã verify tương đương. (2) Đã tìm thấy 1 bug pre-existing KHÔNG sửa (ngoài phạm vi sprint-2): `SettingNumberField.tsx` leak prop `isRequired` xuống DOM (console warning, không vỡ chức năng) — field number, không phải text/textarea nên ngoài scope RULE-01.
+- **qa_notes**: report đầy đủ ở `.sdlc/v1/sprint-2-config-i18n/test-report.md` (test leg) + báo cáo QA trong hội thoại /sdlc:test agent qa-guard (2026-08-31). Còn lại cho user verify thủ công: (1) login admin thật trên dev_multi_lang bị chặn bởi lỗi quyền DB role (permission denied sequence refresh_tokens_id_seq/users_id_seq) — pre-existing, KHÔNG phải do sprint-2; cần cấp quyền INSERT/sequence cho role dev hoặc seed sẵn tài khoản admin để test tay được. (2) Nội dung vi thật cho toàn bộ field RULE-20..23 chưa được nhập (đúng — đây là content/ops task, không phải code task của sprint này).
 
 ## Context loaded this run (so the next run knows what to re-read)
 
