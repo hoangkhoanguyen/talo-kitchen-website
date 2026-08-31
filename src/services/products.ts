@@ -1,8 +1,11 @@
 import { DB, getDb } from "@/db/drizzle";
 import {
+  productAddonTranslations,
   productAddons,
   productCategories,
+  productCategoryTranslations,
   productImages,
+  productTranslations,
   products,
 } from "@/db/schemas";
 import {
@@ -16,6 +19,12 @@ import {
   UpdateProductImageDB,
   WebProduct,
 } from "@/types/products";
+import type { Locale } from "@/types/configs";
+import {
+  resolveAddon,
+  resolveCategoryFields,
+  resolveProductFields,
+} from "@/services/products/translations";
 import { eq, inArray, count, ilike, and, or, desc, ne, asc } from "drizzle-orm";
 // Disabled cache imports - using direct DB calls now
 // import {
@@ -128,10 +137,15 @@ export async function getAdminProductById(id: number) {
     where: eq(products.id, id),
     with: {
       category: true,
-      addons: true,
+      addons: {
+        with: {
+          translations: true,
+        },
+      },
       images: {
         orderBy: [asc(productImages.sortOrder)],
       },
+      translations: true,
     },
   });
 }
@@ -476,6 +490,7 @@ export async function getCategoryWithProducts(id: number) {
         },
         orderBy: [desc(products.createdAt)],
       },
+      translations: true,
     },
   });
 
@@ -552,6 +567,7 @@ export async function isExistingCategoryName(name: string, excludeId?: number) {
  */
 export async function getProductsByCategorySlug(
   categorySlug: string,
+  locale: Locale,
 ): Promise<WebProduct[]> {
   const db = getDb();
 
@@ -578,21 +594,49 @@ export async function getProductsByCategorySlug(
           columns: {
             name: true,
           },
+          with: {
+            translations: {
+              where: eq(productCategoryTranslations.locale, locale),
+            },
+          },
+        },
+        translations: {
+          where: eq(productTranslations.locale, locale),
         },
       },
       orderBy: [desc(products.priority), desc(products.createdAt)],
     });
 
     // Format data for product cards
-    const formattedProducts: WebProduct[] = productsList.map((product) => ({
-      id: product.id,
-      slug: product.slug,
-      title: product.title,
-      subDescription: product.subDescription || "",
-      price: product.price,
-      imageUrl: product.images[0]?.url || "",
-      category: product.category?.name || "",
-    }));
+    const formattedProducts: WebProduct[] = productsList.map((product) => {
+      const resolved = resolveProductFields(
+        {
+          title: product.title,
+          description: null,
+          subDescription: product.subDescription,
+          allergenInfo: null,
+        },
+        product.translations,
+        locale,
+      );
+      const resolvedCategory = product.category
+        ? resolveCategoryFields(
+            { name: product.category.name, description: null },
+            product.category.translations,
+            locale,
+          )
+        : undefined;
+
+      return {
+        id: product.id,
+        slug: product.slug,
+        title: resolved.title,
+        subDescription: resolved.subDescription || "",
+        price: product.price,
+        imageUrl: product.images[0]?.url || "",
+        category: resolvedCategory?.name || "",
+      };
+    });
 
     return formattedProducts;
   }
@@ -608,9 +652,20 @@ export async function getProductsByCategorySlug(
       name: true,
       slug: true,
     },
+    with: {
+      translations: {
+        where: eq(productCategoryTranslations.locale, locale),
+      },
+    },
   });
 
   if (!category) return [];
+
+  const resolvedCategory = resolveCategoryFields(
+    { name: category.name, description: null },
+    category.translations,
+    locale,
+  );
 
   // Lấy tất cả sản phẩm active của category
   const productsList = await db.query.products.findMany({
@@ -633,20 +688,36 @@ export async function getProductsByCategorySlug(
         orderBy: [asc(productImages.sortOrder)],
         limit: 1,
       },
+      translations: {
+        where: eq(productTranslations.locale, locale),
+      },
     },
     orderBy: [desc(products.priority), desc(products.createdAt)],
   });
 
   // Format data for product cards
-  const formattedProducts: WebProduct[] = productsList.map((product) => ({
-    id: product.id,
-    slug: product.slug,
-    title: product.title,
-    subDescription: product.subDescription || "",
-    price: product.price,
-    imageUrl: product.images[0]?.url || "",
-    category: category.name,
-  }));
+  const formattedProducts: WebProduct[] = productsList.map((product) => {
+    const resolved = resolveProductFields(
+      {
+        title: product.title,
+        description: null,
+        subDescription: product.subDescription,
+        allergenInfo: null,
+      },
+      product.translations,
+      locale,
+    );
+
+    return {
+      id: product.id,
+      slug: product.slug,
+      title: resolved.title,
+      subDescription: resolved.subDescription || "",
+      price: product.price,
+      imageUrl: product.images[0]?.url || "",
+      category: resolvedCategory.name,
+    };
+  });
 
   return formattedProducts;
 }
@@ -654,7 +725,7 @@ export async function getProductsByCategorySlug(
 /**
  * Lấy thông tin product theo slug cho việc hiển thị card
  */
-export async function getProductBySlug(slug: string) {
+export async function getProductBySlug(slug: string, locale: Locale) {
   const db = getDb();
 
   const product = await db.query.products.findFirst({
@@ -680,25 +751,49 @@ export async function getProductBySlug(slug: string) {
           name: true,
           slug: true,
         },
+        with: {
+          translations: {
+            where: eq(productCategoryTranslations.locale, locale),
+          },
+        },
+      },
+      translations: {
+        where: eq(productTranslations.locale, locale),
       },
     },
   });
 
   if (!product) return null;
 
+  const resolved = resolveProductFields(
+    {
+      title: product.title,
+      description: null,
+      subDescription: product.subDescription,
+      allergenInfo: null,
+    },
+    product.translations,
+    locale,
+  );
+  const resolvedCategory = resolveCategoryFields(
+    { name: product.category.name, description: null },
+    product.category.translations,
+    locale,
+  );
+
   // Format data for product card
   return {
     id: product.id,
     slug: product.slug,
-    title: product.title,
-    subDescription: product.subDescription || "",
+    title: resolved.title,
+    subDescription: resolved.subDescription || "",
     price: product.price,
     imageUrl: product.images[0]?.url || "",
-    category: product.category.name,
+    category: resolvedCategory.name,
   };
 }
 
-export async function getProductDetailsBySlug(slug: string) {
+export async function getProductDetailsBySlug(slug: string, locale: Locale) {
   const db = getDb();
 
   const product = await db.query.products.findFirst({
@@ -720,6 +815,11 @@ export async function getProductDetailsBySlug(slug: string) {
           name: true,
           slug: true,
         },
+        with: {
+          translations: {
+            where: eq(productCategoryTranslations.locale, locale),
+          },
+        },
       },
       images: {
         orderBy: [asc(productImages.sortOrder)],
@@ -727,17 +827,54 @@ export async function getProductDetailsBySlug(slug: string) {
       addons: {
         where: eq(productAddons.isActive, true),
         orderBy: [asc(productAddons.sortOrder)],
+        with: {
+          translations: {
+            where: eq(productAddonTranslations.locale, locale),
+          },
+        },
+      },
+      translations: {
+        where: eq(productTranslations.locale, locale),
       },
     },
   });
 
-  return product;
+  if (!product) return product;
+
+  const { translations, category, addons, ...base } = product;
+
+  const resolvedProduct = resolveProductFields(base, translations, locale);
+
+  const { translations: categoryTranslations, ...categoryBase } = category;
+  const resolvedCategory = {
+    ...categoryBase,
+    ...resolveCategoryFields(
+      { name: categoryBase.name, description: null },
+      categoryTranslations,
+      locale,
+    ),
+  };
+
+  const resolvedAddons = addons.map((addon) => {
+    const { translations: addonTranslations, ...addonBase } = addon;
+    return {
+      ...addonBase,
+      ...resolveAddon(addonBase, addonTranslations, locale),
+    };
+  });
+
+  return {
+    ...base,
+    ...resolvedProduct,
+    category: resolvedCategory,
+    addons: resolvedAddons,
+  };
 }
 
-export async function getMultipleProductsByIds(ids: number[]) {
+export async function getMultipleProductsByIds(ids: number[], locale: Locale) {
   if (!ids.length) return []; // Tránh query không cần thiết
   const db = getDb();
-  return await db.query.products.findMany({
+  const productList = await db.query.products.findMany({
     where: and(eq(products.isActive, true), inArray(products.id, ids)),
     columns: {
       id: true,
@@ -760,13 +897,61 @@ export async function getMultipleProductsByIds(ids: number[]) {
           name: true,
           slug: true,
         },
+        with: {
+          translations: {
+            where: eq(productCategoryTranslations.locale, locale),
+          },
+        },
+      },
+      translations: {
+        where: eq(productTranslations.locale, locale),
       },
     },
     orderBy: [desc(products.priority), desc(products.createdAt)],
   });
+
+  return productList.map((product) => {
+    const { translations, category, ...base } = product;
+
+    const resolvedProduct = resolveProductFields(
+      {
+        title: base.title,
+        description: null,
+        subDescription: base.subDescription,
+        allergenInfo: null,
+      },
+      translations,
+      locale,
+    );
+
+    const resolvedCategory = category
+      ? (() => {
+          const { translations: categoryTranslations, ...categoryBase } =
+            category;
+          return {
+            ...categoryBase,
+            ...resolveCategoryFields(
+              { name: categoryBase.name, description: null },
+              categoryTranslations,
+              locale,
+            ),
+          };
+        })()
+      : category;
+
+    return {
+      ...base,
+      title: resolvedProduct.title,
+      subDescription: resolvedProduct.subDescription,
+      category: resolvedCategory,
+    };
+  });
 }
 
-export async function getProductsDetailsByIds(ids: number[]): Promise<
+export async function getProductsDetailsByIds(
+  ids: number[],
+  locale: Locale,
+): Promise<
   (Pick<
     WebProduct,
     "id" | "category" | "imageUrl" | "price" | "slug" | "title"
@@ -801,6 +986,11 @@ export async function getProductsDetailsByIds(ids: number[]): Promise<
           name: true,
           slug: true,
         },
+        with: {
+          translations: {
+            where: eq(productCategoryTranslations.locale, locale),
+          },
+        },
       },
       addons: {
         where(fields, operators) {
@@ -813,19 +1003,56 @@ export async function getProductsDetailsByIds(ids: number[]): Promise<
           name: true,
           price: true,
         },
+        with: {
+          translations: {
+            where: eq(productAddonTranslations.locale, locale),
+          },
+        },
+      },
+      translations: {
+        where: eq(productTranslations.locale, locale),
       },
     },
   });
 
-  return productList.map((product) => ({
-    id: product.id,
-    slug: product.slug,
-    title: product.title,
-    price: product.price,
-    imageUrl: product.images[0]?.url || "",
-    category: product.category?.name || "",
-    addons: product.addons,
-  }));
+  return productList.map((product) => {
+    const resolved = resolveProductFields(
+      {
+        title: product.title,
+        description: null,
+        subDescription: null,
+        allergenInfo: null,
+      },
+      product.translations,
+      locale,
+    );
+
+    const resolvedCategory = product.category
+      ? resolveCategoryFields(
+          { name: product.category.name, description: null },
+          product.category.translations,
+          locale,
+        )
+      : undefined;
+
+    const resolvedAddons = product.addons.map((addon) => {
+      const { translations: addonTranslations, ...addonBase } = addon;
+      return {
+        ...addonBase,
+        ...resolveAddon(addonBase, addonTranslations, locale),
+      };
+    });
+
+    return {
+      id: product.id,
+      slug: product.slug,
+      title: resolved.title,
+      price: product.price,
+      imageUrl: product.images[0]?.url || "",
+      category: resolvedCategory?.name || "",
+      addons: resolvedAddons,
+    };
+  });
 }
 
 // ==================== CACHED VERSIONS (DISABLED) ====================
@@ -943,7 +1170,10 @@ export async function updateProductStatus(id: number, isActive: boolean) {
   return updatedProduct;
 }
 
-export async function getProductDetailsForQuickCartById(id: number) {
+export async function getProductDetailsForQuickCartById(
+  id: number,
+  locale: Locale,
+) {
   const db = getDb();
 
   const product = await db.query.products.findFirst({
@@ -963,10 +1193,20 @@ export async function getProductDetailsForQuickCartById(id: number) {
           name: true,
           price: true,
         },
+        with: {
+          translations: {
+            where: eq(productAddonTranslations.locale, locale),
+          },
+        },
       },
       category: {
         columns: {
           name: true,
+        },
+        with: {
+          translations: {
+            where: eq(productCategoryTranslations.locale, locale),
+          },
         },
       },
       images: {
@@ -976,8 +1216,55 @@ export async function getProductDetailsForQuickCartById(id: number) {
         orderBy: [asc(productImages.sortOrder)],
         limit: 1,
       },
+      translations: {
+        where: eq(productTranslations.locale, locale),
+      },
     },
   });
 
-  return product;
+  if (!product) return product;
+
+  const { translations, category, addons, ...base } = product;
+
+  const resolved = resolveProductFields(
+    {
+      title: base.title,
+      description: null,
+      subDescription: null,
+      allergenInfo: base.allergenInfo,
+    },
+    translations,
+    locale,
+  );
+
+  const resolvedCategory = category
+    ? (() => {
+        const { translations: categoryTranslations, ...categoryBase } =
+          category;
+        return {
+          ...categoryBase,
+          ...resolveCategoryFields(
+            { name: categoryBase.name, description: null },
+            categoryTranslations,
+            locale,
+          ),
+        };
+      })()
+    : category;
+
+  const resolvedAddons = addons.map((addon) => {
+    const { translations: addonTranslations, ...addonBase } = addon;
+    return {
+      ...addonBase,
+      ...resolveAddon(addonBase, addonTranslations, locale),
+    };
+  });
+
+  return {
+    ...base,
+    title: resolved.title,
+    allergenInfo: resolved.allergenInfo,
+    category: resolvedCategory,
+    addons: resolvedAddons,
+  };
 }
