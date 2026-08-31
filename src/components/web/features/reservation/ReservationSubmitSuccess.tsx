@@ -4,16 +4,18 @@ import React, { FC, ReactNode } from "react";
 import { Button } from "../../ui/button";
 import ReservationInformation from "./ReservationInformation";
 import { ReservationDB } from "@/db/schemas";
-import moment from "moment";
+import { formatReservationDate, formatReservationTime } from "@/lib/date-web";
+import { resolveLocale } from "@/lib/locale";
 import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 const ReservationSubmitSuccess: FC<{
   configs: any;
   reservation: ReservationDB;
 }> = ({ configs, reservation }) => {
   const t = useTranslations("reservation");
+  const locale = resolveLocale(useLocale());
   const renderBackToHomeButton = () => (
     <Button
       as={Link}
@@ -47,15 +49,11 @@ const ReservationSubmitSuccess: FC<{
                 />
                 <InfoItem
                   label={t("success.preferredDate")}
-                  value={moment(reservation.arrivalDate, "YYYY-MM-DD").format(
-                    "DD/MM/YYYY",
-                  )}
+                  value={formatReservationDate(reservation.arrivalDate, locale)}
                 />
                 <InfoItem
                   label={t("success.preferredTime")}
-                  value={moment(reservation.arrivalTime, "HH:mm:ss").format(
-                    "hh:mm A",
-                  )}
+                  value={formatReservationTime(reservation.arrivalTime, locale)}
                 />
                 <InfoItem
                   label={t("success.numberOfGuests")}
