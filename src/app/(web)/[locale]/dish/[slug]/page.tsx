@@ -1,6 +1,7 @@
 import ProductInformation from "@/components/web/features/products/ProductInformation";
 import RelatedProducts from "@/components/web/features/products/RelatedProducts";
 import { APP_ICONS, APP_URL } from "@/constants/app";
+import { resolveLocale } from "@/lib/locale";
 import {
   getRelatedProductsCached,
   getProductDetailsBySlugCached,
@@ -12,10 +13,11 @@ import React, { FC } from "react";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const product = await getProductDetailsBySlugCached(slug);
+  const { slug, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+  const product = await getProductDetailsBySlugCached(slug, locale);
 
   if (!product) {
     return {
@@ -56,10 +58,13 @@ export async function generateMetadata({
   };
 }
 
-const page: FC<{ params: Promise<{ slug: string }> }> = async ({ params }) => {
-  const { slug } = await params;
+const page: FC<{ params: Promise<{ slug: string; locale: string }> }> = async ({
+  params,
+}) => {
+  const { slug, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
 
-  const product = await getProductDetailsBySlugCached(slug);
+  const product = await getProductDetailsBySlugCached(slug, locale);
 
   if (!product) {
     notFound();
@@ -67,6 +72,7 @@ const page: FC<{ params: Promise<{ slug: string }> }> = async ({ params }) => {
 
   const relatedProducts = await getRelatedProductsCached(
     product.relatedProductIds,
+    locale,
   );
 
   return (
