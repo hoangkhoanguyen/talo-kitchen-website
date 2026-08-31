@@ -1,26 +1,26 @@
+import { relations } from "drizzle-orm";
 import {
-  boolean,
   foreignKey,
   integer,
-  real,
   serial,
+  text,
   timestamp,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 import { dbSchema } from "../../schema";
-import { relations } from "drizzle-orm";
 import { products } from "./products";
-import { productAddonTranslations } from "./product-addon-translations";
 
-export const productAddons = dbSchema.table(
-  "product_addons",
+export const productTranslations = dbSchema.table(
+  "product_translations",
   {
     id: serial("id").primaryKey(),
     productId: integer("product_id").notNull(),
-    name: varchar("name", { length: 255 }).notNull(),
-    sortOrder: integer("sort_order").notNull().default(0),
-    price: real("price").notNull().default(0),
-    isActive: boolean("is_active").notNull().default(true),
+    locale: varchar("locale", { length: 10 }).notNull(),
+    title: varchar("title", { length: 255 }),
+    description: text("description"),
+    subDescription: text("sub_description"),
+    allergenInfo: text("allergen_info"),
     createdAt: timestamp("created_at", {
       withTimezone: true,
     })
@@ -36,17 +36,17 @@ export const productAddons = dbSchema.table(
     productFk: foreignKey({
       columns: [table.productId],
       foreignColumns: [products.id],
-    }),
+    }).onDelete("cascade"),
+    productLocaleUnique: unique().on(table.productId, table.locale),
   }),
 );
 
-export const productAddonRelations = relations(
-  productAddons,
-  ({ one, many }) => ({
+export const productTranslationsRelations = relations(
+  productTranslations,
+  ({ one }) => ({
     product: one(products, {
-      fields: [productAddons.productId],
+      fields: [productTranslations.productId],
       references: [products.id],
     }),
-    translations: many(productAddonTranslations),
   }),
 );
