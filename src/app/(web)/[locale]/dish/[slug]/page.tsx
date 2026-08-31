@@ -1,12 +1,14 @@
 import ProductInformation from "@/components/web/features/products/ProductInformation";
 import RelatedProducts from "@/components/web/features/products/RelatedProducts";
-import { APP_ICONS, APP_URL } from "@/constants/app";
+import { APP_ICONS } from "@/constants/app";
+import { buildAlternates, getOgLocale } from "@/lib/i18n-meta";
 import { resolveLocale } from "@/lib/locale";
 import {
   getRelatedProductsCached,
   getProductDetailsBySlugCached,
 } from "@/services/cached";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import React, { FC } from "react";
 
@@ -18,31 +20,31 @@ export async function generateMetadata({
   const { slug, locale: rawLocale } = await params;
   const locale = resolveLocale(rawLocale);
   const product = await getProductDetailsBySlugCached(slug, locale);
+  const t = await getTranslations({ locale, namespace: "metadata" });
 
   if (!product) {
     return {
-      title: "Product Not Found | TALO Kitchen & Lounge",
+      title: `${t("dish.notFound")} | TALO Kitchen & Lounge`,
     };
   }
 
   const title = `${product.title} | TALO Kitchen & Lounge`;
   const description =
-    product.description || `Discover ${product.title} at TALO Kitchen & Lounge`;
-  const url = `${APP_URL}/dish/${slug}`;
+    product.description ||
+    t("dish.descriptionFallback", { title: product.title });
+  const alternates = buildAlternates(locale, `/dish/${slug}`);
   const imageUrl =
     product.images?.[0]?.url || "/assets/static/dish-og-image.jpg";
 
   return {
     title,
     description,
-    alternates: {
-      canonical: url,
-    },
+    alternates,
     icons: APP_ICONS,
     openGraph: {
       title,
       description,
-      url,
+      url: alternates.canonical,
       siteName: "TALO Kitchen & Lounge",
       images: [
         {
@@ -52,7 +54,7 @@ export async function generateMetadata({
           alt: product.title,
         },
       ],
-      locale: "en_US",
+      locale: getOgLocale(locale),
       type: "website",
     },
   };
