@@ -4,11 +4,12 @@ import NewFood from "@/components/web/features/menu/NewFood";
 import { WhyChooseUsSection } from "@/components/web/shared/WhyChooseUsSection";
 import { getUIConfigsByKeyCached } from "@/services/cached";
 import { APP_ICONS, APP_URL } from "@/constants/app";
+import { buildAlternates, getOgLocale } from "@/lib/i18n-meta";
 import { resolveLocale } from "@/lib/locale";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import React from "react";
-import type { Locale } from "@/types/configs";
 
 // export const dynamic = "force-dynamic";
 
@@ -17,17 +18,24 @@ export async function generateMetadata({
 }: {
   params: Promise<{ category: string; locale: string }>;
 }): Promise<Metadata> {
-  const { category, locale } = await params;
+  const { category, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+
+  const t = await getTranslations({ locale, namespace: "metadata" });
 
   // Lấy config để tìm label của category
-  const menuConfig = await getUIConfigsByKeyCached("menu_page", locale as Locale);
+  const menuConfig = await getUIConfigsByKeyCached("menu_page", locale);
   const categories =
     (menuConfig?.value as any)?.food_categories?.categories_to_show || [];
   const seo = (menuConfig?.value as any)?.seo;
 
   // Thêm "all" category vào đầu
   const allCategories = [
-    { key: "all", label: "All", page_title: "All Menu | TALO Kitchen & Lounge" },
+    {
+      key: "all",
+      label: t("menu.allLabel"),
+      page_title: `${t("menu.allMenuTitle")} | TALO Kitchen & Lounge`,
+    },
     ...categories,
   ];
 
@@ -39,15 +47,15 @@ export async function generateMetadata({
   // Fallback values từ SEO config
   const defaultTitle = seo?.title
     ? `${categoryLabel} - ${seo.title}`
-    : `Menu - ${categoryLabel} | TALO Kitchen & Lounge`;
+    : `${t("menu.titleFallback", { category: categoryLabel })} | TALO Kitchen & Lounge`;
 
   // Sử dụng page_title từ category config nếu có, nếu không dùng default
   const title = categoryPageTitle || defaultTitle;
 
   const description =
-    seo?.description ||
-    `Explore our delicious ${categoryLabel.toLowerCase()} menu at TALO Kitchen & Lounge. Fresh ingredients, authentic flavors.`;
-  const url = `${APP_URL}/menu/${category}`;
+    seo?.description || t("menu.description", { category: categoryLabel });
+  const alternates = buildAlternates(locale, `/menu/${category}`);
+  const url = alternates.canonical;
   const keywords = seo?.keywords?.map((k: any) => k.keyword) || [];
   const ogTitle = seo?.og_title || title;
   const ogDescription = seo?.og_description || description;
@@ -60,9 +68,7 @@ export async function generateMetadata({
     title,
     description,
     keywords,
-    alternates: {
-      canonical: url,
-    },
+    alternates,
     icons: APP_ICONS,
     openGraph: {
       title: ogTitle,
@@ -77,7 +83,7 @@ export async function generateMetadata({
           alt: ogImageAlt,
         },
       ],
-      locale: "en_US",
+      locale: getOgLocale(locale),
       type: "website",
     },
   };
