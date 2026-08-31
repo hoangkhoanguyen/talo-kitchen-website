@@ -2,9 +2,9 @@
 
 - **version**: v1
 - **current_sprint**: sprint-4-i18n-polish
-- **current_phase**: execute
+- **current_phase**: test
 - **current_task**: none
-- **updated_at**: 2026-09-01 02:30
+- **updated_at**: 2026-08-31
 
 ## Phase status (current sprint)
 
@@ -13,7 +13,7 @@
 - design_ui:     n/a
 - tasks:         done
 - execute:       done
-- test:          todo
+- test:          done
 - qa:            todo
 
 ## Human approval gates
@@ -39,8 +39,27 @@
   pre-existing dead code, not a sprint-4 regression). `messages/en.json`/`vi.json` key sets fully
   symmetric (0 missing either direction). `<html lang={locale}>` confirmed in `[locale]/layout.tsx`
   (NFR-06). `formatCurrency` (admin) + `lib/date.ts formatDateVN` (admin) confirmed untouched — 0 admin
-  files modified in this sprint's diff. Next: Test leg for sprint-4-i18n-polish (this is the LAST sprint
-  of v1 — after Test+QA, v1 is fully done).
+  files modified in this sprint's diff.
+- **sprint-4-i18n-polish TEST LEG DONE** (2026-08-31). New unit tests `tests/unit/currency-web.test.ts`
+  (8/8) + `tests/unit/i18n-meta.test.ts` (11/11); new Playwright `tests/i18n/sprint4-seo-polish.spec.ts`
+  (15/15, covers all 6 metadata pages + hreflang + sitemap + fallback + no-runtime-error sweep). Full
+  regression `tests/i18n/*` re-run `--workers=1` = 135/135 pass; `tests/unit/*` = 51/52 (1 pre-existing
+  `entity-translations.test.ts` failure confirmed unrelated to sprint-4, fails identically on commit
+  `8a1f5fc` before this sprint started — server-only import when run outside Next runtime, harness gap
+  not a product bug); `tsc --noEmit` 0 errors; `next build` PASS. **Found + fixed 1 real bug** (1 fix
+  round, Sonnet, no Opus escalation): `dish/[slug]/page.tsx` calls `notFound()` when product missing,
+  which per Next.js App Router semantics DISCARDS that route's own `generateMetadata` (its
+  `t("dish.notFound")` fallback branch was dead code) and falls back to the shared
+  `(web)/[locale]/not-found.tsx` boundary's metadata instead — which had NO `generateMetadata` at all,
+  so every 404 showed the static untranslated root-layout title regardless of locale (violated
+  AC-01.4/EC-01). Fixed by adding `generateMetadata` to `not-found.tsx` using the existing `notFound`
+  messages namespace + `resolveLocale` + `getOgLocale`. Also updated 1 pre-existing sprint-3 assertion
+  in `tests/i18n/entity-i18n-user.spec.ts` (price string-equality across locale) to numeric-equality,
+  since sprint-4 INTENTIONALLY makes price display grouping differ per locale (AC-05.1/05.2) while the
+  value stays the same (AC-05.3) — this was an outdated test assumption, not a code defect. Full mapping
+  + manual-verification list (reservation E2E visual, social-share preview, GSC hreflang validation —
+  all genuinely un-automatable pre-deploy) in `.sdlc/v1/sprint-4-i18n-polish/test-report.md`. Next: QA
+  gate for sprint-4-i18n-polish — LAST sprint of v1, after QA v1 is fully done.
 - (sprint-3-entity-i18n TEST LEG DONE, historical) — unit (21/21) + Playwright user-facing (16/16) +
   Playwright admin LocaleTabStrip (15/15, run `--workers=1`, shares fixture row PRODUCT_ID=18) +
   visual-baseline (6/6) all green; full `tests/i18n/` regression suite (114/114) + tsc (0 lỗi) + `next build`
