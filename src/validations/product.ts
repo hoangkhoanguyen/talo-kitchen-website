@@ -1,10 +1,51 @@
 import { z } from "zod";
 
+// Bản dịch (RULE-01/RULE-19): en (defaultLocale) required, vi optional (fallback về en khi rỗng)
+const productTranslationSchema = z.object({
+  en: z.object({
+    title: z
+      .string({ error: "Tên sản phẩm không được để trống" })
+      .min(1, { error: "Tên sản phẩm không được để trống" })
+      .max(255, { error: "Tên sản phẩm quá dài" }),
+    description: z.string().optional(),
+    subDescription: z.string().optional(),
+    allergenInfo: z.string().optional(),
+  }),
+  vi: z.object({
+    title: z.string().max(255, { error: "Tên sản phẩm quá dài" }).optional(),
+    description: z.string().optional(),
+    subDescription: z.string().optional(),
+    allergenInfo: z.string().optional(),
+  }),
+});
+
+const categoryTranslationSchema = z.object({
+  en: z.object({
+    name: z
+      .string({ error: "Tên danh mục không được để trống" })
+      .min(1, { error: "Tên danh mục không được để trống" })
+      .max(255, { error: "Tên danh mục quá dài" }),
+    description: z.string().max(1024, { error: "Mô tả quá dài" }).optional(),
+  }),
+  vi: z.object({
+    name: z.string().max(255, { error: "Tên danh mục quá dài" }).optional(),
+    description: z.string().max(1024, { error: "Mô tả quá dài" }).optional(),
+  }),
+});
+
+const addonTranslationSchema = z.object({
+  en: z.object({
+    name: z
+      .string({ error: "Tên addons không được để trống" })
+      .min(1, { error: "Tên addons không được để trống" })
+      .max(255, { error: "Tên addons quá dài" }),
+  }),
+  vi: z.object({
+    name: z.string().max(255, { error: "Tên addons quá dài" }).optional(),
+  }),
+});
+
 export const productCategorySchema = z.object({
-  name: z
-    .string()
-    .min(1, { error: "Tên danh mục không được để trống" })
-    .max(255, { error: "Tên danh mục quá dài" }),
   slug: z
     .string()
     .min(1, { error: "Đường dẫn không được để trống" })
@@ -13,17 +54,14 @@ export const productCategorySchema = z.object({
       error: "Đường dẫn không được chứa khoảng trắng",
     }),
   isActive: z.boolean().optional(),
-  description: z.string().max(1000, { error: "Mô tả quá dài" }).optional(),
+  translations: categoryTranslationSchema,
 });
 
 const productAddonSchema = z.object({
   id: z.number().optional(),
-  name: z
-    .string()
-    .min(1, { error: "Tên addons không được để trống" })
-    .max(255, { error: "Tên addons quá dài" }),
   price: z.number({ error: "Giá không hợp lệ" }),
   isActive: z.boolean(),
+  translations: addonTranslationSchema,
 });
 
 const productImageSchema = z.object({
@@ -32,10 +70,6 @@ const productImageSchema = z.object({
 });
 
 const basicProductSchema = {
-  title: z
-    .string({ error: "Tên sản phẩm không được để trống" })
-    .min(1, { error: "Tên sản phẩm không được để trống" })
-    .max(255, { error: "Tên sản phẩm quá dài" }),
   slug: z
     .string()
     .min(1, { error: "Đường dẫn không được để trống" })
@@ -46,6 +80,7 @@ const basicProductSchema = {
   categoryId: z.number({ error: "Danh mục không hợp lệ" }).min(1, {
     error: "Danh mục không được để trống",
   }),
+  translations: productTranslationSchema,
 };
 
 export const createProductSchema = z.object({
@@ -61,9 +96,6 @@ const relatedProductSchema = z.object({
 
 export const updateProductSchema = z.object({
   ...basicProductSchema,
-  allergenInfo: z.string().optional(),
-  subDescription: z.string().optional(),
-  description: z.string().optional(),
   isActive: z.boolean(),
   price: z
     .number({ error: "Giá không hợp lệ" })
