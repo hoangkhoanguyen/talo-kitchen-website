@@ -22,30 +22,48 @@ export function revalidateByAction(
   },
 ) {
   // Revalidate static tags từ REVALIDATION_MAP
+  //
+  // BUGFIX (found in sprint-2-config-i18n testing, blocks EC-11/AC-05.2/RULE-09
+  // for the WHOLE app, not just configs): `revalidateTag(tag, "default")`
+  // passed "default" as a cache-life *profile name*. This project does not
+  // configure `cacheLifeProfiles` (no dynamicIO/cacheComponents in
+  // next.config), so Next 16 can never resolve "default" to a real profile —
+  // it silently falls into the soft/stale-while-revalidate branch instead of
+  // the immediate-purge branch, so `unstable_cache`-tagged entries (products,
+  // categories, configs) were NEVER actually invalidated after any admin
+  // save. Passing an explicit `{ expire: 0 }` cache-life object (instead of a
+  // profile name) makes Next take the immediate-purge branch unconditionally
+  // (see next/dist/server/web/spec-extension/revalidate.js — `cacheLife.expire
+  // === 0` short-circuits to `pathWasRevalidated =
+  // ActionDidRevalidateStaticAndDynamic`), while staying within the typed
+  // `revalidateTag(tag, profile: string | CacheLifeConfig)` API (no deprecated
+  // single-arg call). Verified via a real admin save → /vi round trip in
+  // tests/i18n/config-i18n-admin.spec.ts.
+  const IMMEDIATE = { expire: 0 } as const;
   const staticTags = REVALIDATION_MAP[action];
   staticTags.forEach((tag) => {
-    revalidateTag(tag, "default");
+    revalidateTag(tag, IMMEDIATE);
   });
 
   // Revalidate dynamic tags nếu có params
   if (params) {
     if (params.productSlug) {
-      revalidateTag(CACHE_TAGS.PRODUCTS.BY_SLUG(params.productSlug), "default");
+      revalidateTag(CACHE_TAGS.PRODUCTS.BY_SLUG(params.productSlug), IMMEDIATE);
     }
     if (params.productId) {
       revalidateTag(
         CACHE_TAGS.PRODUCTS.BY_SLUG(`id:${params.productId}`),
-        "default",
+        IMMEDIATE,
       );
     }
     if (params.categoryId) {
       revalidateTag(
         CACHE_TAGS.PRODUCTS.BY_CATEGORY(params.categoryId),
-        "default",
+        IMMEDIATE,
       );
     }
     if (params.configKey) {
-      revalidateTag(CACHE_TAGS.CONFIGS.BY_KEY(params.configKey), "default");
+      revalidateTag(CACHE_TAGS.CONFIGS.BY_KEY(params.configKey), IMMEDIATE);
     }
   }
 }
@@ -74,10 +92,9 @@ export function revalidateProductUpdate(params: {
 
   // Revalidate old category nếu đổi category
   if (params.oldCategoryId && params.oldCategoryId !== params.categoryId) {
-    revalidateTag(
-      CACHE_TAGS.PRODUCTS.BY_CATEGORY(params.oldCategoryId),
-      "default",
-    );
+    revalidateTag(CACHE_TAGS.PRODUCTS.BY_CATEGORY(params.oldCategoryId), {
+      expire: 0,
+    });
   }
 }
 
