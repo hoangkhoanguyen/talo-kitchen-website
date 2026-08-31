@@ -225,7 +225,7 @@
 
 ## Wave 3 — Fallback sweep + hardcode scan + verify gate (CUỐI; phụ thuộc mọi task trên)
 
-- [ ] TASK-14  (todo)
+- [x] TASK-14  (done)
   Description: Task VERIFY tổng (không code lớn, chỉ vá chỗ sót nếu phát hiện). Chạy grep pattern §11:
     - `rg -n ">[A-Za-z ]{3,}<" src/components/web` và literal JSX English chưa qua `t()` →
       xử lý theo RULE-13 (i18n hoá; brand/danh từ riêng được giữ).

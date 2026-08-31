@@ -3,8 +3,8 @@
 - **version**: v1
 - **current_sprint**: sprint-4-i18n-polish
 - **current_phase**: execute
-- **current_task**: TASK-14 (Wave 3, in progress)
-- **updated_at**: 2026-09-01 02:00
+- **current_task**: none
+- **updated_at**: 2026-09-01 02:30
 
 ## Phase status (current sprint)
 
@@ -12,7 +12,7 @@
 - design_system: done
 - design_ui:     n/a
 - tasks:         done
-- execute:       doing
+- execute:       done
 - test:          todo
 - qa:            todo
 
@@ -24,9 +24,23 @@
 
 ## Resume pointer
 
-- **next_action**: sprint-4-i18n-polish IMPLEMENT — Wave 1 (TASK-01..04) + Wave 2 (TASK-05..13) all
-  done and committed (13/14 tasks). Now running Wave 3 (TASK-14: fallback sweep + hardcode scan +
-  final tsc/next build gate). See below (old sprint-3 note kept for history).
+- **next_action**: sprint-4-i18n-polish IMPLEMENT DONE (14/14 tasks). Wave 1 (TASK-01..04: i18n-meta.ts,
+  metadata namespace en/vi, date-web.ts TZ-safe, formatCurrencyWebsite locale param) + Wave 2
+  (TASK-05..13: 6 pages' generateMetadata refactored to use i18n-meta helpers + metadata namespace
+  fallback, sitemap alternates.languages, 9 client + 5 server formatCurrencyWebsite callsites passing
+  locale, ReservationSubmitSuccess moved off moment) + Wave 3 (TASK-14: fallback sweep + hardcode scan
+  + final build gate) all done and committed on `feature/multi-language` (commits 8a1f5fc..HEAD, see
+  `git log --grep='sprint-4-i18n-polish'`). Verify gate: `npx tsc --noEmit` = 0 errors, `npx next build`
+  PASS (22 app routes incl. `/[locale]/cart` and `/[locale]/checkout` now dynamic with generateMetadata).
+  Hardcode sweep: grep clean except 2 pre-existing DEAD/unused files not reachable in the app
+  (`src/components/web/Story.tsx` "Story" h1, `ContactSection.tsx`'s unused `openingHoursConfigs` const,
+  `GallerySection.tsx`'s unused `galleryImages` const — none are imported/rendered anywhere, actual
+  render always uses the DB config prop which IS localized via sprint-2; left untouched as out-of-scope
+  pre-existing dead code, not a sprint-4 regression). `messages/en.json`/`vi.json` key sets fully
+  symmetric (0 missing either direction). `<html lang={locale}>` confirmed in `[locale]/layout.tsx`
+  (NFR-06). `formatCurrency` (admin) + `lib/date.ts formatDateVN` (admin) confirmed untouched — 0 admin
+  files modified in this sprint's diff. Next: Test leg for sprint-4-i18n-polish (this is the LAST sprint
+  of v1 — after Test+QA, v1 is fully done).
 - (sprint-3-entity-i18n TEST LEG DONE, historical) — unit (21/21) + Playwright user-facing (16/16) +
   Playwright admin LocaleTabStrip (15/15, run `--workers=1`, shares fixture row PRODUCT_ID=18) +
   visual-baseline (6/6) all green; full `tests/i18n/` regression suite (114/114) + tsc (0 lỗi) + `next build`
