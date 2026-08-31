@@ -3,8 +3,8 @@
 - **version**: v1
 - **current_sprint**: sprint-4-i18n-polish
 - **current_phase**: execute
-- **current_task**: TASK-05..13 (Wave 2, in progress)
-- **updated_at**: 2026-09-01 01:10
+- **current_task**: TASK-14 (Wave 3, in progress)
+- **updated_at**: 2026-09-01 02:00
 
 ## Phase status (current sprint)
 
@@ -24,11 +24,9 @@
 
 ## Resume pointer
 
-- **next_action**: sprint-4-i18n-polish IMPLEMENT in progress — Wave 1 done (TASK-01 i18n-meta.ts,
-  TASK-02 metadata namespace en/vi, TASK-03 date-web.ts TZ-safe, TASK-04 formatCurrencyWebsite locale
-  param), commits 8a1f5fc/ddba8df/d973612/8691ce7. Now running Wave 2 (TASK-05..13, metadata pages +
-  sitemap + currency callsites + ReservationSubmitSuccess) in parallel via feature-builder. Wave 3
-  (TASK-14 fallback sweep + build gate) after. See below (old sprint-3 note kept for history).
+- **next_action**: sprint-4-i18n-polish IMPLEMENT — Wave 1 (TASK-01..04) + Wave 2 (TASK-05..13) all
+  done and committed (13/14 tasks). Now running Wave 3 (TASK-14: fallback sweep + hardcode scan +
+  final tsc/next build gate). See below (old sprint-3 note kept for history).
 - (sprint-3-entity-i18n TEST LEG DONE, historical) — unit (21/21) + Playwright user-facing (16/16) +
   Playwright admin LocaleTabStrip (15/15, run `--workers=1`, shares fixture row PRODUCT_ID=18) +
   visual-baseline (6/6) all green; full `tests/i18n/` regression suite (114/114) + tsc (0 lỗi) + `next build`
