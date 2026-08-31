@@ -1,6 +1,13 @@
 import { getDb } from "@/db/drizzle";
 import { productAddons, productImages } from "@/db/schemas";
 import { ProductAddOnDB, WebProduct } from "@/types/products";
+import type { Locale } from "@/types/configs";
+import { resolveLocale } from "@/lib/locale";
+import {
+  resolveAddon,
+  resolveCategoryFields,
+  resolveProductFields,
+} from "@/services/products/translations";
 import { asc } from "drizzle-orm";
 // Disabled cache imports - using direct DB calls now
 // import { createDynamicCachedFunction } from "@/lib/cache-utils";
@@ -28,7 +35,10 @@ export async function checkCartLength({
   return count;
 }
 
-export async function getCartProductsByIds(ids: number[]): Promise<
+export async function getCartProductsByIds(
+  ids: number[],
+  locale: Locale,
+): Promise<
   (Pick<
     WebProduct,
     "id" | "category" | "imageUrl" | "price" | "slug" | "title"
@@ -37,6 +47,10 @@ export async function getCartProductsByIds(ids: number[]): Promise<
   })[]
 > {
   if (!ids.length) return []; // Tránh query không cần thiết
+
+  // Defensive guard at the service boundary (EC-15): callers should already
+  // resolve locale (server action / hooks), but sanitize here too.
+  const resolvedLocale = resolveLocale(locale);
 
   const db = getDb();
 
@@ -51,6 +65,18 @@ export async function getCartProductsByIds(ids: number[]): Promise<
       slug: true,
     },
     with: {
+      translations: {
+        where(fields, { eq }) {
+          return eq(fields.locale, resolvedLocale);
+        },
+        columns: {
+          locale: true,
+          title: true,
+          description: true,
+          subDescription: true,
+          allergenInfo: true,
+        },
+      },
       images: {
         columns: {
           url: true,
@@ -65,6 +91,18 @@ export async function getCartProductsByIds(ids: number[]): Promise<
           name: true,
           slug: true,
         },
+        with: {
+          translations: {
+            where(fields, { eq }) {
+              return eq(fields.locale, resolvedLocale);
+            },
+            columns: {
+              locale: true,
+              name: true,
+              description: true,
+            },
+          },
+        },
       },
       addons: {
         where(fields, operators) {
@@ -77,19 +115,54 @@ export async function getCartProductsByIds(ids: number[]): Promise<
           name: true,
           price: true,
         },
+        with: {
+          translations: {
+            where(fields, { eq }) {
+              return eq(fields.locale, resolvedLocale);
+            },
+            columns: {
+              locale: true,
+              name: true,
+            },
+          },
+        },
       },
     },
   });
 
-  return productList.map((product) => ({
-    id: product.id,
-    slug: product.slug,
-    title: product.title,
-    price: product.price,
-    imageUrl: product.images[0]?.url || "",
-    category: product.category?.name || "",
-    addons: product.addons,
-  }));
+  return productList.map((product) => {
+    const { title } = resolveProductFields(
+      {
+        title: product.title,
+        description: null,
+        subDescription: null,
+        allergenInfo: null,
+      },
+      product.translations,
+      resolvedLocale,
+    );
+
+    const categoryName = product.category
+      ? resolveCategoryFields(
+          { name: product.category.name, description: null },
+          product.category.translations,
+          resolvedLocale,
+        ).name
+      : "";
+
+    return {
+      id: product.id,
+      slug: product.slug,
+      title,
+      price: product.price,
+      imageUrl: product.images[0]?.url || "",
+      category: categoryName,
+      addons: product.addons.map((addon) => ({
+        ...addon,
+        ...resolveAddon(addon, addon.translations, resolvedLocale),
+      })),
+    };
+  });
 }
 
 // ==================== CACHED VERSIONS (DISABLED) ====================
