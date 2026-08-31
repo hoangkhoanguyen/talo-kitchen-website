@@ -87,7 +87,7 @@
 
 ## Wave 2 — Metadata trang + sitemap + callsite (song song; phụ thuộc Wave 1)
 
-- [ ] TASK-05  (todo)
+- [x] TASK-05  (done)
   Description: Refactor `generateMetadata` trang home `page.tsx`: dùng `resolveLocale(rawLocale)`
     (ở CẢ generateMetadata LẪN page component — reviewer note), truyền locale vào cached service
     (`homepage.seo.*`), thay canonical đơn → `buildAlternates(locale, "")`, thay og:locale hardcode
@@ -103,7 +103,7 @@
   Test: metadata home: alternates.languages đủ en/vi/x-default, canonical=self, og:locale theo locale,
     seo trống → fallback ns không rỗng. Verify `tsc --noEmit`.
 
-- [ ] TASK-06  (todo)
+- [x] TASK-06  (done)
   Description: Refactor `generateMetadata` `menu/[category]/page.tsx`: đổi `locale as Locale` →
     `resolveLocale(rawLocale)` (EC-11), truyền locale vào cached service (`menu_page.seo.*` + category
     label/page_title), `buildAlternates(locale, "/menu/"+category)` + `getOgLocale`. i18n hoá fallback:
@@ -118,7 +118,7 @@
   Test: `/menu/all` en → path `/menu/all`, vi → `/vi/menu/all`; label "All" qua ns không hardcode;
     description ICU render đúng cả 2 locale; seo trống → fallback. Verify `tsc --noEmit`.
 
-- [ ] TASK-07  (todo)
+- [x] TASK-07  (done)
   Description: Refactor `generateMetadata` `dish/[slug]/page.tsx`: giữ `resolveLocale` hiện có, thay
     canonical đơn → `buildAlternates(locale, "/dish/"+slug)`, og:locale hardcode `"en_US"` →
     `getOgLocale(locale)`. i18n fallback: product null → `title: t("dish.notFound")` (EC-01, thay
@@ -133,7 +133,7 @@
   Test: `/vi/dish/x` → nội dung vi; product null → title từ ns (i18n) không crash; alternates 2 chiều
     khớp; og:locale theo locale. Verify `tsc --noEmit`.
 
-- [ ] TASK-08  (todo)
+- [x] TASK-08  (done)
   Description: Refactor `generateMetadata` `reservation/page.tsx`: đổi `locale as Locale` →
     `resolveLocale(rawLocale)` (EC-11), truyền locale vào cached service (`reservation_page.seo.*`),
     `buildAlternates(locale, "/reservation")` + `getOgLocale`, openGraph.url=canonical. Fallback seo
@@ -145,7 +145,7 @@
   Suggested skill:
   Test: metadata reservation locale-đúng, alternates/canonical/og:locale đúng, fallback ns. `tsc --noEmit`.
 
-- [ ] TASK-09  (todo)
+- [x] TASK-09  (done)
   Description: Chuyển `checkout/page.tsx` và `cart/page.tsx` từ static `export const metadata`
     (English cứng) → `async generateMetadata({params})` nhận `locale`. Thêm `params: Promise<{locale}>`
     vào cả generateMetadata (và page component nếu cần lấy locale). Dùng `resolveLocale` +
@@ -161,7 +161,7 @@
   Test: `/checkout` & `/cart` build có generateMetadata; vi → title/desc tiếng Việt; alternates/
     og:locale đúng; trang vẫn render. Verify `tsc --noEmit` + `next build`.
 
-- [ ] TASK-10  (todo)
+- [x] TASK-10  (done)
   Description: Sửa `src/app/sitemap.ts`: THÊM `alternates: { languages: buildSitemapLanguages(path) }`
     vào MỖI entry (path=pathname không prefix: `""`, `/menu/${key}`, `/reservation`, `/dish/${slug}`).
     GIỮ NGUYÊN: `force-dynamic`, tập URL gốc (bản defaultLocale, không prefix), đọc `menu_page` theo
