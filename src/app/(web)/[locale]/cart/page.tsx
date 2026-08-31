@@ -2,13 +2,39 @@ import CartIntro from "@/components/web/features/cart/CartIntro";
 import CartItems from "@/components/web/features/cart/CartItems";
 import CartProvider from "@/components/web/features/cart/CartProvider";
 import CartSummary from "@/components/web/features/cart/CartSummary";
+import { buildAlternates, getOgLocale } from "@/lib/i18n-meta";
+import { resolveLocale } from "@/lib/locale";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import React from "react";
 
-export const metadata: Metadata = {
-  title: "Shopping Cart | TALO Kitchen & Lounge",
-  description: "Review your order items before checkout at TALO Kitchen & Lounge.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+  const t = await getTranslations({ locale, namespace: "metadata" });
+
+  const title = t("cart.title");
+  const description = t("cart.description");
+  const alternates = buildAlternates(locale, "/cart");
+
+  return {
+    title,
+    description,
+    alternates,
+    openGraph: {
+      title,
+      description,
+      url: alternates.canonical,
+      siteName: "TALO Kitchen & Lounge",
+      type: "website",
+      locale: getOgLocale(locale),
+    },
+  };
+}
 
 const CartPage = () => {
   return (
