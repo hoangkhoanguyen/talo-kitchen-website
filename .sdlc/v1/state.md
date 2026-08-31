@@ -2,9 +2,9 @@
 
 - **version**: v1
 - **current_sprint**: sprint-3-entity-i18n
-- **current_phase**: test
+- **current_phase**: qa
 - **current_task**: none
-- **updated_at**: 2026-08-31 21:15
+- **updated_at**: 2026-08-31 22:40
 
 ## Phase status (current sprint)
 
@@ -14,7 +14,7 @@
 - tasks:         done
 - execute:       done
 - test:          done
-- qa:            todo
+- qa:            done
 
 ## Human approval gates
 
@@ -50,6 +50,7 @@
 - (sprint-2-config-i18n) next_action cũ: QA gate DONE (1 fix round). Full checklist re-run clean: 25/25 unit + 83/83 Playwright pass, `tsc --noEmit` sạch, `next build` PASS, migration re-run trên dev_multi_lang idempotent + English 100% nguyên vẹn + config app/non-localized không đụng (verify trực tiếp bằng SQL). Backward-compat helper (`normalizeLocalized`/`resolveLocalizedString` coi string chưa migrate = bản en, không crash) đã confirm là điều kiện đủ để deploy code trước / migrate sau trên prod. Đã tự fix 1 cosmetic bug (`SettingNumberField.tsx` leak `isRequired` xuống DOM) vì trivial 1-file fix, re-run full suite xanh lại sau fix, đã commit. Sprint sẵn sàng handoff cho manual test.
 - **blockers**: none
 - **qa_notes**: report đầy đủ ở `.sdlc/v1/sprint-2-config-i18n/test-report.md` (test leg) + báo cáo QA trong hội thoại /sdlc:test agent qa-guard (2026-08-31). Còn lại cho user verify thủ công: (1) login admin thật trên dev_multi_lang bị chặn bởi lỗi quyền DB role (permission denied sequence refresh_tokens_id_seq/users_id_seq) — pre-existing, KHÔNG phải do sprint-2; cần cấp quyền INSERT/sequence cho role dev hoặc seed sẵn tài khoản admin để test tay được. (2) Nội dung vi thật cho toàn bộ field RULE-20..23 chưa được nhập (đúng — đây là content/ops task, không phải code task của sprint này).
+- **qa_notes (sprint-3-entity-i18n, 2026-08-31, qa-guard)**: QA gate DONE, 0 fix rounds needed (test leg đã sạch từ trước, không tìm thêm bug). Re-run toàn bộ checklist: `npx tsc --noEmit` 0 lỗi; `npx next build` PASS (22 route); unit `tests/unit/entity-translations.test.ts` 21/21 + `tests/unit/localized-config.test.ts` 25/25; Playwright `tests/i18n/` (toàn bộ, `--workers=1`) 120/120 pass (gồm entity-i18n-admin 15, entity-i18n-user 16, entity-i18n-visual-baseline 6, + regression sprint-1/2 đầy đủ). Xác nhận trực tiếp bằng SQL trên `dev_multi_lang`: `products`=40/`product_translations(en)`=40, `product_categories`=4/`product_category_translations(en)`=4, `product_addons`=15/`product_addon_translations(en)`=15 (1:1, AC-06.2); migration SQL (`src/db/migration/0001_flashy_morbius.sql`) CHỈ có `CREATE TABLE`+`ALTER...ADD CONSTRAINT FK CASCADE`, KHÔNG đụng cột gốc (AC-06.1/NFR-03); vi row test fixture (product id=18) đã cleanup đúng (empty string, không xoá row, EN base column "Orange Juice" nguyên vẹn). Xác nhận fix bug LocaleTabStrip remount (`key={...-${activeLocale}}`) có mặt ở cả 5 file (ProductEditForm/AddonsEditor/CreateProduct/CreateCategory/UpdateCategory). Scan sạch: không TODO/FIXME mới trong sprint-3 diff, không hardcode secret/URL, `console.log` chỉ ở CLI scripts (intentional output) + 5 chỗ trong `actions/admin/{product,category}.ts` là pattern lỗi PRE-EXISTING (không phải sprint-3 gây ra, verify bằng git show ở commit trước sprint). Addon add-remove-before-save (AC-02.3) xác nhận KHÔNG orphan by construction (đọc code `updateProductById`: `upsertAddonTranslations` chỉ gọi SAU khi có `insertedAddon.id` từ tx INSERT, addon bị xoá ở client trước submit không bao giờ vào `newAddons`). Backward-compat "deploy code trước, migrate sau" = **BẮT BUỘC migrate schema TRƯỚC khi deploy code sprint-3** (không như sprint-2): resolver không throw với giá trị null/rỗng/thiếu row, NHƯNG nếu 3 bảng `*_translations` chưa tồn tại, Drizzle relational `with: { translations }` sẽ lỗi ở tầng query (bảng không tồn tại) — đây là ops/deploy-order concern, không phải code-level guard. Thứ tự deploy đúng: `db:generate`+`db:migrate` (tạo 3 bảng) → `seed:entities-i18n` (backup + idempotent) → deploy code mới. Không tìm thấy lỗi nào cần fix (0/6 fix rounds dùng). Sprint sẵn sàng handoff cho manual test.
 
 ## Context loaded this run (so the next run knows what to re-read)
 
