@@ -1,6 +1,37 @@
 import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import { getTranslations } from "next-intl/server";
+import { resolveLocale } from "@/lib/locale";
+import { getOgLocale } from "@/lib/i18n-meta";
+import type { Metadata } from "next";
+
+/**
+ * NOTE (sprint-4-i18n-polish, EC-01/RULE-05): when a page in this locale
+ * segment calls `notFound()` (e.g. dish/[slug] for a missing product), Next
+ * discards that page's own `generateMetadata` result and renders this
+ * boundary instead — so THIS file must be locale-aware, otherwise every 404
+ * (including "product not found") silently falls back to the untranslated
+ * root layout title regardless of locale.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale?: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+  const t = await getTranslations({ locale, namespace: "notFound" });
+
+  return {
+    title: t("title"),
+    description: t("message"),
+    openGraph: {
+      title: t("title"),
+      description: t("message"),
+      locale: getOgLocale(locale),
+    },
+  };
+}
 
 const NotFoundPage = async () => {
   const t = await getTranslations("notFound");
