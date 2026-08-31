@@ -2,7 +2,6 @@ import { getAdminOrderById } from "@/services/orders";
 import { notFound } from "next/navigation";
 import { formatDateVN } from "@/lib/date";
 import { Poppins } from "next/font/google";
-import QRCode from "qrcode";
 import BillReceipt, {
   BillData,
 } from "@/components/admin/features/orders/BillReceipt";
@@ -12,22 +11,6 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
-
-// Link Google Maps để khách quét QR đánh giá TALO
-const REVIEW_URL = "https://maps.app.goo.gl/EYzMXo5j7sacPYYs5";
-
-async function buildReviewQrSvg() {
-  try {
-    return await QRCode.toString(REVIEW_URL, {
-      type: "svg",
-      margin: 0,
-      errorCorrectionLevel: "M",
-      color: { dark: "#000000", light: "#00000000" },
-    });
-  } catch {
-    return "";
-  }
-}
 
 const PrintOrderBillPage = async ({
   params,
@@ -60,11 +43,7 @@ const PrintOrderBillPage = async ({
     total: order.totalPrice - order.shippingFee,
   };
 
-  const qrSvg = await buildReviewQrSvg();
-
-  return (
-    <BillReceipt data={data} qrSvg={qrSvg} fontClassName={poppins.className} />
-  );
+  return <BillReceipt data={data} fontClassName={poppins.className} />;
 };
 
 export default PrintOrderBillPage;

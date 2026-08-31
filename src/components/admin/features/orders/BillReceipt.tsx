@@ -29,18 +29,17 @@ const RESTAURANT = {
   addressLine1: "69 Nguyen Thai Hoc Street - Ha Giang 2 Ward",
   addressLine2: "Tuyen Quang Province -  Vietnam",
   tel: "Tel: +84 98 082 138",
+  // Ảnh QR review Google Maps (đặt trong /public)
+  reviewQr: "/bill-review-qr.png",
 };
 
 const fmt = (n: number) => Math.round(n).toLocaleString("vi-VN");
 
 export default function BillReceipt({
   data,
-  qrSvg = "",
   fontClassName = "",
 }: {
   data: BillData;
-  /** SVG markup của QR review (sinh sẵn ở server). Rỗng => ẩn khối QR. */
-  qrSvg?: string;
   fontClassName?: string;
 }) {
   useEffect(() => {
@@ -132,16 +131,16 @@ export default function BillReceipt({
           </div>
 
           {/* Review Google Maps */}
-          {qrSvg && (
+          {RESTAURANT.reviewQr && (
             <div className="bill-review">
               <div className="bill-center bill-review-lead">
                 Enjoyed your meal? We&rsquo;d be delighted if you could leave
                 TALO a review on Google Maps.
               </div>
-              <div
-                className="bill-qr"
-                dangerouslySetInnerHTML={{ __html: qrSvg }}
-              />
+              <div className="bill-qr">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={RESTAURANT.reviewQr} alt="QR review Google Maps" />
+              </div>
               <div className="bill-center bill-review-foot">
                 Please, scan the QR code to share your experience with TALO!
               </div>
@@ -267,10 +266,11 @@ const printStyles = `
   margin: 16px 0;
 }
 
-.bill-qr svg {
+.bill-qr img {
   width: 42mm;
   height: 42mm;
   display: block;
+  object-fit: contain;
 }
 
 .bill-review-foot {
