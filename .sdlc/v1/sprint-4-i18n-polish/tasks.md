@@ -192,7 +192,7 @@
   Suggested skill:
   Test: build; render các trang cart/checkout không lỗi; số tiền đúng. Verify `tsc --noEmit`.
 
-- [ ] TASK-12  (todo)
+- [x] TASK-12  (done)
   Description: Cập nhật 5 callsite SERVER (không `"use client"`) của `formatCurrencyWebsite` truyền
     `locale`: `ProductInformation`, `ProductCard`, `OrderItem` (checkout), `CartItemTotalPrice`,
     `QuickCartForm` — lấy locale qua prop (từ parent đã có locale) HOẶC `getLocale()` (next-intl/server).
