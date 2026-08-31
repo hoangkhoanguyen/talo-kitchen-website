@@ -4,8 +4,9 @@ import SettingsNumberInput from "../elements/SettingsNumberInput";
 import { CommonField, NumberField } from "@/types/settings";
 
 const SettingNumberField: FC<
-  Omit<NumberField, "type" | "key"> & { control: Control; name: string }
-> = ({ control, name, ...props }) => {
+  Omit<NumberField, "type" | "key"> &
+    Omit<CommonField, "key"> & { control: Control; name: string }
+> = ({ control, name, isRequired, ...props }) => {
   return (
     <Controller
       control={control}
