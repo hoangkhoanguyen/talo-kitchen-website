@@ -2,9 +2,10 @@
 import useUpdateProduct from "@/hooks/admin/features/products/useUpdateProduct";
 import useUpdateProductForm from "@/hooks/admin/features/products/useUpdateProductForm";
 import { useSetLoading } from "@/hooks/admin/loading";
+import { routing } from "@/i18n/routing";
 import { AdminEditProductForm } from "@/types/products";
-import React, { PropsWithChildren, useCallback, useEffect } from "react";
-import { Control } from "react-hook-form";
+import React, { PropsWithChildren, useCallback, useEffect, useState } from "react";
+import { Control, UseFormSetValue } from "react-hook-form";
 
 const Context = React.createContext<{
   id: number;
@@ -13,6 +14,9 @@ const Context = React.createContext<{
   isPending?: boolean;
   isDirty?: boolean;
   control: Control<AdminEditProductForm>;
+  setValue: UseFormSetValue<AdminEditProductForm>;
+  activeLocale: string;
+  setActiveLocale(locale: string): void;
 } | null>(null);
 
 export default function ProductDetailsProvider({
@@ -24,10 +28,15 @@ export default function ProductDetailsProvider({
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { isDirty },
   } = useUpdateProductForm();
 
   const { mutate, isPending } = useUpdateProduct();
+
+  const [activeLocale, setActiveLocale] = useState<string>(
+    routing.defaultLocale,
+  );
 
   const onUpdateFormData = useCallback(
     (data: AdminEditProductForm) => {
@@ -62,10 +71,13 @@ export default function ProductDetailsProvider({
       value={{
         id,
         control,
+        setValue,
         onReset,
         onSubmit,
         isPending,
         isDirty,
+        activeLocale,
+        setActiveLocale,
       }}
     >
       {children}

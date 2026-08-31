@@ -10,18 +10,80 @@ import ProductPriceInput from "./form-elements/ProductPriceInput";
 import RelatedProductEditor from "./form-elements/RelatedProductEditor";
 import ImagesEditor from "./form-elements/ImagesEditor";
 import AddonsEditor from "./form-elements/AddonsEditor";
+import LocaleTabStrip from "./form-elements/LocaleTabStrip";
 import { useProductDetailsContext } from "./ProductDetailsProvider";
-import { Controller, useWatch } from "react-hook-form";
+import { Controller, FieldPath, useWatch } from "react-hook-form";
 import { generateSlug } from "@/lib/utils";
 import { Input, InputWithLabel, SlugInput } from "../../ui/form";
 import WithError from "../../ui/form/WithError";
+import { routing } from "@/i18n/routing";
+import { AdminEditProductForm } from "@/types/products";
+import type { Locale } from "@/types/configs";
+
+const translatedPath = (
+  locale: string,
+  field: "title" | "allergenInfo" | "subDescription" | "description",
+) =>
+  `translations.${locale}.${field}` as FieldPath<AdminEditProductForm>;
 
 const ProductEditForm = () => {
-  const { control } = useProductDetailsContext();
+  const { control, setValue, activeLocale, setActiveLocale } =
+    useProductDetailsContext();
   const title = useWatch({
     control,
-    name: "title",
+    name: translatedPath(routing.defaultLocale, "title"),
   });
+  const translations = useWatch({
+    control,
+    name: "translations",
+  });
+  const addons = useWatch({
+    control,
+    name: "addons",
+  });
+
+  const isMissing = (locale: string) => {
+    const defaultGroup = translations?.[routing.defaultLocale as Locale];
+    const localeGroup = translations?.[locale as Locale];
+
+    const basicFieldsMissing = (
+      ["title", "allergenInfo", "subDescription", "description"] as const
+    ).some((field) => {
+      const defaultValue = defaultGroup?.[field];
+      const localeValue = localeGroup?.[field];
+      return !!defaultValue && !localeValue;
+    });
+
+    const addonNameMissing = (addons ?? []).some((addon) => {
+      const defaultName =
+        addon.translations?.[routing.defaultLocale as Locale]?.name;
+      const localeName = addon.translations?.[locale as Locale]?.name;
+      return !!defaultName && !localeName;
+    });
+
+    return basicFieldsMissing || addonNameMissing;
+  };
+
+  const onCopyFromDefault = () => {
+    const defaultGroup = translations?.[routing.defaultLocale as Locale];
+
+    (
+      ["title", "allergenInfo", "subDescription", "description"] as const
+    ).forEach((field) => {
+      setValue(
+        translatedPath(activeLocale, field),
+        defaultGroup?.[field] ?? "",
+      );
+    });
+
+    (addons ?? []).forEach((_, index) => {
+      setValue(
+        `addons.${index}.translations.${activeLocale}.name` as FieldPath<AdminEditProductForm>,
+        addons?.[index]?.translations?.[routing.defaultLocale as Locale]
+          ?.name ?? "",
+      );
+    });
+  };
 
   return (
     <div className="container p-5 mx-auto">
@@ -31,21 +93,75 @@ const ProductEditForm = () => {
             <div className="card bg-white">
               <div className="p-5">
                 <div className="card-title">Thông tin cơ bản</div>
+                <LocaleTabStrip
+                  className="mb-4"
+                  locales={routing.locales}
+                  defaultLocale={routing.defaultLocale}
+                  activeLocale={activeLocale}
+                  onChange={setActiveLocale}
+                  isMissing={isMissing}
+                  showCopy={activeLocale !== routing.defaultLocale}
+                  onCopyFromDefault={onCopyFromDefault}
+                />
                 <div className="grid grid-cols-1 gap-4">
                   <Controller
                     control={control}
-                    name="title"
+                    name={translatedPath(activeLocale, "title")}
                     render={({
                       field: { value, onChange },
                       fieldState: { error },
                     }) => (
                       <ProductTitleInput
-                        value={value}
+                        value={value as string}
                         onChange={onChange}
                         error={error}
                       />
                     )}
                   />
+                  <Controller
+                    control={control}
+                    name={translatedPath(activeLocale, "allergenInfo")}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <ProductAllergenInfoInput
+                        value={value as string}
+                        onChange={onChange}
+                        error={error}
+                      />
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name={translatedPath(activeLocale, "subDescription")}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <ProductSubDescriptionInput
+                        value={value as string}
+                        onChange={onChange}
+                        error={error}
+                      />
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name={translatedPath(activeLocale, "description")}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <ProductDescriptionInput
+                        value={value as string}
+                        onChange={onChange}
+                        error={error}
+                      />
+                    )}
+                  />
+                </div>
+                <div className="border-t border-base-300 pt-4 mt-4">
                   <Controller
                     control={control}
                     name="slug"
@@ -58,50 +174,8 @@ const ProductEditForm = () => {
                         onChange={onChange}
                         error={error}
                         onGenerateSlug={() => {
-                          onChange(generateSlug(title));
+                          onChange(generateSlug(title as string));
                         }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name="allergenInfo"
-                    render={({
-                      field: { value, onChange },
-                      fieldState: { error },
-                    }) => (
-                      <ProductAllergenInfoInput
-                        value={value}
-                        onChange={onChange}
-                        error={error}
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name="subDescription"
-                    render={({
-                      field: { value, onChange },
-                      fieldState: { error },
-                    }) => (
-                      <ProductSubDescriptionInput
-                        value={value}
-                        onChange={onChange}
-                        error={error}
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name="description"
-                    render={({
-                      field: { value, onChange },
-                      fieldState: { error },
-                    }) => (
-                      <ProductDescriptionInput
-                        value={value}
-                        onChange={onChange}
-                        error={error}
                       />
                     )}
                   />

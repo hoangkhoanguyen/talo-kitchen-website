@@ -2,6 +2,10 @@ import ProductDetailsHeader from "@/components/admin/features/products/ProductDe
 import ProductDetailsProvider from "@/components/admin/features/products/ProductDetailsProvider";
 import ProductEditForm from "@/components/admin/features/products/ProductEditForm";
 import ImageLibraryModalProvider from "@/components/admin/shared/image-library/ImageLibraryProvider";
+import {
+  mapAddonTranslationsToForm,
+  mapProductTranslationsToForm,
+} from "@/lib/mappings/products";
 import { getAdminProductDetailsById } from "@/services/products";
 import { pick } from "lodash";
 import React from "react";
@@ -24,17 +28,15 @@ const ProductDetailsPage = async ({
   if (!product) return <>NoData</>;
 
   const convertedProduct = {
-    title: product.title,
     slug: product.slug,
     categoryId: product.category.id,
     isActive: product.isActive,
-    allergenInfo: product.allergenInfo || undefined,
-    subDescription: product.subDescription || undefined,
-    description: product.description || undefined,
     price: product.price,
-    addons: product.addons.map((item) =>
-      pick(item, "id", "name", "isActive", "price"),
-    ),
+    translations: mapProductTranslationsToForm(product, product.translations),
+    addons: product.addons.map((item) => ({
+      ...pick(item, "id", "isActive", "price"),
+      translations: mapAddonTranslationsToForm(item, item.translations),
+    })),
     images: product.images.map((item) => pick(item, "id", "url")),
     relatedProducts: product.relatedProducts.map((item) =>
       pick(item, "id", "title"),

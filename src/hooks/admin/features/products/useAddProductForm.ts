@@ -1,21 +1,12 @@
-import { routing } from "@/i18n/routing";
-import { AdminCreateProductForm, ProductTranslationForm } from "@/types/products";
+import { AdminCreateProductForm } from "@/types/products";
 import { createProductSchema } from "@/validations/product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { createEmptyProductTranslations } from "@/lib/mappings/products";
 
-// Entity MỚI (chưa tồn tại) → mọi locale rỗng, không cần seed cột gốc (EC-05 chỉ áp dụng khi load
-// entity cũ, xem useUpdateProductForm.ts).
-export const createEmptyProductTranslations = (): ProductTranslationForm =>
-  routing.locales.reduce((acc, locale) => {
-    acc[locale] = {
-      title: "",
-      description: "",
-      subDescription: "",
-      allergenInfo: "",
-    };
-    return acc;
-  }, {} as ProductTranslationForm);
+// Re-export cho các consumer hiện có (giữ nguyên vị trí import cũ). Logic thật nằm ở
+// `@/lib/mappings/products` (pure, KHÔNG import react-hook-form).
+export { createEmptyProductTranslations };
 
 const useAddProductForm = () => {
   return useForm<AdminCreateProductForm>({

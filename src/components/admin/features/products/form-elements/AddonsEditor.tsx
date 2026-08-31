@@ -3,13 +3,21 @@ import { Button, IconButton } from "@/components/admin/ui/button";
 import { Switch } from "@/components/admin/ui/form";
 import React from "react";
 import { useProductDetailsContext } from "../ProductDetailsProvider";
-import { Controller, useFieldArray } from "react-hook-form";
+import { Controller, FieldPath, useFieldArray } from "react-hook-form";
 import Icon from "@/components/common/Icon";
 import WithError from "@/components/admin/ui/form/WithError";
 import { cn } from "@/lib/utils";
+import { routing } from "@/i18n/routing";
+import { AddonTranslationForm, AdminEditProductForm } from "@/types/products";
+
+const createEmptyAddonTranslations = (): AddonTranslationForm =>
+  routing.locales.reduce((acc, locale) => {
+    acc[locale] = { name: "" };
+    return acc;
+  }, {} as AddonTranslationForm);
 
 const AddonsEditor = () => {
-  const { control } = useProductDetailsContext();
+  const { control, activeLocale } = useProductDetailsContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "addons",
@@ -18,9 +26,9 @@ const AddonsEditor = () => {
 
   const onAddAddons = () => {
     append({
-      name: "",
       price: 0,
       isActive: true,
+      translations: createEmptyAddonTranslations(),
     });
   };
 
@@ -50,7 +58,9 @@ const AddonsEditor = () => {
               />
               <Controller
                 control={control}
-                name={`addons.${index}.name`}
+                name={
+                  `addons.${index}.translations.${activeLocale}.name` as FieldPath<AdminEditProductForm>
+                }
                 render={({
                   field: { value, onChange },
                   fieldState: { error },
@@ -71,7 +81,7 @@ const AddonsEditor = () => {
                           type="text"
                           className="grow"
                           placeholder="Tên"
-                          value={value}
+                          value={value as string}
                           onChange={(e) => onChange(e.target.value)}
                         />
                       </label>
