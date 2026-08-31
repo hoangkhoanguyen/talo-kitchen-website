@@ -62,9 +62,11 @@ export default function BillReceipt({
       if (!styleEl) {
         styleEl = document.createElement("style");
         styleEl.id = "bill-page-size";
-        document.head.appendChild(styleEl);
       }
       styleEl.textContent = `@page { size: 80mm ${heightMm}mm; margin: 0; }`;
+      // Chèn vào CUỐI body để @page này luôn đứng SAU @page tĩnh trong DOM
+      // (khai báo @page sau sẽ thắng) → chiều cao động mới có hiệu lực.
+      document.body.appendChild(styleEl);
     };
 
     // Đợi ảnh QR load xong mới đo (QR chiếm chiều cao đáng kể)
@@ -190,7 +192,9 @@ export default function BillReceipt({
 }
 
 const printStyles = `
-@page { size: 80mm auto; margin: 0; }
+/* Không đặt size ở đây để tránh đè lên @page động (đo chiều cao thật).
+   JS sẽ chèn @page { size: 80mm <chiều cao thật>mm } vào cuối body. */
+@page { margin: 0; }
 
 .bill-root {
   background: #f3f4f6;
