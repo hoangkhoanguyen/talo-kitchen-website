@@ -7,13 +7,18 @@ import SectionSubTitleFromConfigs from "../../shared/SectionSubTitleFromConfigs"
 import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
 import { getProductsByCategorySlugCached } from "@/services/cached";
 import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/types/configs";
 
-const FoodCategories: FC<{ activeCategoryKey: string; configs: any }> = async ({
-  activeCategoryKey,
-  configs,
-}) => {
+const FoodCategories: FC<{
+  activeCategoryKey: string;
+  configs: any;
+  locale: Locale;
+}> = async ({ activeCategoryKey, configs, locale }) => {
   const t = await getTranslations("menu");
-  const products = await getProductsByCategorySlugCached(activeCategoryKey);
+  const products = await getProductsByCategorySlugCached(
+    activeCategoryKey,
+    locale,
+  );
 
   const categoryLabel = configs.categories_to_show.find(
     (category: any) => category.key === activeCategoryKey,

@@ -4,6 +4,7 @@ import NewFood from "@/components/web/features/menu/NewFood";
 import { WhyChooseUsSection } from "@/components/web/shared/WhyChooseUsSection";
 import { getUIConfigsByKeyCached } from "@/services/cached";
 import { APP_ICONS, APP_URL } from "@/constants/app";
+import { resolveLocale } from "@/lib/locale";
 import { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
@@ -87,9 +88,10 @@ const page = async ({
 }: {
   params: Promise<{ category: string; locale: string }>;
 }) => {
-  const { category, locale } = await params;
+  const { category, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
 
-  const dbConfigs = await getUIConfigsByKeyCached("menu_page", locale as Locale);
+  const dbConfigs = await getUIConfigsByKeyCached("menu_page", locale);
 
   const configs = dbConfigs?.value as any;
 
@@ -125,8 +127,9 @@ const page = async ({
       <FoodCategories
         configs={configs?.food_categories}
         activeCategoryKey={category}
+        locale={locale}
       />
-      <NewFood configs={configs?.new_product} />
+      <NewFood configs={configs?.new_product} locale={locale} />
       <section className="bg-web-background-1">
         <WhyChooseUsSection configs={configs?.why_choose_us} />
       </section>

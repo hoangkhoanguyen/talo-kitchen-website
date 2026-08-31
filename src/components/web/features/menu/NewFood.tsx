@@ -8,12 +8,16 @@ import { splitTextByNewLine } from "@/lib/utils";
 import { webRoutes } from "@/constants/route";
 import { getProductBySlugCached } from "@/services/cached";
 import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/types/configs";
 
-const NewFood: FC<{ configs: any }> = async ({ configs }) => {
+const NewFood: FC<{ configs: any; locale: Locale }> = async ({
+  configs,
+  locale,
+}) => {
   if (!configs.isShow) return null;
 
   const t = await getTranslations("menu");
-  const product = await getProductBySlugCached(configs?.product_slug);
+  const product = await getProductBySlugCached(configs?.product_slug, locale);
 
   if (!product) return null;
 
