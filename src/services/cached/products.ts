@@ -14,14 +14,22 @@ import {
   getMultipleProductsByIds,
   getProductDetailsForQuickCartById,
 } from "@/services/products";
+import type { Locale } from "@/types/configs";
 
 /**
  * ✅ CACHED: Get products by category slug
  * Dùng cho: Menu page - /menu/[categorySlug]
+ * Cache key theo locale (mỗi locale 1 entry), tag GIỮ NGUYÊN (không kèm
+ * locale) để 1 lần revalidate xoá cache của mọi locale (RULE-10).
  */
 export const getProductsByCategorySlugCached = createDynamicCachedFunction(
   getProductsByCategorySlug,
-  (categorySlug: string) => ["products", "category", categorySlug],
+  (categorySlug: string, locale: Locale) => [
+    "products",
+    "category",
+    categorySlug,
+    locale,
+  ],
   (categorySlug: string) => {
     // Nếu là "all" thì dùng tag ALL, còn không dùng tag BY_CATEGORY
     if (categorySlug === "all") {
@@ -39,7 +47,7 @@ export const getProductsByCategorySlugCached = createDynamicCachedFunction(
  */
 export const getProductBySlugCached = createDynamicCachedFunction(
   getProductBySlug,
-  (slug: string) => ["products", "card", slug],
+  (slug: string, locale: Locale) => ["products", "card", slug, locale],
   (slug: string) => [CACHE_TAGS.PRODUCTS.BY_SLUG(slug)],
 );
 
@@ -49,7 +57,7 @@ export const getProductBySlugCached = createDynamicCachedFunction(
  */
 export const getProductDetailsBySlugCached = createDynamicCachedFunction(
   getProductDetailsBySlug,
-  (slug: string) => ["products", "details", slug],
+  (slug: string, locale: Locale) => ["products", "details", slug, locale],
   (slug: string) => [CACHE_TAGS.PRODUCTS.BY_SLUG(slug)],
 );
 
@@ -59,7 +67,12 @@ export const getProductDetailsBySlugCached = createDynamicCachedFunction(
  */
 export const getRelatedProductsCached = createDynamicCachedFunction(
   getMultipleProductsByIds,
-  (ids: number[]) => ["products", "related", ...ids.sort().map(String)],
+  (ids: number[], locale: Locale) => [
+    "products",
+    "related",
+    ...ids.sort().map(String),
+    locale,
+  ],
   () => {
     // Related products cần revalidate khi bất kỳ product nào thay đổi
     return [CACHE_TAGS.PRODUCTS.ALL];
@@ -73,6 +86,11 @@ export const getRelatedProductsCached = createDynamicCachedFunction(
 export const getProductDetailsForQuickCartByIdCached =
   createDynamicCachedFunction(
     getProductDetailsForQuickCartById,
-    (id: number) => ["products", "quick-cart", id.toString()],
+    (id: number, locale: Locale) => [
+      "products",
+      "quick-cart",
+      id.toString(),
+      locale,
+    ],
     (id: number) => [CACHE_TAGS.PRODUCTS.BY_SLUG(`id:${id}`)],
   );
