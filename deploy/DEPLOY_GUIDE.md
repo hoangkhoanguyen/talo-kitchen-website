@@ -1,41 +1,39 @@
 # Deploy prod → Multi-language (blue/green)
 
-**Ý tưởng:** `prod` = bản cũ (giữ nguyên để rollback). `prod_v2` = clone + migrate. Cắt = đổi env `DB_SCHEMA` trên Vercel. Rollback = đổi lại.
+**Ý tưởng:** `prod` = bản cũ (giữ nguyên để rollback). `prod_v2` = clone + migrate. Cắt = đổi env `DB_SCHEMA` trên Vercel. Rollback = switch Vercel về deployment cũ.
 
 🧑 = bạn làm · 🤖 = nhờ Claude
 
 ---
 
-### Chuẩn bị
-- [ ] 🧑 Backup `prod` (Supabase PITR hoặc snapshot).
-- [ ] 🧑 Có prod connection string **port 5432**.
+### 1. Dựng `prod_v2` (1 lệnh)
+- [ ] 🧑 Backup `prod` (Supabase PITR/snapshot).
+- [ ] 🧑 `npm install` (nếu máy chưa có deps).
+- [ ] 🧑 Chạy script — điền `DATABASE_URL` **root, port 5432**:
+  ```bash
+  DATABASE_URL="postgresql://USER:PASS@HOST:5432/postgres" npx tsx deploy/upgrade-to-v2.ts
+  ```
+  Script tự: clone `prod`→`prod_v2` → tạo 3 bảng translation + seed `en` → migrate config JSON → verify. `prod` KHÔNG bị đụng. In "✅ XONG" là được.
+  - Chạy lại (nếu cần): thêm `DROP_TARGET=1` để xoá `prod_v2` cũ rồi clone lại.
 
-### Dựng `prod_v2`
-- [ ] 🧑 Clone schema: `pg_dump --schema=prod` → đổi tên `prod`→`prod_v2` → restore. *(🤖 nhờ mình viết `clone-schema.sh` cho gọn)*
-- [ ] 🧑 Tạo bảng + seed: chạy `deploy/prod_v2_entity_migration.sql` → đọc phần VERIFY phải toàn `OK`.
-- [ ] 🧑 Migrate config: `DB_SCHEMA=prod_v2 DATABASE_URL="<prod-5432>" npm run migrate:configs-i18n`
+### 2. Cắt
+- [ ] 🤖 Mình mở PR `feature/multi-language` → `main` + merge (khi bạn ok).
+- [ ] 🧑 Vercel: (khuyến nghị) test **Preview** với `DB_SCHEMA=prod_v2` trước; rồi Production set `DB_SCHEMA=prod_v2` → deploy.
+- [ ] 🧑 Test trực tiếp trên prod (quán chưa mở → an toàn).
 
-### Test trước khi cắt
-- [ ] 🤖 Mình mở PR `feature/multi-language` → `main`.
-- [ ] 🧑 Vercel: tạo **Preview** với env `DB_SCHEMA=prod_v2` → bấm thử vài trang /en, /vi, đặt 1 order.
-
-### Cắt
-- [ ] 🤖 Mình merge PR → `main`.
-- [ ] 🧑 Vercel Production: set `DB_SCHEMA=prod_v2` → deploy.
-- [ ] 🧑 Bấm thử prod 2–3 phút. Ghi lại giờ cắt.
-
-### Nếu lỗi → rollback
-- [ ] 🧑 Vercel: set `DB_SCHEMA=prod` + Instant Rollback về bản cũ. Xong.
-- [ ] 🧑 Nếu đã có order mới vào `prod_v2`: nhờ 🤖 chạy script copy ngược về `prod`. *(🤖 nhờ mình viết sẵn `reconcile.ts`)*
+### 3. Rollback (nếu lỗi)
+- [ ] 🧑 Vercel → **Instant Rollback** về deployment cũ. **XONG — không cần đổi env.**
+  > Code cũ hardcode schema `prod`, không đọc `DB_SCHEMA` → tự khắc đọc lại `prod`.
+  > (Nên đổi env về `prod` sau đó cho sạch, để lần deploy code mới sau không lỡ trỏ `prod_v2`.)
+- Quán chưa mở nên không có data khách mới → rollback sạch, khỏi reconcile.
 
 ---
 
-**Tóm tắt file/lệnh:**
-| Việc | Chạy |
+**Lệnh phụ (khi cần):**
+| Việc | Lệnh |
 |---|---|
-| Tạo bảng translation + seed en | `deploy/prod_v2_entity_migration.sql` (SQL editor) |
-| Migrate config JSON | `npm run migrate:configs-i18n` (Node, `DB_SCHEMA=prod_v2`) |
-| Rollback config | `npm run rollback:configs-i18n` |
-| Rollback bảng translation | `npm run rollback:entities-i18n` |
+| Làm lại từ đầu | thêm `DROP_TARGET=1` vào lệnh script |
+| Rollback config (nếu chạy nhầm schema nào đó) | `DB_SCHEMA=<schema> npm run rollback:configs-i18n` |
+| Bỏ hẳn prod_v2 | `DROP SCHEMA prod_v2 CASCADE;` |
 
-⚠️ **Thứ tự bắt buộc:** bảng translation phải tạo **trước** khi code mới chạy (query sẽ lỗi nếu chưa có bảng). Config thì linh hoạt. Trong blue/green, mọi migrate làm trên `prod_v2` trước khi cắt nên không lo.
+**Yêu cầu:** script cần role **tạo được schema + function** (root/owner). Đã verify trên dev: guard + flow + entity DDL + seed + config logic chạy đúng; riêng bước clone chỉ chạy được bằng root (dev role bị chặn `CREATE SCHEMA`). Script có verify row-count nguồn↔đích tự động, lệch là nó dừng ngay.
