@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
+    // Tắt Image Optimization của Vercel: gói Hobby đã hết quota tối ưu ảnh
+    // -> Vercel trả 402 OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED cho mọi ảnh.
+    // Ảnh phục vụ thẳng từ R2 (assets.talokitchenhg.com) qua Cloudflare CDN.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
