@@ -6,7 +6,7 @@ const LoginPage = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-base-content">
-            L&apos;Telle Eatery
+            TALO Kitchen &amp; Lounge
           </h1>
           <p className="text-base-content/70 mt-2">
             Hệ thống quản trị nhà hàng
@@ -17,7 +17,7 @@ const LoginPage = () => {
 
         <div className="text-center mt-6">
           <p className="text-sm text-base-content/60">
-            © 2025 L&apos;Telle Eatery. All rights reserved.
+            © 2025 TALO Kitchen &amp; Lounge. All rights reserved.
           </p>
         </div>
       </div>
