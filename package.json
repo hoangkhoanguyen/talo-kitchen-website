@@ -12,7 +12,11 @@
     "lint": "eslint",
     "db:generate": "npm run clean && drizzle-kit generate",
     "db:migrate": "npm run clean && drizzle-kit migrate",
-    "db:update": "npm run clean && drizzle-kit generate && drizzle-kit migrate"
+    "db:update": "npm run clean && drizzle-kit generate && drizzle-kit migrate",
+    "migrate:configs-i18n": "tsx scripts/migrate-configs-i18n.ts",
+    "rollback:configs-i18n": "tsx scripts/rollback-configs-i18n.ts",
+    "seed:entities-i18n": "tsx scripts/seed-entities-i18n.ts",
+    "rollback:entities-i18n": "tsx scripts/rollback-entities-i18n.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1085.0",
@@ -32,6 +36,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
     "next": "^16.2.10",
+    "next-intl": "^4.14.1",
     "nuqs": "^2.6.0",
     "postgres": "^3.4.9",
     "query-string": "^9.3.1",
@@ -49,6 +54,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@iconify/react": "^6.0.1",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/bcrypt": "^6.0.0",
     "@types/lodash": "^4.17.20",

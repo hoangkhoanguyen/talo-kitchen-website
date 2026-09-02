@@ -2,9 +2,11 @@
 import React, { FC, memo, useState } from "react";
 import Icon from "@/components/common/Icon";
 import { Button } from "../ui/button";
+import { useTranslations } from "next-intl";
 
 const Note: FC<{ note: string; onSubmit(note: string): void }> = memo(
   ({ note, onSubmit }) => {
+    const t = useTranslations("common");
     const [isEditing, setIsEditing] = useState(false);
 
     const [noteText, setNoteText] = useState("");
@@ -21,7 +23,7 @@ const Note: FC<{ note: string; onSubmit(note: string): void }> = memo(
     return (
       <div className="bg-web-background-3 rounded-lg p-5">
         <p className="text-web-h4-mobile lg:text-web-h4 text-web-content-2">
-          Note ({note.length}/300)
+          {t("noteLabel", { count: note.length })}
         </p>
         {isEditing ? (
           <textarea
@@ -51,7 +53,7 @@ const Note: FC<{ note: string; onSubmit(note: string): void }> = memo(
             variant={"secondary1"}
             className="text-web-background-1 text-web-button-mobile lg:text-web-button rounded-full"
           >
-            {isEditing ? "Save" : "Fill in note"}
+            {isEditing ? t("save") : t("fillInNote")}
           </Button>
           {isEditing && (
             <Button
@@ -59,7 +61,7 @@ const Note: FC<{ note: string; onSubmit(note: string): void }> = memo(
               variant={"white"}
               className="text-web-content-2 rounded-full text-web-button-mobile lg:text-web-button"
             >
-              Cancel
+              {t("cancel")}
             </Button>
           )}
         </div>

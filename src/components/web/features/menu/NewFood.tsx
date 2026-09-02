@@ -1,17 +1,23 @@
 import Image from "next/image";
 import React, { FC } from "react";
 import ProductCard from "../../shared/ProductCard";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
 import SectionSubTitleFromConfigs from "../../shared/SectionSubTitleFromConfigs";
 import { splitTextByNewLine } from "@/lib/utils";
 import { webRoutes } from "@/constants/route";
 import { getProductBySlugCached } from "@/services/cached";
+import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/types/configs";
 
-const NewFood: FC<{ configs: any }> = async ({ configs }) => {
+const NewFood: FC<{ configs: any; locale: Locale }> = async ({
+  configs,
+  locale,
+}) => {
   if (!configs.isShow) return null;
 
-  const product = await getProductBySlugCached(configs?.product_slug);
+  const t = await getTranslations("menu");
+  const product = await getProductBySlugCached(configs?.product_slug, locale);
 
   if (!product) return null;
 
@@ -42,7 +48,7 @@ const NewFood: FC<{ configs: any }> = async ({ configs }) => {
             <div className="relative aspect-[3/2] lg:aspect-auto md:h-full">
               <Image
                 src={configs?.banner?.url}
-                alt={configs?.banner?.alt || "New Food Banner"}
+                alt={configs?.banner?.alt || t("newFoodBannerAlt")}
                 fill
                 className="object-cover"
               />
@@ -63,7 +69,7 @@ const NewFood: FC<{ configs: any }> = async ({ configs }) => {
                       href={webRoutes.dish(configs?.product_slug)}
                       className="md:hidden bg-web-secondary-2 text-web-content-1 text-center rounded-lg py-4 text-web-button-mobile lg:text-web-button hover:bg-web-secondary-1 duration-200"
                     >
-                      Discover
+                      {t("discover")}
                     </Link>
                   </div>
                 </div>
@@ -72,12 +78,12 @@ const NewFood: FC<{ configs: any }> = async ({ configs }) => {
                 href={webRoutes.dish(configs?.product_slug)}
                 className="hidden md:block bg-web-secondary-2 text-web-content-1 text-center rounded-lg py-4 md:px-10 text-web-button-mobile lg:text-web-button hover:bg-web-secondary-1 duration-200"
               >
-                Discover
+                {t("discover")}
               </Link>
             </div>
           </div>
 
-          <ProductCard product={product} />
+          <ProductCard product={product} locale={locale} />
         </div>
       </div>
     </section>

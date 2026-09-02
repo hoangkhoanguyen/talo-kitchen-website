@@ -1,15 +1,17 @@
 import Image from "next/image";
 import React, { FC } from "react";
 import QuickCartButton from "./quick-cart/QuickCartButton";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import { WebProduct } from "@/types/products";
 import { formatCurrencyWebsite } from "@/lib/utils";
+import type { Locale } from "@/types/configs";
 
-const ProductCard: FC<{ product: WebProduct; categoryLabel?: string }> = ({
-  product,
-  categoryLabel,
-}) => {
+const ProductCard: FC<{
+  product: WebProduct;
+  categoryLabel?: string;
+  locale?: Locale;
+}> = ({ product, categoryLabel, locale }) => {
   return (
     <Link
       href={webRoutes.dish(product.slug)}
@@ -38,7 +40,7 @@ const ProductCard: FC<{ product: WebProduct; categoryLabel?: string }> = ({
         </div>
         <div className="flex justify-between items-center">
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-primary">
-            {formatCurrencyWebsite(product.price)}
+            {formatCurrencyWebsite(product.price, locale)}
           </span>
           <QuickCartButton data={{ id: product.id, title: product.title }} />
         </div>

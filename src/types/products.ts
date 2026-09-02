@@ -1,9 +1,13 @@
 import {
+  productAddonTranslations,
   productAddons,
   productCategories,
+  productCategoryTranslations,
   productImages,
+  productTranslations,
   products,
 } from "@/db/schemas";
+import type { Locale } from "@/types/configs";
 import {
   createProductSchema,
   productCategorySchema,
@@ -38,6 +42,37 @@ export type UpdateProductImageDB = Omit<
   Partial<NewProductImageDB>,
   "createdAt" | "updatedAt"
 >;
+
+export type ProductTranslationDB = typeof productTranslations.$inferSelect;
+export type NewProductTranslationDB = typeof productTranslations.$inferInsert;
+
+export type ProductCategoryTranslationDB =
+  typeof productCategoryTranslations.$inferSelect;
+export type NewProductCategoryTranslationDB =
+  typeof productCategoryTranslations.$inferInsert;
+
+export type ProductAddonTranslationDB =
+  typeof productAddonTranslations.$inferSelect;
+export type NewProductAddonTranslationDB =
+  typeof productAddonTranslations.$inferInsert;
+
+// Admin form nested (RULE-19): translations record theo locale
+export type ProductTranslationForm = Record<
+  Locale,
+  {
+    title: string;
+    description?: string;
+    subDescription?: string;
+    allergenInfo?: string;
+  }
+>;
+
+export type CategoryTranslationForm = Record<
+  Locale,
+  { name: string; description?: string }
+>;
+
+export type AddonTranslationForm = Record<Locale, { name: string }>;
 
 export type AdminProductTableApi = ProductDB & {
   category: ProductCategoryDB;

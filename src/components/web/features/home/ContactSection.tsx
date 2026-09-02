@@ -3,6 +3,7 @@ import { cn, splitTextByNewLine } from "@/lib/utils";
 import React, { FC, PropsWithChildren } from "react";
 import { Button } from "../../ui/button";
 import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
+import { getTranslations } from "next-intl/server";
 
 const openingHoursConfigs = [
   {
@@ -24,12 +25,13 @@ const openingHoursConfigs = [
   },
 ];
 
-export const ContactSection: FC<{ configs: any }> = ({ configs }) => {
+export const ContactSection: FC<{ configs: any }> = async ({ configs }) => {
+  const t = await getTranslations("home");
   return (
     <section className="bg-web-background-2 pt-10 pb-10 md:pb-12 lg:pb-14">
       <div className="container">
         <h3 className="text-web-secondary-1 text-center text-web-subtitle-mobile uppercase mb-5 lg:text-web-subtitle">
-          visit us
+          {t("visitUs")}
         </h3>
 
         <h2 className="text-web-h2-mobile text-center capitalize lg:text-web-h2 mb-5 flex flex-row flex-wrap justify-center items-center gap-x-2">
@@ -44,7 +46,7 @@ export const ContactSection: FC<{ configs: any }> = ({ configs }) => {
             <Card>
               <div className="flex flex-col gap-5 h-full">
                 <div className="flex flex-col gap-10 flex-1">
-                  <CardTitle icon="ph:map-pin" title="Location" />
+                  <CardTitle icon="ph:map-pin" title={t("location")} />
 
                   <div className="w-full">
                     {splitTextByNewLine(configs.location.address).map(
@@ -74,7 +76,7 @@ export const ContactSection: FC<{ configs: any }> = ({ configs }) => {
                   }
                   className="text-web-label-mobile lg:text-web-label border border-web-content-3"
                 >
-                  Get Directions
+                  {t("getDirections")}
                 </Button>
               </div>
             </Card>
@@ -83,12 +85,12 @@ export const ContactSection: FC<{ configs: any }> = ({ configs }) => {
             <Card>
               <div className="flex flex-col gap-5 h-full">
                 <div className="flex flex-col gap-10 flex-1">
-                  <CardTitle icon="ph:phone" title="Contact" />
+                  <CardTitle icon="ph:phone" title={t("contact")} />
 
                   <div className="w-full flex flex-col gap-5">
                     <div>
                       <p className="text-web-content-2 text-web-h4-mobile lg:text-web-h4">
-                        Phone
+                        {t("phone")}
                       </p>
                       <p className="text-web-content-2 text-web-caption-mobile lg:text-web-caption">
                         {configs.contact_info.phone}
@@ -96,7 +98,7 @@ export const ContactSection: FC<{ configs: any }> = ({ configs }) => {
                     </div>
                     <div>
                       <p className="text-web-content-2 text-web-h4-mobile lg:text-web-h4">
-                        Email
+                        {t("email")}
                       </p>
                       <p className="text-web-content-2 text-web-caption-mobile lg:text-web-caption">
                         {configs.contact_info.email}
@@ -122,7 +124,7 @@ export const ContactSection: FC<{ configs: any }> = ({ configs }) => {
           <div className="col-span-1 lg:col-span-2">
             <Card>
               <div className="mb-10">
-                <CardTitle icon="ph:clock" title="Opening Hours" />
+                <CardTitle icon="ph:clock" title={t("openingHours")} />
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
                 {configs.opening_hours.map((config: any, index: number) => (

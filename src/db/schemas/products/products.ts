@@ -13,6 +13,7 @@ import { dbSchema } from "../../schema";
 import { productAddons } from "./product-addons";
 import { productImages } from "./product-images";
 import { productCategories } from "./product-categories";
+import { productTranslations } from "./product-translations";
 
 export const products = dbSchema.table("products", {
   id: serial("id").primaryKey(),
@@ -54,4 +55,5 @@ export const productsRelations = relations(products, ({ many, one }) => ({
     fields: [products.categoryId],
     references: [productCategories.id],
   }),
+  translations: many(productTranslations),
 }));

@@ -2,10 +2,13 @@ import Icon from "@/components/common/Icon";
 import { webRoutes } from "@/constants/route";
 import { splitTextByNewLine } from "@/lib/utils";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import React, { FC } from "react";
+import { getTranslations } from "next-intl/server";
 
-const Footer: FC<{ configs: any }> = ({ configs }) => {
+const Footer: FC<{ configs: any }> = async ({ configs }) => {
+  const t = await getTranslations("footer");
+
   return (
     <footer className="bg-[#FFF3DA]">
       <div className="container py-10 pb-20 lg:pb-10">
@@ -37,7 +40,7 @@ const Footer: FC<{ configs: any }> = ({ configs }) => {
 
           <div className="col-span-1 lg:col-span-3 xl:col-span-1">
             <p className="mb-5 text-[#1A1A1A] text-web-h4-mobile lg:text-web-h4 capitalize">
-              Quick Links
+              {t("quickLinks")}
             </p>
             <ul className="flex flex-col gap-2">
               {configs.quick_links.map((item: any, index: number) => (
@@ -55,7 +58,7 @@ const Footer: FC<{ configs: any }> = ({ configs }) => {
 
           <div className="col-span-1 lg:col-span-3 xl:col-span-1">
             <p className="mb-5 text-[#1A1A1A] text-web-h4-mobile lg:text-web-h4 capitalize">
-              Our Services
+              {t("ourServices")}
             </p>
             <ul className="flex flex-col gap-2">
               {configs.services.map((item: any, index: number) => (
@@ -71,7 +74,7 @@ const Footer: FC<{ configs: any }> = ({ configs }) => {
           <div className="col-span-1 lg:col-span-3 xl:col-span-2">
             <div className="flex flex-col gap-5">
               <p className="text-[#1A1A1A] text-web-h4-mobile lg:text-web-h4 capitalize">
-                Contact Information
+                {t("contactInformation")}
               </p>
 
               <div className="flex flex-col gap-2">
@@ -126,7 +129,7 @@ const Footer: FC<{ configs: any }> = ({ configs }) => {
 
               <div className="bg-[#FEEB79] rounded flex flex-col gap-2 py-2 px-5">
                 <p className="text-[#1A1A1A] text-web-subtitle-mobile lg:text-web-subtitle capitalize font-semibold">
-                  {configs.opening_hours_title || "Opening Hours"}
+                  {configs.opening_hours_title || t("openingHours")}
                 </p>
                 <div className="flex flex-col gap-1 text-web-caption-mobile lg:text-web-caption">
                   {configs.opening_hours.map((line: any, idx: any) => (
@@ -146,7 +149,7 @@ const Footer: FC<{ configs: any }> = ({ configs }) => {
 
           <div className="col-span-1 lg:col-span-8">
             <p className="text-[#1A1A1A] text-web-h4-mobile lg:text-web-h4 text-start md:text-center lg:text-start">
-              &copy; 2025 TALO Kitchen &amp; Lounge
+              {t("copyright")}
             </p>
           </div>
         </div>

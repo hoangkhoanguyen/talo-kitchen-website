@@ -10,6 +10,7 @@ import {
 import { dbSchema } from "../../schema";
 import { relations } from "drizzle-orm";
 import { products } from "./products";
+import { productAddonTranslations } from "./product-addon-translations";
 
 export const productAddons = dbSchema.table(
   "product_addons",
@@ -39,9 +40,13 @@ export const productAddons = dbSchema.table(
   }),
 );
 
-export const productAddonRelations = relations(productAddons, ({ one }) => ({
-  product: one(products, {
-    fields: [productAddons.productId],
-    references: [products.id],
+export const productAddonRelations = relations(
+  productAddons,
+  ({ one, many }) => ({
+    product: one(products, {
+      fields: [productAddons.productId],
+      references: [products.id],
+    }),
+    translations: many(productAddonTranslations),
   }),
-}));
+);

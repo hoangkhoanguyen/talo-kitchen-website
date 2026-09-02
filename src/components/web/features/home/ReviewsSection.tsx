@@ -4,9 +4,10 @@ import { ReviewsSliders } from "./ReviewsSliders";
 import { Button } from "../../ui/button";
 import SectionSubTitleFromConfigs from "../../shared/SectionSubTitleFromConfigs";
 import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import { getGoogleMapReviews } from "@/lib/gg-map-reviews";
+import { getTranslations } from "next-intl/server";
 
 interface IReview {
   customer_name: string;
@@ -17,6 +18,7 @@ interface IReview {
 }
 
 export const ReviewsSection: FC<{ configs: any }> = async ({ configs }) => {
+  const t = await getTranslations("home");
   const reviews = await getGoogleMapReviews();
   const averageRating = reviews
     ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) /
@@ -42,7 +44,7 @@ export const ReviewsSection: FC<{ configs: any }> = async ({ configs }) => {
             {averageRating.toFixed(1)}
           </span>
           <span className="text-web-caption-mobile lg:text-web-caption text-web-content-2">
-            ({totalReviews} Reviews)
+            {t("reviewsCount", { count: totalReviews })}
           </span>
         </div>
 
@@ -54,6 +56,7 @@ export const ReviewsSection: FC<{ configs: any }> = async ({ configs }) => {
             {reviews.map((review: any, index: number) => (
               <Review
                 key={index}
+                t={t}
                 data={{
                   customer_name: review.user.name,
                   comment: review.snippet,
@@ -90,7 +93,7 @@ export const ReviewsSection: FC<{ configs: any }> = async ({ configs }) => {
               variant={"white"}
               className="text-web-label text-web-content-1 lg:text-web-label border-web-content-3 hover:bg-web-primary hover:text-web-background-1"
             >
-              Explore Our Menu
+              {t("exploreOurMenu")}
             </Button>
             <Button
               as={Link}
@@ -98,7 +101,7 @@ export const ReviewsSection: FC<{ configs: any }> = async ({ configs }) => {
               variant={"primary"}
               className="text-web-label lg:text-web-label"
             >
-              Reserve Your Table
+              {t("reserveYourTableCta")}
             </Button>
           </div>
         </div>
@@ -124,8 +127,10 @@ function Stars({ rating }: { rating: number }) {
 
 function Review({
   data: { customer_name, comment, date, rating, link },
+  t,
 }: {
   data: IReview;
+  t: Awaited<ReturnType<typeof getTranslations>>;
 }) {
   return (
     <div className="bg-web-background-3 rounded-lg px-6 pb-6 pt-1 h-full">
@@ -137,7 +142,7 @@ function Review({
         <div className="flex gap-1 items-center text-web-success px-2 py-1 rounded-full bg-web-background-1">
           <Icon icon="devicon:google" className="text-base" />
           <span className="w-2 aspect-square bg-web-success rounded-full"></span>
-          <span className="text-web-label">Verified</span>
+          <span className="text-web-label">{t("verified")}</span>
         </div>
       </div>
 
@@ -145,7 +150,7 @@ function Review({
         <div className="flex items-center gap-2">
           <Stars rating={rating} />
           <span className="text-web-content-2 text-web-caption-mobile lg:text-web-caption">
-            ({rating}/5)
+            {t("ratingOutOfFive", { rating })}
           </span>
         </div>
 
@@ -159,7 +164,7 @@ function Review({
           rel="noreferrer"
           className="text-web-secondary-1 text-web-button-mobile lg:text-web-button hover:underline"
         >
-          Read more
+          {t("readMore")}
         </a>
 
         <div>

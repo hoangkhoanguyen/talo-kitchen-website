@@ -12,7 +12,7 @@ export default defineConfig({
     url: process.env.DATABASE_URL || "",
   },
   migrations: {
-    schema: "prod",
+    schema: process.env.DB_SCHEMA || "prod",
   },
   verbose: true,
   strict: true,

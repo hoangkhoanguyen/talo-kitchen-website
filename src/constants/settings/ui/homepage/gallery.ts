@@ -75,6 +75,7 @@ const fields: FieldType[] = [
           description: "Tiêu đề hiển thị dưới ảnh",
           isRequired: true,
           placeholder: "Nhập tiêu đề ảnh",
+          localized: true,
         },
         {
           type: "text",
@@ -83,6 +84,7 @@ const fields: FieldType[] = [
           description: "Tiêu đề phụ hiển thị dưới ảnh",
           isRequired: true,
           placeholder: "Nhập tiêu đề phụ ảnh",
+          localized: true,
         },
       ],
     },

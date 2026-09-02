@@ -108,6 +108,7 @@ export const foodCategoriesMeta: MetaValue = {
             description: "Nhãn hiển thị cho danh mục món ăn",
             isRequired: true,
             placeholder: "Nhập nhãn",
+            localized: true,
           },
           {
             key: "page_title",
@@ -117,6 +118,7 @@ export const foodCategoriesMeta: MetaValue = {
               "Tiêu đề trang cho category này (hiển thị trên tab trình duyệt)",
             isRequired: false,
             placeholder: "Ví dụ: Main Course - TALO Kitchen & Lounge",
+            localized: true,
           },
         ],
       },

@@ -8,14 +8,17 @@ import { webApi } from "@/lib/api/axios";
 import { webRoutes } from "@/constants/route";
 import { WebProductDetails } from "@/types/products";
 import QuickCartForm from "./QuickCartForm";
+import { useLocale } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const QuickCartModal = () => {
   const isOpen = useQuickCartModalStore((state) => state.isOpen);
   const closeModal = useQuickCartModalStore((state) => state.closeModal);
   const productId = useQuickCartModalStore((state) => state.productId);
+  const locale = useLocale();
 
   const { data, isPending } = useQuery({
-    queryKey: ["quick-product", productId],
+    queryKey: ["quick-product", productId, locale],
     queryFn: (): Promise<{
       product: Pick<
         WebProductDetails,
@@ -27,7 +30,7 @@ const QuickCartModal = () => {
         | "addons"
         | "images"
       >;
-    }> => webApi.get(webRoutes.productQuickApi(productId!)),
+    }> => webApi.get(webRoutes.productQuickApi(productId!, locale)),
     enabled: Boolean(productId),
     select(data) {
       return data.product;
@@ -46,7 +49,13 @@ const QuickCartModal = () => {
       );
     }
 
-    return <QuickCartForm product={data} closeModal={closeModal} />;
+    return (
+      <QuickCartForm
+        product={data}
+        closeModal={closeModal}
+        locale={resolveLocale(locale)}
+      />
+    );
   };
 
   return (

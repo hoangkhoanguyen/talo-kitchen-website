@@ -1,17 +1,24 @@
 import { webRoutes } from "@/constants/route";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import React, { FC } from "react";
 import ProductCard from "../../shared/ProductCard";
 import SectionSubTitleFromConfigs from "../../shared/SectionSubTitleFromConfigs";
 import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
 import { getProductsByCategorySlugCached } from "@/services/cached";
+import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/types/configs";
 
-const FoodCategories: FC<{ activeCategoryKey: string; configs: any }> = async ({
-  activeCategoryKey,
-  configs,
-}) => {
-  const products = await getProductsByCategorySlugCached(activeCategoryKey);
+const FoodCategories: FC<{
+  activeCategoryKey: string;
+  configs: any;
+  locale: Locale;
+}> = async ({ activeCategoryKey, configs, locale }) => {
+  const t = await getTranslations("menu");
+  const products = await getProductsByCategorySlugCached(
+    activeCategoryKey,
+    locale,
+  );
 
   const categoryLabel = configs.categories_to_show.find(
     (category: any) => category.key === activeCategoryKey,
@@ -37,7 +44,7 @@ const FoodCategories: FC<{ activeCategoryKey: string; configs: any }> = async ({
                 : "text-web-content-2 border border-web-content-2",
             )}
           >
-            All
+            {t("all")}
           </Link>
           {configs.categories_to_show.map((category: any) => (
             <Link
@@ -61,6 +68,7 @@ const FoodCategories: FC<{ activeCategoryKey: string; configs: any }> = async ({
               key={product.id}
               product={product}
               categoryLabel={categoryLabel || ""}
+              locale={locale}
             />
           ))}
         </div>

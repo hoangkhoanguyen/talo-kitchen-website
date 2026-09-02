@@ -101,6 +101,7 @@ export const bookingMeta: MetaValue = {
       description: "Mô tả hiển thị trên phần đặt bàn",
       isRequired: true,
       placeholder: "Nhập mô tả",
+      localized: true,
     },
     {
       key: "reservation_info",
@@ -130,6 +131,7 @@ export const bookingMeta: MetaValue = {
             description: "Tiêu đề hiển thị trên phần đặt bàn",
             isRequired: true,
             placeholder: "Nhập tiêu đề",
+            localized: true,
           },
           {
             key: "items",
@@ -149,6 +151,7 @@ export const bookingMeta: MetaValue = {
                   description: "Nội dung hiển thị trên phần đặt bàn",
                   isRequired: true,
                   placeholder: "Nhập nội dung",
+                  localized: true,
                 },
                 {
                   key: "type",
@@ -216,6 +219,7 @@ export const bookingMeta: MetaValue = {
       description: "Ghi chú hiển thị bên dưới trong form đặt bàn",
       isRequired: false,
       placeholder: "Nhập ghi chú",
+      localized: true,
     },
     {
       key: "success_title",
@@ -224,6 +228,7 @@ export const bookingMeta: MetaValue = {
       description: "Tiêu đề hiển thị khi đặt bàn thành công",
       isRequired: true,
       placeholder: "Nhập tiêu đề thành công",
+      localized: true,
     },
     {
       key: "success_description",
@@ -232,6 +237,7 @@ export const bookingMeta: MetaValue = {
       description: "Mô tả hiển thị khi đặt bàn thành công",
       isRequired: true,
       placeholder: "Nhập mô tả thành công",
+      localized: true,
     },
   ],
 };

@@ -2,10 +2,12 @@ import Icon from "@/components/common/Icon";
 import React, { FC } from "react";
 import { Button } from "../../ui/button";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
+import { getTranslations } from "next-intl/server";
 
-export const HeroSection: FC<{ configs: any }> = ({ configs }) => {
+export const HeroSection: FC<{ configs: any }> = async ({ configs }) => {
+  const t = await getTranslations("home");
   return (
     <section className="relative ">
       <div className="absolute w-full h-full top-0 left-0 z-0">
@@ -38,7 +40,7 @@ export const HeroSection: FC<{ configs: any }> = ({ configs }) => {
               startIcon={<Icon icon="ph:shopping-bag" className="text-2xl" />}
               className="border border-web-background-1 flex-1 capitalize text-web-button-mobile lg:text-web-button"
             >
-              Delivery
+              {t("delivery")}
             </Button>
             <Button
               as={Link}
@@ -47,7 +49,7 @@ export const HeroSection: FC<{ configs: any }> = ({ configs }) => {
               startIcon={<Icon icon="ph:calendar-blank" className="text-2xl" />}
               variant={"secondary2"}
             >
-              Reserve your table
+              {t("reserveYourTable")}
             </Button>
           </div>
         </div>

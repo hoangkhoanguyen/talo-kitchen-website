@@ -60,6 +60,7 @@ export const footerMeta: MetaValue = {
       type: "text",
       description: "Mô tả hiển thị bên dưới logo trong phần footer",
       isRequired: false,
+      localized: true,
     },
     {
       key: "socials",
@@ -117,6 +118,7 @@ export const footerMeta: MetaValue = {
             description: "Tên hiển thị của liên kết",
             isRequired: true,
             placeholder: "Nhập tên liên kết",
+            localized: true,
           },
           {
             key: "href",
@@ -135,6 +137,7 @@ export const footerMeta: MetaValue = {
               "Tiêu đề hiển thị khi hover vào liên kết (dùng cho SEO)",
             isRequired: true,
             placeholder: "Nhập tiêu đề",
+            localized: true,
           },
         ],
       },
@@ -161,6 +164,7 @@ export const footerMeta: MetaValue = {
             description: "Tên hiển thị của dịch vụ",
             isRequired: true,
             placeholder: "Nhập tên dịch vụ",
+            localized: true,
           },
         ],
       },
@@ -182,6 +186,7 @@ export const footerMeta: MetaValue = {
           type: "textarea",
           description: "Địa chỉ liên hệ",
           isRequired: false,
+          localized: true,
         },
         {
           key: "phone",
@@ -206,6 +211,7 @@ export const footerMeta: MetaValue = {
       description: "Tiêu đề hiển thị trong box giờ mở cửa ở footer",
       isRequired: false,
       placeholder: "Nhập tiêu đề",
+      localized: true,
     },
     {
       key: "opening_hours",
@@ -226,6 +232,7 @@ export const footerMeta: MetaValue = {
             description: "Ví dụ: Mon - Sun",
             isRequired: true,
             placeholder: "Nhập nhãn",
+            localized: true,
           },
           {
             key: "value",

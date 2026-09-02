@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { FC } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import CartItemQuantity from "./CartItemQuantity";
 import CardItemAddons from "./CardItemAddons";
 import CartItemTotalPrice from "./CartItemTotalPrice";
@@ -9,9 +10,12 @@ import { CartItemDisplay } from "@/types/cart";
 import { formatCurrencyWebsite } from "@/lib/utils";
 import Icon from "@/components/common/Icon";
 import { useCartStore } from "@/hooks/web/cart/store";
+import { resolveLocale } from "@/lib/locale";
 
 const CartItem: FC<{ item: CartItemDisplay }> = ({ item }) => {
   const removeFromCart = useCartStore((state) => state.actions.removeFromCart);
+  const t = useTranslations("cart");
+  const locale = resolveLocale(useLocale());
   return (
     <div className="border-t border-web-content-3 pt-5 relative">
       <button
@@ -25,7 +29,7 @@ const CartItem: FC<{ item: CartItemDisplay }> = ({ item }) => {
           <div className="w-40 aspect-square relative overflow-hidden shrink-0">
             <Image
               src={item.imageUrl}
-              alt="Product Image"
+              alt={t("item.productImageAlt")}
               layout="fill"
               objectFit="cover"
             />
@@ -39,9 +43,9 @@ const CartItem: FC<{ item: CartItemDisplay }> = ({ item }) => {
               {item.title}
             </h2>
             <p className="text-web-h4-mobile lg:text-web-h4">
-              <span className="text-web-content-1">Price:</span>{" "}
+              <span className="text-web-content-1">{t("item.priceLabel")}</span>{" "}
               <span className="text-web-secondary-1 uppercase">
-                {formatCurrencyWebsite(item.price)}
+                {formatCurrencyWebsite(item.price, locale)}
               </span>
             </p>
           </div>
@@ -56,7 +60,7 @@ const CartItem: FC<{ item: CartItemDisplay }> = ({ item }) => {
             <CardItemAddons cartId={item.id} cartAddons={item.addons} />
           )}
           <hr className="border-web-content-3" />
-          <CartItemTotalPrice totalPrice={item.totalPrice} />
+          <CartItemTotalPrice totalPrice={item.totalPrice} locale={locale} />
         </div>
       </div>
       <CartItemNote cartId={item.id} note={item.notes} />

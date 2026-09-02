@@ -4,9 +4,9 @@
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "prod.configs": {
+    "dev_multi_lang.configs": {
       "name": "configs",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "key": {
           "name": "key",
@@ -69,9 +69,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.users": {
+    "dev_multi_lang.users": {
       "name": "users",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -173,9 +173,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.refresh_tokens": {
+    "dev_multi_lang.refresh_tokens": {
       "name": "refresh_tokens",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -225,9 +225,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.products": {
+    "dev_multi_lang.products": {
       "name": "products",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -330,9 +330,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.product_categories": {
+    "dev_multi_lang.product_categories": {
       "name": "product_categories",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -396,9 +396,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.product_images": {
+    "dev_multi_lang.product_images": {
       "name": "product_images",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -461,9 +461,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.product_addons": {
+    "dev_multi_lang.product_addons": {
       "name": "product_addons",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -525,7 +525,7 @@
           "name": "product_addons_product_id_products_id_fk",
           "tableFrom": "product_addons",
           "tableTo": "products",
-          "schemaTo": "prod",
+          "schemaTo": "dev_multi_lang",
           "columnsFrom": [
             "product_id"
           ],
@@ -542,9 +542,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.customers": {
+    "dev_multi_lang.customers": {
       "name": "customers",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -612,9 +612,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.order_item_addons": {
+    "dev_multi_lang.order_item_addons": {
       "name": "order_item_addons",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -679,7 +679,7 @@
           "name": "order_item_addons_addon_id_product_addons_id_fk",
           "tableFrom": "order_item_addons",
           "tableTo": "product_addons",
-          "schemaTo": "prod",
+          "schemaTo": "dev_multi_lang",
           "columnsFrom": [
             "addon_id"
           ],
@@ -693,7 +693,7 @@
           "name": "order_item_addons_order_item_id_order_items_id_fk",
           "tableFrom": "order_item_addons",
           "tableTo": "order_items",
-          "schemaTo": "prod",
+          "schemaTo": "dev_multi_lang",
           "columnsFrom": [
             "order_item_id"
           ],
@@ -710,9 +710,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.order_items": {
+    "dev_multi_lang.order_items": {
       "name": "order_items",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -784,7 +784,7 @@
           "name": "order_items_product_id_products_id_fk",
           "tableFrom": "order_items",
           "tableTo": "products",
-          "schemaTo": "prod",
+          "schemaTo": "dev_multi_lang",
           "columnsFrom": [
             "product_id"
           ],
@@ -798,7 +798,7 @@
           "name": "order_items_order_id_orders_id_fk",
           "tableFrom": "order_items",
           "tableTo": "orders",
-          "schemaTo": "prod",
+          "schemaTo": "dev_multi_lang",
           "columnsFrom": [
             "order_id"
           ],
@@ -815,9 +815,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.orders": {
+    "dev_multi_lang.orders": {
       "name": "orders",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -959,9 +959,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.order_status_history": {
+    "dev_multi_lang.order_status_history": {
       "name": "order_status_history",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -1001,7 +1001,7 @@
           "name": "order_status_history_order_id_orders_id_fk",
           "tableFrom": "order_status_history",
           "tableTo": "orders",
-          "schemaTo": "prod",
+          "schemaTo": "dev_multi_lang",
           "columnsFrom": [
             "order_id"
           ],
@@ -1018,9 +1018,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.reservations": {
+    "dev_multi_lang.reservations": {
       "name": "reservations",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -1131,9 +1131,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "prod.reservation_status_history": {
+    "dev_multi_lang.reservation_status_history": {
       "name": "reservation_status_history",
-      "schema": "prod",
+      "schema": "dev_multi_lang",
       "columns": {
         "id": {
           "name": "id",
@@ -1173,7 +1173,7 @@
           "name": "reservation_status_history_reservation_id_reservations_id_fk",
           "tableFrom": "reservation_status_history",
           "tableTo": "reservations",
-          "schemaTo": "prod",
+          "schemaTo": "dev_multi_lang",
           "columnsFrom": [
             "reservation_id"
           ],

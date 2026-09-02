@@ -1,5 +1,7 @@
 import { getCartProductsByIdsAction } from "@/actions/web/cart";
+import { resolveLocale } from "@/lib/locale";
 import { useMutation } from "@tanstack/react-query";
+import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 interface UseGetProductsDetailsByIdsProps {
@@ -13,6 +15,7 @@ const useGetProductsDetailsByIds = ({
   enabled = true,
   crossTabSyncVersion = 0,
 }: UseGetProductsDetailsByIdsProps) => {
+  const locale = resolveLocale(useLocale());
   const [isReady, setIsReady] = useState(false);
   const hasFetchedOnce = useRef(false);
   const prevIdsLength = useRef<number | null>(null);
@@ -34,10 +37,10 @@ const useGetProductsDetailsByIds = ({
     if (crossTabSyncVersion > lastSyncVersion.current && enabled) {
       lastSyncVersion.current = crossTabSyncVersion;
       if (ids.length > 0) {
-        mutate({ ids });
+        mutate({ ids, locale });
       }
     }
-  }, [crossTabSyncVersion, enabled, ids, mutate]);
+  }, [crossTabSyncVersion, enabled, ids, locale, mutate]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -45,7 +48,7 @@ const useGetProductsDetailsByIds = ({
 
     if (ids.length > 0) {
       hasFetchedOnce.current = true;
-      mutate({ ids });
+      mutate({ ids, locale });
     } else if (
       prevIdsLength.current !== null &&
       prevIdsLength.current === 0 &&
@@ -56,7 +59,7 @@ const useGetProductsDetailsByIds = ({
     }
 
     prevIdsLength.current = ids.length;
-  }, [enabled, ids, mutate]);
+  }, [enabled, ids, locale, mutate]);
 
   // Sau một khoảng thời gian ngắn, nếu vẫn rỗng thì set ready
   useEffect(() => {

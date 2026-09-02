@@ -1,0 +1,218 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "viewMore": "Xem thêm",
+    "close": "Đóng",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "error": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    "addExtras": "Thêm món phụ",
+    "filter": "Bộ lọc",
+    "menu": "Thực đơn",
+    "oops": "RẤT TIẾC!!",
+    "notFoundGenericMessage": "Đây không phải là trang bạn đang tìm kiếm!",
+    "backToHome": "Về trang chủ",
+    "noteLabel": "Ghi chú ({count}/300)",
+    "save": "Lưu",
+    "fillInNote": "Thêm ghi chú",
+    "amount": "Số lượng",
+    "reserveTable": "Đặt bàn ngay",
+    "reserve": "Đặt bàn",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "home": "Trang chủ",
+    "select": "Chọn"
+  },
+  "header": {},
+  "footer": {
+    "quickLinks": "Liên kết nhanh",
+    "ourServices": "Dịch vụ của chúng tôi",
+    "contactInformation": "Thông tin liên hệ",
+    "openingHours": "Giờ mở cửa",
+    "copyright": "© 2025 TALO Kitchen & Lounge"
+  },
+  "home": {
+    "visitUs": "ghé thăm chúng tôi",
+    "location": "Địa điểm",
+    "getDirections": "Chỉ đường",
+    "contact": "Liên hệ",
+    "phone": "Điện thoại",
+    "email": "Email",
+    "openingHours": "Giờ mở cửa",
+    "delivery": "Giao hàng",
+    "reserveYourTable": "Đặt bàn ngay",
+    "reviewsCount": "({count} đánh giá)",
+    "exploreOurMenu": "Khám phá thực đơn",
+    "reserveYourTableCta": "Đặt bàn ngay",
+    "verified": "Đã xác thực",
+    "ratingOutOfFive": "({rating}/5)",
+    "readMore": "Xem thêm"
+  },
+  "menu": {
+    "all": "Tất cả",
+    "newFoodBannerAlt": "Banner món mới",
+    "discover": "Khám phá",
+    "noServeFood": "Hiện không phục vụ"
+  },
+  "reservation": {
+    "form": {
+      "title": "Đặt bàn",
+      "subtitle": "Vui lòng điền đầy đủ các thông tin bắt buộc để giữ chỗ cho trải nghiệm ẩm thực của bạn",
+      "detailsHeading": "Chi tiết đặt bàn",
+      "dateLabel": "Ngày mong muốn (GMT +7) *",
+      "datePlaceholder": "Chọn ngày",
+      "timeLabel": "Giờ mong muốn (GMT +7) *",
+      "timeCaption": "Giờ",
+      "timePlaceholder": "Chọn giờ",
+      "guestsLabel": "Số lượng khách *",
+      "guestsPlaceholder": "Vui lòng chọn một tùy chọn",
+      "contactHeading": "Thông tin liên hệ",
+      "fullNameLabel": "Họ và tên *",
+      "fullNamePlaceholder": "Nhập họ và tên của bạn",
+      "phoneLabel": "Số điện thoại tại Việt Nam *",
+      "phonePlaceholder": "Nhập số điện thoại của bạn",
+      "specialRequestHeading": "Yêu cầu đặc biệt",
+      "notesLabel": "Thông tin bổ sung (Không bắt buộc)",
+      "notesPlaceholder": "Cho chúng tôi biết về chế độ ăn kiêng, dịp kỷ niệm, vị trí ngồi ưa thích hoặc bất kỳ yêu cầu đặc biệt nào khác...",
+      "submitButton": "Gửi yêu cầu đặt bàn"
+    },
+    "info": {
+      "title": "Thông tin đặt bàn",
+      "needAssistance": "Cần hỗ trợ?",
+      "getInTouch": "Liên hệ với đội ngũ đặt bàn của chúng tôi",
+      "callDirectly": "Gọi trực tiếp cho chúng tôi",
+      "emailForRequests": "Email cho các yêu cầu đặc biệt",
+      "callNow": "gọi ngay"
+    },
+    "success": {
+      "title": "Đặt bàn thành công!",
+      "description": "Cảm ơn bạn đã chọn nhà hàng của chúng tôi. Chúng tôi đã nhận được yêu cầu đặt bàn của bạn và sẽ liên hệ lại sớm để xác nhận chi tiết.",
+      "backToHome": "Về trang chủ",
+      "makeReservation": "Đặt bàn",
+      "reservationCode": "Mã đặt bàn",
+      "preferredDate": "Ngày mong muốn",
+      "preferredTime": "Giờ mong muốn",
+      "numberOfGuests": "Số lượng khách",
+      "contactInformation": "Thông tin liên hệ",
+      "fullName": "Họ và tên",
+      "phoneNumberVietnam": "Số điện thoại tại Việt Nam",
+      "specialRequests": "Yêu cầu đặc biệt",
+      "noSpecialRequests": "Không có yêu cầu đặc biệt"
+    },
+    "toast": {
+      "success": "Đặt bàn thành công! Mã của bạn là {code}"
+    }
+  },
+  "cart": {
+    "title": "Giỏ hàng của bạn ({count})",
+    "itemsEmpty": "Giỏ hàng của bạn đang trống.",
+    "checkout": "Thanh toán • {total}",
+    "item": {
+      "productImageAlt": "Hình ảnh sản phẩm",
+      "priceLabel": "Giá:",
+      "total": "Tổng cộng"
+    },
+    "summary": {
+      "subtotal": "Tạm tính",
+      "shippingNote": "Phí vận chuyển được tính khi thanh toán"
+    },
+    "empty": {
+      "imageAlt": "Giỏ hàng trống",
+      "title": "Giỏ hàng của bạn đang trống",
+      "message": "Bạn chưa có sản phẩm nào trong giỏ hàng.",
+      "cta": "Cùng chọn món ngay thôi",
+      "continueShopping": "Tiếp tục mua sắm"
+    },
+    "note": {
+      "label": "Ghi chú ({count}/{max})",
+      "save": "Lưu",
+      "fillIn": "Thêm ghi chú",
+      "cancel": "Hủy"
+    }
+  },
+  "checkout": {
+    "form": {
+      "contactTitle": "Liên hệ",
+      "phonePlaceholder": "Số điện thoại tại Việt Nam",
+      "firstNamePlaceholder": "Tên",
+      "lastNamePlaceholder": "Họ",
+      "paymentMethodTitle": "Phương thức thanh toán",
+      "onlyCash": "Chỉ tiền mặt",
+      "shippingMethodTitle": "Phương thức giao hàng",
+      "deliveryTitle": "Giao hàng",
+      "deliveryNote": "Chúng tôi giao hàng trong bán kính 10km. Nếu địa chỉ của bạn quá xa nhà hàng, chúng tôi sẽ gọi điện để xác nhận với bạn.",
+      "deliveryAddressPlaceholder": "Địa chỉ giao hàng",
+      "addressNotePlaceholder": "Căn hộ, homestay, v.v. (không bắt buộc)",
+      "completeOrder": "Hoàn tất đơn hàng • {amount}"
+    },
+    "summary": {
+      "title": "Tóm tắt đơn hàng",
+      "subtotal": "Tạm tính",
+      "shippingFee": "Phí vận chuyển",
+      "free": "Miễn phí",
+      "total": "Tổng cộng",
+      "shipping": "Vận chuyển",
+      "noteHeading": "Ghi chú cho toàn bộ đơn hàng!"
+    },
+    "success": {
+      "title": "Đặt hàng thành công",
+      "thankYouMessage": "Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn sẽ được xử lý sớm nhất có thể. Chúng tôi sẽ liên hệ để xác nhận yêu cầu và giao hàng.",
+      "confirmCallMessage": "Chúng tôi sẽ gọi điện để xác nhận đơn hàng của bạn.",
+      "yourContact": "Thông tin liên hệ của bạn",
+      "orderCodeLabel": "Mã đơn hàng",
+      "phoneLabel": "Số điện thoại tại Việt Nam",
+      "paymentMethodLabel": "Phương thức thanh toán",
+      "shippingMethodLabel": "Phương thức giao hàng",
+      "backToHome": "Về trang chủ"
+    },
+    "note": {
+      "title": "Ghi chú ({count}/300)",
+      "save": "Lưu",
+      "fillInNote": "Thêm ghi chú",
+      "cancel": "Hủy"
+    },
+    "orderItem": {
+      "noteLabel": "Ghi chú:"
+    }
+  },
+  "products": {
+    "addToCart": "Thêm vào giỏ • {price}",
+    "foodIngredients": "Thành phần món ăn",
+    "noFoodIngredientsInfo": "Chưa có thông tin thành phần món ăn.",
+    "description": "Mô tả",
+    "youAlsoLike": "Có thể bạn cũng thích"
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "message": "Rất tiếc! Trang bạn đang tìm kiếm không tồn tại.",
+    "backHome": "Về trang chủ"
+  },
+  "metadata": {
+    "home": {
+      "title": "TALO Kitchen & Lounge - Trang chủ",
+      "description": "Chào mừng bạn đến với TALO Kitchen & Lounge, nơi sự tinh tế trong ẩm thực hòa quyện cùng không gian ấm cúng, thân thiện."
+    },
+    "reservation": {
+      "title": "Đặt bàn | TALO Kitchen & Lounge",
+      "description": "Đặt bàn tại TALO Kitchen & Lounge. Trải nghiệm ẩm thực tinh tế với nguyên liệu tươi ngon và hương vị chuẩn vị trong không gian ấm áp."
+    },
+    "checkout": {
+      "title": "Thanh toán | TALO Kitchen & Lounge",
+      "description": "Hoàn tất đơn hàng của bạn tại TALO Kitchen & Lounge. Quy trình thanh toán an toàn."
+    },
+    "cart": {
+      "title": "Giỏ hàng | TALO Kitchen & Lounge",
+      "description": "Xem lại các món trong giỏ hàng trước khi thanh toán tại TALO Kitchen & Lounge."
+    },
+    "menu": {
+      "allLabel": "Tất cả",
+      "allMenuTitle": "Toàn bộ thực đơn",
+      "titleFallback": "Thực đơn - {category}",
+      "description": "Khám phá thực đơn {category} hấp dẫn tại TALO Kitchen & Lounge. Nguyên liệu tươi ngon, hương vị chuẩn vị."
+    },
+    "dish": {
+      "notFound": "Không tìm thấy sản phẩm",
+      "descriptionFallback": "Khám phá {title} tại TALO Kitchen & Lounge"
+    }
+  }
+}

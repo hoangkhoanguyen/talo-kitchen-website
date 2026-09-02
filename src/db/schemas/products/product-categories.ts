@@ -2,6 +2,7 @@ import { serial, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
 import { dbSchema } from "../../schema";
 import { relations } from "drizzle-orm";
 import { products } from "./products";
+import { productCategoryTranslations } from "./product-category-translations";
 
 export const productCategories = dbSchema.table("product_categories", {
   id: serial("id").primaryKey(),
@@ -25,5 +26,6 @@ export const productCategoriesRelations = relations(
   productCategories,
   ({ many }) => ({
     products: many(products),
+    translations: many(productCategoryTranslations),
   }),
 );

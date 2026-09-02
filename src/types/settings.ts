@@ -13,12 +13,14 @@ export interface TextField {
   type: "text";
   placeholder?: string;
   withLabel?: boolean;
+  localized?: boolean;
 }
 
 export interface TextareaField {
   type: "textarea";
   placeholder?: string;
   withLabel?: boolean;
+  localized?: boolean;
 }
 
 export interface NumberField {

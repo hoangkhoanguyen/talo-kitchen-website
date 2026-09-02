@@ -57,6 +57,7 @@ const fields: FieldType[] = [
     description: "Mô tả hiển thị trên phần Why Choose Us",
     isRequired: true,
     placeholder: "Nhập mô tả",
+    localized: true,
   },
   {
     key: "reasons",
@@ -91,6 +92,7 @@ const fields: FieldType[] = [
           description: "Tiêu đề hiển thị cho lý do",
           isRequired: true,
           placeholder: "Nhập tiêu đề",
+          localized: true,
         },
         {
           key: "desc",
@@ -99,6 +101,7 @@ const fields: FieldType[] = [
           description: "Mô tả hiển thị cho lý do",
           isRequired: true,
           placeholder: "Nhập mô tả",
+          localized: true,
         },
       ],
     },

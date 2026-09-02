@@ -4,14 +4,18 @@ import CheckoutForm from "./CheckoutForm";
 import CheckoutSummary from "./CheckoutSummary";
 import Icon from "@/components/common/Icon";
 import { Button } from "../../ui/button";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import OrderItem from "./OrderItem";
 import { useCheckoutContext } from "./CheckoutProvider";
 import { formatCurrencyWebsite } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/lib/locale";
 
 const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
   const { successOrder } = useCheckoutContext();
+  const t = useTranslations("checkout");
+  const locale = resolveLocale(useLocale());
 
   if (!successOrder)
     return (
@@ -29,7 +33,7 @@ const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
 
   const renderTitle = () => (
     <h2 className="text-web-h2-mobile lg:text-web-h2 text-web-content-1">
-      Order Summary
+      {t("summary.title")}
     </h2>
   );
 
@@ -62,30 +66,31 @@ const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
       <ul className="flex flex-col gap-2.5 items-stretch">
         <li className="flex justify-between items-center">
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-content-1">
-            Subtotal
+            {t("summary.subtotal")}
           </span>
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1">
             {formatCurrencyWebsite(
               successOrder.order.totalPrice - successOrder.order.shippingFee,
+              locale,
             )}
           </span>
         </li>
         <li className="flex justify-between items-center">
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-content-1">
-            Shipping Fee
+            {t("summary.shippingFee")}
           </span>
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-secondary-1">
             {successOrder.order.shippingFee
-              ? formatCurrencyWebsite(successOrder.order.shippingFee)
-              : "Free"}
+              ? formatCurrencyWebsite(successOrder.order.shippingFee, locale)
+              : t("summary.free")}
           </span>
         </li>
         <li className="flex justify-between items-center">
           <span className="text-web-h2-mobile lg:text-web-h2 text-web-content-1">
-            Total
+            {t("summary.total")}
           </span>
           <span className="text-web-h2-mobile lg:text-web-h2 text-web-secondary-1">
-            {formatCurrencyWebsite(successOrder.order.totalPrice)}
+            {formatCurrencyWebsite(successOrder.order.totalPrice, locale)}
           </span>
         </li>
       </ul>
@@ -97,30 +102,31 @@ const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div>
           <h2 className="text-web-h2-mobile lg:text-web-h2 text-web-content-1 mb-5">
-            Successfully Order
+            {t("success.title")}
           </h2>
           <p className="text-web-body-mobile lg:text-web-body text-web-content-1 mb-5">
-            Thank you for placing your order. Your order will be processed as
-            soon as possible. We will contact you to confirm your request and
-            delivery.
+            {t("success.thankYouMessage")}
           </p>
           <p className="text-web-body-mobile lg:text-web-body text-web-content-1 mb-10">
-            We will call to confirm your order.
+            {t("success.confirmCallMessage")}
           </p>
           <Card>
-            <CardTitle label="Your Contact" icon="ph:phone" />
+            <CardTitle label={t("success.yourContact")} icon="ph:phone" />
             <ul className="flex flex-col gap-5">
               <InfoItem
-                label="Order Code"
+                label={t("success.orderCodeLabel")}
                 value={`#${successOrder.order.code}`}
               />
               <InfoItem
-                label="Phone Number in Vietnam"
+                label={t("success.phoneLabel")}
                 value={successOrder.order.customerPhone}
               />
-              <InfoItem label="Payment method" value={"Only Cash"} />
               <InfoItem
-                label="Shipping method"
+                label={t("success.paymentMethodLabel")}
+                value={t("form.onlyCash")}
+              />
+              <InfoItem
+                label={t("success.shippingMethodLabel")}
                 value={successOrder.order.orderTypeLabel || ""}
               />
             </ul>
@@ -132,7 +138,7 @@ const CheckoutRender: FC<{ configs: any }> = ({ configs }) => {
               variant={"primary"}
               className="w-full text-web-button-mobile lg:text-web-button py-4 rounded-lg"
             >
-              Back to home
+              {t("success.backToHome")}
             </Button>
           </div>
         </div>

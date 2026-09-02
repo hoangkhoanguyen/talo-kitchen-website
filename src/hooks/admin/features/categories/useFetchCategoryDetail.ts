@@ -1,10 +1,15 @@
 import { adminRoutes } from "@/constants/route";
-import { ProductCategoryDB, ProductDB } from "@/types/products";
+import {
+  ProductCategoryDB,
+  ProductCategoryTranslationDB,
+  ProductDB,
+} from "@/types/products";
 import adminApi from "@/lib/api/axios";
 import { useQuery } from "@tanstack/react-query";
 
 interface CategoryWithProducts extends ProductCategoryDB {
   products: ProductDB[];
+  translations: ProductCategoryTranslationDB[];
 }
 
 interface CategoryDetailResponse {

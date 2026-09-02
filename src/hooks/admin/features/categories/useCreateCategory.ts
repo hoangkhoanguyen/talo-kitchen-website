@@ -1,12 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { addProductCategoryAction } from "@/actions/admin/category";
-import { NewProductCategoryDB } from "@/types/products";
+import { AdminCreateProductCategoryForm } from "@/types/products";
 import { toast } from "sonner";
 import { handleServerActionError } from "@/lib/handle-server-action-error";
 
 const useCreateCategory = () => {
   return useMutation({
-    mutationFn: (data: NewProductCategoryDB) => addProductCategoryAction(data),
+    mutationFn: (data: AdminCreateProductCategoryForm) =>
+      addProductCategoryAction(data),
     onSuccess: (result) => {
       if (result.success) {
         toast.success("Tạo danh mục thành công!");

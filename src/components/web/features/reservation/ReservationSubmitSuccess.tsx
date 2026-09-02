@@ -1,16 +1,21 @@
+"use client";
 import Icon from "@/components/common/Icon";
 import React, { FC, ReactNode } from "react";
 import { Button } from "../../ui/button";
 import ReservationInformation from "./ReservationInformation";
 import { ReservationDB } from "@/db/schemas";
-import moment from "moment";
-import Link from "next/link";
+import { formatReservationDate, formatReservationTime } from "@/lib/date-web";
+import { resolveLocale } from "@/lib/locale";
+import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
+import { useLocale, useTranslations } from "next-intl";
 
 const ReservationSubmitSuccess: FC<{
   configs: any;
   reservation: ReservationDB;
 }> = ({ configs, reservation }) => {
+  const t = useTranslations("reservation");
+  const locale = resolveLocale(useLocale());
   const renderBackToHomeButton = () => (
     <Button
       as={Link}
@@ -18,7 +23,7 @@ const ReservationSubmitSuccess: FC<{
       variant={"primary"}
       className="w-full"
     >
-      Back to home
+      {t("success.backToHome")}
     </Button>
   );
   return (
@@ -27,60 +32,55 @@ const ReservationSubmitSuccess: FC<{
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-5">
             <h3 className="text-web-h2-mobile lg:text-web-h2 text-web-primary mb-5">
-              {configs.success_title || "Reservation Submitted Successfully!"}
+              {configs.success_title || t("success.title")}
             </h3>
 
             <p className="text-web-subtitle-mobile lg:text-web-subtitle text-web-content-2">
-              {configs.success_description ||
-                "Thank you for choosing our restaurant. We have received your reservation request and will get back to you shortly to confirm the details."}
+              {configs.success_description || t("success.description")}
             </p>
           </div>
           <div className="lg:col-span-3 grid grid-cols-1 gap-5">
             <Card>
-              <CardTitle label="Make a Reservation" icon="ph:calendar-blank" />
+              <CardTitle label={t("success.makeReservation")} icon="ph:calendar-blank" />
               <ul className="flex flex-col gap-5">
                 <InfoItem
-                  label="Reservation Code"
+                  label={t("success.reservationCode")}
                   value={`#${reservation.code}`}
                 />
                 <InfoItem
-                  label="Preferred Date"
-                  value={moment(reservation.arrivalDate, "YYYY-MM-DD").format(
-                    "DD/MM/YYYY",
-                  )}
+                  label={t("success.preferredDate")}
+                  value={formatReservationDate(reservation.arrivalDate, locale)}
                 />
                 <InfoItem
-                  label="Preferred Time"
-                  value={moment(reservation.arrivalTime, "HH:mm:ss").format(
-                    "hh:mm A",
-                  )}
+                  label={t("success.preferredTime")}
+                  value={formatReservationTime(reservation.arrivalTime, locale)}
                 />
                 <InfoItem
-                  label="Number of Guests"
+                  label={t("success.numberOfGuests")}
                   value={reservation.numberOfPeople}
                 />
               </ul>
             </Card>
 
             <Card>
-              <CardTitle label="Contact Information" icon="ph:phone" />
+              <CardTitle label={t("success.contactInformation")} icon="ph:phone" />
               <ul className="flex flex-col gap-5">
                 <InfoItem
-                  label="Full name"
+                  label={t("success.fullName")}
                   value={`${reservation.customerFullName}`}
                 />
                 <InfoItem
-                  label="Phone Number in Vietnam"
+                  label={t("success.phoneNumberVietnam")}
                   value={`${reservation.customerPhone}`}
                 />
               </ul>
             </Card>
 
             <Card>
-              <CardTitle label="Special requests" icon="ph:chat-circle" />
+              <CardTitle label={t("success.specialRequests")} icon="ph:chat-circle" />
               <div className="w-full p-2.5 rounded-lg bg-web-background-2 border border-web-content-3">
                 <p className="text-web-body-mobile lg:text-web-body text-web-content-2">
-                  {reservation.note || "No special requests"}
+                  {reservation.note || t("success.noSpecialRequests")}
                 </p>
               </div>
             </Card>

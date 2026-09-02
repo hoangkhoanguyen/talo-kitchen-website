@@ -36,6 +36,7 @@ export const seoMeta: MetaValue = {
         "Tiêu đề trang hiển thị trên tab trình duyệt và kết quả tìm kiếm",
       isRequired: true,
       placeholder: "TALO Kitchen & Lounge - Home",
+      localized: true,
     },
     {
       key: "description",
@@ -45,6 +46,7 @@ export const seoMeta: MetaValue = {
         "Mô tả trang hiển thị trên kết quả tìm kiếm Google (150-160 ký tự)",
       isRequired: true,
       placeholder: "Nhập mô tả trang...",
+      localized: true,
     },
     {
       key: "keywords",
@@ -63,6 +65,7 @@ export const seoMeta: MetaValue = {
             description: "Nhập từ khóa SEO",
             isRequired: true,
             placeholder: "Ví dụ: restaurant",
+            localized: true,
           },
         ],
       },
@@ -77,6 +80,7 @@ export const seoMeta: MetaValue = {
       description: "Tiêu đề hiển thị khi chia sẻ lên Facebook/Meta",
       isRequired: true,
       placeholder: "TALO Kitchen & Lounge - Fine Dining Experience",
+      localized: true,
     },
     {
       key: "og_description",
@@ -85,6 +89,7 @@ export const seoMeta: MetaValue = {
       description: "Mô tả hiển thị khi chia sẻ lên Facebook/Meta",
       isRequired: true,
       placeholder: "Nhập mô tả...",
+      localized: true,
     },
     {
       key: "og_image",

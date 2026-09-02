@@ -7,6 +7,7 @@ const envSchema = z.object({
     .default("development"),
   PORT: z.coerce.number().default(3000),
   DATABASE_URL: z.string(),
+  DB_SCHEMA: z.string().default("prod"),
   ACCESS_TOKEN_JWT_SECRET: z.string(),
   ACCESS_TOKEN_JWT_EXPIRES_IN: z.string(),
   REFRESH_TOKEN_JWT_SECRET: z.string(),

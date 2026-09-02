@@ -1,0 +1,218 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "viewMore": "View more",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "error": "Something went wrong. Please try again.",
+    "addExtras": "Add Extras",
+    "filter": "Filter",
+    "menu": "Menu",
+    "oops": "OOOPS!!",
+    "notFoundGenericMessage": "This is not page you are looking for!",
+    "backToHome": "Back to Home",
+    "noteLabel": "Note ({count}/300)",
+    "save": "Save",
+    "fillInNote": "Fill in note",
+    "amount": "Amount",
+    "reserveTable": "Reserve Your Table",
+    "reserve": "Reserve",
+    "prev": "Prev",
+    "next": "Next",
+    "home": "Home",
+    "select": "Select"
+  },
+  "header": {},
+  "footer": {
+    "quickLinks": "Quick Links",
+    "ourServices": "Our Services",
+    "contactInformation": "Contact Information",
+    "openingHours": "Opening Hours",
+    "copyright": "© 2025 TALO Kitchen & Lounge"
+  },
+  "home": {
+    "visitUs": "visit us",
+    "location": "Location",
+    "getDirections": "Get Directions",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "openingHours": "Opening Hours",
+    "delivery": "Delivery",
+    "reserveYourTable": "Reserve your table",
+    "reviewsCount": "({count} Reviews)",
+    "exploreOurMenu": "Explore Our Menu",
+    "reserveYourTableCta": "Reserve Your Table",
+    "verified": "Verified",
+    "ratingOutOfFive": "({rating}/5)",
+    "readMore": "Read more"
+  },
+  "menu": {
+    "all": "All",
+    "newFoodBannerAlt": "New Food Banner",
+    "discover": "Discover",
+    "noServeFood": "NoServeFood"
+  },
+  "reservation": {
+    "form": {
+      "title": "Make a Reservation",
+      "subtitle": "Please fill out all required fields to secure your dining experience",
+      "detailsHeading": "Reservation Details",
+      "dateLabel": "Preferred Date (GMT +7) *",
+      "datePlaceholder": "Select date",
+      "timeLabel": "Preferred Time (GMT +7) *",
+      "timeCaption": "Time",
+      "timePlaceholder": "Select time",
+      "guestsLabel": "Number of Guests *",
+      "guestsPlaceholder": "Please choose an option",
+      "contactHeading": "Contact Details",
+      "fullNameLabel": "Full Name *",
+      "fullNamePlaceholder": "Enter your full name",
+      "phoneLabel": "Phone Number at Vietnam *",
+      "phonePlaceholder": "Enter your phone number",
+      "specialRequestHeading": "Special Request",
+      "notesLabel": "Additional Information (Optional)",
+      "notesPlaceholder": "Tell us about dietary restrictions, celebrations, seating preferences, or any other special requirements...",
+      "submitButton": "Submit Reservation Request"
+    },
+    "info": {
+      "title": "Reservation Information",
+      "needAssistance": "Need Assistance?",
+      "getInTouch": "Get in touch with our reservations team",
+      "callDirectly": "Call us directly",
+      "emailForRequests": "Email for special requests",
+      "callNow": "call now"
+    },
+    "success": {
+      "title": "Reservation Submitted Successfully!",
+      "description": "Thank you for choosing our restaurant. We have received your reservation request and will get back to you shortly to confirm the details.",
+      "backToHome": "Back to home",
+      "makeReservation": "Make a Reservation",
+      "reservationCode": "Reservation Code",
+      "preferredDate": "Preferred Date",
+      "preferredTime": "Preferred Time",
+      "numberOfGuests": "Number of Guests",
+      "contactInformation": "Contact Information",
+      "fullName": "Full name",
+      "phoneNumberVietnam": "Phone Number in Vietnam",
+      "specialRequests": "Special requests",
+      "noSpecialRequests": "No special requests"
+    },
+    "toast": {
+      "success": "Reservation successful! Your code is {code}"
+    }
+  },
+  "cart": {
+    "title": "Your Cart ({count})",
+    "itemsEmpty": "Your cart is empty.",
+    "checkout": "Checkout • {total}",
+    "item": {
+      "productImageAlt": "Product Image",
+      "priceLabel": "Price:",
+      "total": "Total"
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "shippingNote": "Shipping calculated at checkout"
+    },
+    "empty": {
+      "imageAlt": "Empty Cart",
+      "title": "Your cart is empty",
+      "message": "You have no items in your cart.",
+      "cta": "Let’s go buy something",
+      "continueShopping": "Continue Shopping"
+    },
+    "note": {
+      "label": "Note ({count}/{max})",
+      "save": "Save",
+      "fillIn": "Fill in note",
+      "cancel": "Cancel"
+    }
+  },
+  "checkout": {
+    "form": {
+      "contactTitle": "Contact",
+      "phonePlaceholder": "Phone number in Vietnam",
+      "firstNamePlaceholder": "First name",
+      "lastNamePlaceholder": "Last name",
+      "paymentMethodTitle": "Payment Method",
+      "onlyCash": "Only Cash",
+      "shippingMethodTitle": "Shipping Method",
+      "deliveryTitle": "Delivery",
+      "deliveryNote": "We will deliver within a 10km radius. If your address is too far from the restaurant, we will call to confirm with you.",
+      "deliveryAddressPlaceholder": "Delivery address",
+      "addressNotePlaceholder": "Apartment, Homestay, etc (optional)",
+      "completeOrder": "Complete the Order • {amount}"
+    },
+    "summary": {
+      "title": "Order Summary",
+      "subtotal": "Subtotal",
+      "shippingFee": "Shipping Fee",
+      "free": "Free",
+      "total": "Total",
+      "shipping": "Shipping",
+      "noteHeading": "Where you note the entire order!"
+    },
+    "success": {
+      "title": "Successfully Order",
+      "thankYouMessage": "Thank you for placing your order. Your order will be processed as soon as possible. We will contact you to confirm your request and delivery.",
+      "confirmCallMessage": "We will call to confirm your order.",
+      "yourContact": "Your Contact",
+      "orderCodeLabel": "Order Code",
+      "phoneLabel": "Phone Number in Vietnam",
+      "paymentMethodLabel": "Payment method",
+      "shippingMethodLabel": "Shipping method",
+      "backToHome": "Back to home"
+    },
+    "note": {
+      "title": "Note ({count}/300)",
+      "save": "Save",
+      "fillInNote": "Fill in note",
+      "cancel": "Cancel"
+    },
+    "orderItem": {
+      "noteLabel": "Note:"
+    }
+  },
+  "products": {
+    "addToCart": "Add to Cart • {price}",
+    "foodIngredients": "Food Ingredients",
+    "noFoodIngredientsInfo": "No food ingredients information provided.",
+    "description": "Description",
+    "youAlsoLike": "You also like"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "Oops! The page you are looking for could not be found.",
+    "backHome": "Back to Home"
+  },
+  "metadata": {
+    "home": {
+      "title": "TALO Kitchen & Lounge - Home",
+      "description": "Welcome to TALO Kitchen & Lounge, where culinary excellence meets a warm and inviting atmosphere."
+    },
+    "reservation": {
+      "title": "Reservation | TALO Kitchen & Lounge",
+      "description": "Reserve your table at TALO Kitchen & Lounge. Experience fine dining with fresh ingredients and authentic flavors in a warm atmosphere."
+    },
+    "checkout": {
+      "title": "Checkout | TALO Kitchen & Lounge",
+      "description": "Complete your order at TALO Kitchen & Lounge. Secure checkout process."
+    },
+    "cart": {
+      "title": "Shopping Cart | TALO Kitchen & Lounge",
+      "description": "Review your order items before checkout at TALO Kitchen & Lounge."
+    },
+    "menu": {
+      "allLabel": "All",
+      "allMenuTitle": "All Menu",
+      "titleFallback": "Menu - {category}",
+      "description": "Explore our delicious {category} menu at TALO Kitchen & Lounge. Fresh ingredients, authentic flavors."
+    },
+    "dish": {
+      "notFound": "Product Not Found",
+      "descriptionFallback": "Discover {title} at TALO Kitchen & Lounge"
+    }
+  }
+}
