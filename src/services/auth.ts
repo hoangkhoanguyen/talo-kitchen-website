@@ -1,12 +1,12 @@
 import { getDb } from "@/db/drizzle";
-import { refreshTokens, users } from "@/db/schemas";
+import { refreshTokens, refreshTokenRotations, users } from "@/db/schemas";
 import {
   NewRefreshTokenDB,
   NewUserDB,
   RefreshTokenDB,
   UserDB,
 } from "@/db/schemas";
-import { eq, and, or, ilike, sql } from "drizzle-orm";
+import { eq, and, or, ilike, sql, gt } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import {
   comparePassword,
@@ -179,30 +179,10 @@ export async function refreshAccessToken(
       };
     }
 
-    // 3. Check refresh token in database với userId để tăng bảo mật
-    const tokenRecord = await getTokenInfoByToken(
-      refreshToken,
-      verificationResult.payload.userId,
-    );
-    if (!tokenRecord) {
-      return {
-        success: false,
-        error: "Refresh token không tồn tại hoặc không thuộc về user này",
-        code: "TOKEN_NOT_FOUND",
-      };
-    }
+    const userId = verificationResult.payload.userId;
 
-    // 4. Check if token is still valid in database
-    if (!tokenRecord.isValid) {
-      return {
-        success: false,
-        error: "Refresh token đã bị vô hiệu hóa",
-        code: "TOKEN_REVOKED",
-      };
-    }
-
-    // 5. Get user info
-    const user = await getUserById(verificationResult.payload.userId);
+    // 3. Get user info trước (cần cho cả 2 nhánh success bên dưới)
+    const user = await getUserById(userId);
     if (!user) {
       return {
         success: false,
@@ -211,7 +191,7 @@ export async function refreshAccessToken(
       };
     }
 
-    // 6. Check user status
+    // 4. Check user status
     if (!user.isActive) {
       return {
         success: false,
@@ -220,7 +200,7 @@ export async function refreshAccessToken(
       };
     }
 
-    // 7. Generate new access token
+    // 5. Generate new access + refresh token (for token rotation)
     const newAccessToken = await signAccessToken({
       userId: user.id,
       email: user.email,
@@ -231,21 +211,58 @@ export async function refreshAccessToken(
       isActive: user.isActive,
     });
 
-    // 8. Generate new refresh token (for token rotation)
     const newRefreshToken = await signRefreshToken({
       userId: user.id,
     });
 
-    // 9. Update refresh token vào record cũ (token rotation)
-    await updateRefreshToken(tokenRecord.id, {
-      refreshToken: newRefreshToken,
-      isValid: true,
-    });
+    // 6. Xoay token bằng compare-and-swap 1 câu: chỉ xoay nếu refreshToken
+    // hiện tại trong DB vẫn đúng bằng token client gửi lên (chưa bị request
+    // nào khác xoay trước). Tránh race condition khi 2 luồng refresh chạy
+    // gần như đồng thời (client polling + server action) cùng dùng 1 cookie.
+    const rotated = await rotateRefreshToken(
+      refreshToken,
+      userId,
+      newRefreshToken,
+    );
 
+    if (rotated) {
+      return {
+        success: true,
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
+    }
+
+    // 7. CAS thất bại (0 row) — token không còn khớp isValid=true.
+    // Có thể do: (a) race — token vừa bị 1 request khác xoay ra vài giây
+    // trước, vẫn còn trong grace window; hoặc (b) token thực sự bị revoke/
+    // không tồn tại.
+    const racedRecord = await getRecordByPreviousToken(refreshToken, userId);
+    if (racedRecord) {
+      // Đây là "loser" của race: trả về cặp token HIỆN HÀNH (đã được
+      // "winner" xoay ra), không xoay thêm để tránh tạo thêm race.
+      return {
+        success: true,
+        accessToken: newAccessToken,
+        refreshToken: racedRecord.refreshToken,
+      };
+    }
+
+    // 8. Không tìm thấy token (đã hết grace window hoặc chưa từng tồn tại)
+    const existingRecord = await getTokenInfoByToken(refreshToken, userId);
+    if (!existingRecord) {
+      return {
+        success: false,
+        error: "Refresh token không tồn tại hoặc không thuộc về user này",
+        code: "TOKEN_NOT_FOUND",
+      };
+    }
+
+    // Token tồn tại nhưng isValid=false → thực sự bị revoke
     return {
-      success: true,
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
+      success: false,
+      error: "Refresh token đã bị vô hiệu hóa",
+      code: "TOKEN_REVOKED",
     };
   } catch (error) {
     console.error("Error during token refresh:", error);
@@ -587,6 +604,102 @@ export async function updateRefreshToken(
     return updatedRefreshToken;
   } catch (error) {
     throw new Error(`Lỗi khi cập nhật refresh token: ${error}`);
+  }
+}
+
+// Grace window: khoảng thời gian sau khi 1 refresh token bị xoay, request
+// "thua" trong race vẫn được coi là hợp lệ nếu tới trong khoảng này.
+const REFRESH_TOKEN_ROTATION_GRACE_WINDOW_MS = 30 * 1000;
+
+/**
+ * Xoay refresh token bằng compare-and-swap (1 câu UPDATE có điều kiện).
+ * Chỉ update nếu `oldToken` vẫn đúng là giá trị hiện tại trong DB và
+ * isValid = true. Trả về record mới nếu xoay thành công, null nếu có
+ * request khác đã xoay trước đó (race) hoặc token không hợp lệ.
+ */
+export async function rotateRefreshToken(
+  oldToken: string,
+  userId: number,
+  newToken: string,
+) {
+  try {
+    const db = getDb();
+
+    const [updated] = await db
+      .update(refreshTokens)
+      .set({
+        refreshToken: newToken,
+        isValid: true,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(refreshTokens.refreshToken, oldToken),
+          eq(refreshTokens.userId, userId),
+          eq(refreshTokens.isValid, true),
+        ),
+      )
+      .returning();
+
+    if (updated) {
+      // Ghi log rotation để 1 request "thua" race (đến sau vài giây, vẫn
+      // cầm oldToken) có thể tự nhận ra và lấy lại cặp token hiện hành
+      // thay vì bị coi là TOKEN_NOT_FOUND.
+      const graceExpiresAt = new Date(
+        Date.now() + REFRESH_TOKEN_ROTATION_GRACE_WINDOW_MS,
+      );
+      await db.insert(refreshTokenRotations).values({
+        userId,
+        oldRefreshToken: oldToken,
+        refreshTokenId: updated.id,
+        expiresAt: graceExpiresAt,
+      });
+    }
+
+    return updated || null;
+  } catch (error) {
+    throw new Error(`Lỗi khi xoay refresh token: ${error}`);
+  }
+}
+
+/**
+ * Tìm record hiện hành mà `token` chính là refresh token VỪA BỊ xoay ra
+ * (còn trong grace window). Dùng để phân biệt race condition (loser vẫn
+ * hợp lệ) với token thực sự bị revoke/không tồn tại.
+ */
+export async function getRecordByPreviousToken(token: string, userId: number) {
+  try {
+    const db = getDb();
+    const [rotation] = await db
+      .select()
+      .from(refreshTokenRotations)
+      .where(
+        and(
+          eq(refreshTokenRotations.oldRefreshToken, token),
+          eq(refreshTokenRotations.userId, userId),
+          gt(refreshTokenRotations.expiresAt, new Date()),
+        ),
+      )
+      .limit(1);
+
+    if (!rotation) {
+      return null;
+    }
+
+    const [record] = await db
+      .select()
+      .from(refreshTokens)
+      .where(
+        and(
+          eq(refreshTokens.id, rotation.refreshTokenId),
+          eq(refreshTokens.isValid, true),
+        ),
+      )
+      .limit(1);
+
+    return record || null;
+  } catch (error) {
+    throw new Error(`Lỗi khi tra cứu previous refresh token: ${error}`);
   }
 }
 
