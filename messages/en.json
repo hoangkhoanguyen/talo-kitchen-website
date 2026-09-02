@@ -134,8 +134,7 @@
     "form": {
       "contactTitle": "Contact",
       "phonePlaceholder": "Phone number in Vietnam",
-      "firstNamePlaceholder": "First name",
-      "lastNamePlaceholder": "Last name",
+      "namePlaceholder": "Full name",
       "paymentMethodTitle": "Payment Method",
       "onlyCash": "Only Cash",
       "shippingMethodTitle": "Shipping Method",

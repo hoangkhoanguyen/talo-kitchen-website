@@ -49,31 +49,14 @@ const CheckoutForm: FC<{ shippingMethods: any }> = ({ shippingMethods }) => {
         />
         <Controller
           control={control}
-          name="customerFirstName"
+          name="customerName"
           render={({ field, fieldState: { error } }) => (
             <div>
               <input
                 {...field}
                 type="text"
                 className={cn("web-input", !!error && " web-input-error")}
-                placeholder={t("form.firstNamePlaceholder")}
-              />
-              {error?.message && (
-                <p className="text-web-error text-xs mt-1">{error.message}</p>
-              )}
-            </div>
-          )}
-        />
-        <Controller
-          control={control}
-          name="customerLastName"
-          render={({ field, fieldState: { error } }) => (
-            <div>
-              <input
-                {...field}
-                type="text"
-                className={cn("web-input", !!error && " web-input-error")}
-                placeholder={t("form.lastNamePlaceholder")}
+                placeholder={t("form.namePlaceholder")}
               />
               {error?.message && (
                 <p className="text-web-error text-xs mt-1">{error.message}</p>

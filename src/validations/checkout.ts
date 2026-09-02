@@ -7,14 +7,10 @@ export const checkoutSchema = z
       .string({ error: "Phone number is required" })
       .min(10, "Phone number must be at least 10 digits")
       .max(20, "Phone number must be at most 20 digits"),
-    customerFirstName: z
-      .string({ error: "First name is required" })
-      .min(1, "First name is required")
-      .max(100, "First name must be at most 100 characters"),
-    customerLastName: z
-      .string({ error: "Last name is required" })
-      .min(1, "Last name is required")
-      .max(100, "Last name must be at most 100 characters"),
+    customerName: z
+      .string({ error: "Name is required" })
+      .min(1, "Name is required")
+      .max(200, "Name must be at most 200 characters"),
     paymentMethod: z.enum(["cash"], {
       error: '"Payment method is required",',
     }),

@@ -50,8 +50,7 @@ const CheckoutProvider: FC<
       paymentMethod: "cash",
       shippingMethod: defaultMethod,
       addressNote: "",
-      customerFirstName: "",
-      customerLastName: "",
+      customerName: "",
       customerPhone: "",
       deliveryAddress: "",
       note: "",
@@ -95,8 +94,8 @@ const CheckoutProvider: FC<
       {
         orderData: {
           customerPhone: data.customerPhone,
-          firstName: data.customerFirstName,
-          lastName: data.customerLastName,
+          firstName: data.customerName,
+          lastName: "",
           paymentMethod: data.paymentMethod,
           orderType: data.shippingMethod,
           deliveryAddress: data.deliveryAddress,

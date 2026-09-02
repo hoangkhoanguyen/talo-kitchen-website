@@ -134,8 +134,7 @@
     "form": {
       "contactTitle": "Liên hệ",
       "phonePlaceholder": "Số điện thoại tại Việt Nam",
-      "firstNamePlaceholder": "Tên",
-      "lastNamePlaceholder": "Họ",
+      "namePlaceholder": "Họ và tên",
       "paymentMethodTitle": "Phương thức thanh toán",
       "onlyCash": "Chỉ tiền mặt",
       "shippingMethodTitle": "Phương thức giao hàng",
