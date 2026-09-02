@@ -9,12 +9,23 @@ import Pagination from "@/components/admin/ui/table/Pagination";
 import useFetchProducts from "@/hooks/admin/features/products/useFetchProducts";
 import useProductsParams from "@/hooks/admin/features/products/useProductsParams";
 import { AdminProductTable } from "@/types/products";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 const ProductPage = () => {
   const { query, setQuery } = useProductsParams();
 
   const { data, refetch, isPending, isRefetching } = useFetchProducts(query);
+
+  const totalPages = data ? Math.ceil(data.total / query.limit) : 0;
+
+  // Self-correcting guard: snap back to the last valid page if the current
+  // one is out of range (stale/tampered `?page=`, or filter/search shrank
+  // the result set).
+  useEffect(() => {
+    if (data && data.total > 0 && query.page > totalPages) {
+      setQuery({ page: totalPages });
+    }
+  }, [data, query.page, totalPages, setQuery]);
 
   const convertedData: AdminProductTable[] = useMemo(
     () =>
@@ -53,6 +64,7 @@ const ProductPage = () => {
             onRemove={() =>
               setQuery({
                 isActive: null,
+                page: 1,
               })
             }
             label="Trạng thái"
@@ -72,7 +84,7 @@ const ProductPage = () => {
       <Pagination
         className="self-center"
         currentPage={query.page}
-        totalPages={data ? Math.ceil(data.total / query.limit) : 0}
+        totalPages={totalPages}
         onPageChange={(page) => {
           setQuery({
             page,

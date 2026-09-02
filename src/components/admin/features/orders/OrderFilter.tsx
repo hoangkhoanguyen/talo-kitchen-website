@@ -16,7 +16,7 @@ const OrderFilter = ({
   setQuery: setURLQuery,
 }: {
   query: FilterQuery;
-  setQuery(value: FilterQuery): void;
+  setQuery(value: FilterQuery & { page?: number }): void;
 }) => {
   const [query, setQuery] = useState<FilterQuery>(initQuery);
   // const [urlQuery, setURLQuery] = useState<FilterQuery>(initQuery);
@@ -47,8 +47,8 @@ const OrderFilter = ({
   };
 
   const onSubmit = () => {
-    // update state to url
-    setURLQuery(query);
+    // update state to url, reset to page 1 since the result set may shrink
+    setURLQuery({ ...query, page: 1 });
   };
 
   return (

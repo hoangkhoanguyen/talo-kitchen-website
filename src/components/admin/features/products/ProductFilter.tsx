@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import Filter from "../../shared/Filter";
-import { parseAsBoolean, useQueryStates } from "nuqs";
+import { parseAsBoolean, parseAsInteger, useQueryStates } from "nuqs";
 import { Select } from "../../ui/form";
 
 const ProductFilter = () => {
   const [urlQuery, setURLQuery] = useQueryStates({
     isActive: parseAsBoolean,
+    page: parseAsInteger.withDefault(1),
   });
   const [query, setQuery] = useState<{
     isActive: boolean | null;
@@ -19,8 +20,8 @@ const ProductFilter = () => {
   };
 
   const onSubmit = () => {
-    // update state to url
-    setURLQuery(query);
+    // update state to url, reset to page 1 since the result set may shrink
+    setURLQuery({ ...query, page: 1 });
   };
 
   const onReset = () => {

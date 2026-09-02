@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import CategoryTable from "@/components/admin/features/categories/CategoryTable";
 import CreateCategory from "@/components/admin/features/products/CreateCategory";
 import UpdateCategory from "@/components/admin/features/categories/UpdateCategory";
@@ -18,6 +18,17 @@ import { AdminProductCategory } from "@/types/products";
 const CategoriesPage = () => {
   const { query, setQuery } = useCategoriesParams();
   const { data, refetch } = useFetchCategories(query);
+
+  const totalPages = data ? Math.ceil(data.total / query.limit) : 0;
+
+  // Self-correcting guard: snap back to the last valid page if the current
+  // one is out of range (stale/tampered `?page=`, or filter/search shrank
+  // the result set).
+  useEffect(() => {
+    if (data && data.total > 0 && query.page > totalPages) {
+      setQuery({ page: totalPages });
+    }
+  }, [data, query.page, totalPages, setQuery]);
 
   const updateModalRef = useRef<{
     open: (categoryId: number) => void;
@@ -97,7 +108,7 @@ const CategoriesPage = () => {
       <Pagination
         className="self-center"
         currentPage={query.page}
-        totalPages={data ? Math.ceil(data.total / query.limit) : 0}
+        totalPages={totalPages}
         onPageChange={(page) => {
           setQuery({
             page,

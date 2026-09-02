@@ -3,7 +3,7 @@ import Header from "@/components/admin/shared/header/Header";
 import SearchInput from "@/components/admin/shared/SearchInput";
 import Pagination from "@/components/admin/ui/table/Pagination";
 import useOrdersParams from "@/hooks/admin/features/orders/useOrdersParams";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import useFetchReservation from "@/hooks/admin/features/reservations/useFetchReservation";
 import {
   AdminReservationTable,
@@ -17,6 +17,17 @@ import { formatDateVN } from "@/lib/date";
 const ProductPage = () => {
   const { query, setQuery } = useOrdersParams();
   const { data, refetch, isPending, isRefetching } = useFetchReservation(query);
+
+  const totalPages = data ? Math.ceil(data.total / query.limit) : 0;
+
+  // Self-correcting guard: snap back to the last valid page if the current
+  // one is out of range (stale/tampered `?page=`, or filter/search shrank
+  // the result set).
+  useEffect(() => {
+    if (data && data.total > 0 && query.page > totalPages) {
+      setQuery({ page: totalPages });
+    }
+  }, [data, query.page, totalPages, setQuery]);
 
   const convertedData = useMemo(
     (): AdminReservationTable[] =>
@@ -47,6 +58,7 @@ const ProductPage = () => {
               onSubmit={(search) => {
                 setQuery({
                   search,
+                  page: 1,
                 });
               }}
             />
@@ -83,7 +95,7 @@ const ProductPage = () => {
       <Pagination
         className="self-center"
         currentPage={query.page}
-        totalPages={data ? Math.ceil(data.total / query.limit) : 0}
+        totalPages={totalPages}
         onPageChange={(page) => {
           setQuery({
             page,
