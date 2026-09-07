@@ -111,7 +111,7 @@ export default function BillReceipt({
     <>
       <style>{printStyles}</style>
       <div className={`bill-root ${fontClassName}`}>
-        <div className="bill hidden">
+        <div className="bill">
           {/* Header */}
           <div className="bill-center">
             <div className="bill-shop-name">{RESTAURANT.name}</div>
