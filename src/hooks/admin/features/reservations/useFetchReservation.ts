@@ -8,6 +8,7 @@ const useFetchReservation = (query: any) => {
     queryKey: ["admin", "reservations", query],
     queryFn: (): Promise<{ reservations: ReservationDB[]; total: number }> =>
       adminApi.get(adminRoutes.reservationApi(query)),
+    staleTime: 60 * 1000,
   });
 };
 

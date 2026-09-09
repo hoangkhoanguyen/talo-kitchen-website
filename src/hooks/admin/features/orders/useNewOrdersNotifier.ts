@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import adminApi from "@/lib/api/axios";
 import { adminRoutes } from "@/constants/route";
 import { NewOrderNotice, useNewOrdersStore } from "@/store/new-orders";
@@ -19,6 +19,7 @@ const POLL_INTERVAL = 5_000;
  */
 export function useNewOrdersNotifier() {
   const { playBeep } = useNotificationSound();
+  const queryClient = useQueryClient();
 
   const { data } = useQuery({
     queryKey: ["admin", "new-orders"],
@@ -45,7 +46,11 @@ export function useNewOrdersNotifier() {
 
     if (data.orders.length) {
       const added = store.pushOrders(data.orders);
-      if (added > 0) playBeep();
+      if (added > 0) {
+        playBeep();
+        // có đơn mới -> đánh dấu bảng đơn stale để tự refetch khi đang mở
+        queryClient.invalidateQueries({ queryKey: ["admin", "order"] });
+      }
     }
-  }, [data, playBeep]);
+  }, [data, playBeep, queryClient]);
 }

@@ -8,6 +8,7 @@ const useFetchOrders = (query: any) => {
     queryKey: ["admin", "order", query],
     queryFn: (): Promise<{ orders: AdminOrderTableApi[]; total: number }> =>
       adminApi.get(adminRoutes.ordersApi(query)),
+    staleTime: 30 * 1000,
   });
 };
 
