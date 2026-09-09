@@ -3,7 +3,8 @@ import { BasicTable } from "../../ui/table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { AdminProductTable } from "@/types/products";
 import { IconButton } from "../../ui/button";
-import { useRouter } from "next/navigation";
+import Icon from "@/components/common/Icon";
+import Link from "next/link";
 import { adminRoutes } from "@/constants/route";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,6 @@ export default function ProductTable({
   onReloadData(): void;
   loading?: boolean;
 }) {
-  const route = useRouter();
   const updateProductStatus = useUpdateProductStatus();
 
   const columns = [
@@ -28,10 +28,13 @@ export default function ProductTable({
       header: () => <IconButton onClick={onReloadData} icon="mdi:reload" />,
       cell(props) {
         return (
-          <IconButton
-            icon="tabler:edit"
-            onClick={() => route.push(adminRoutes.product(props.getValue()))}
-          />
+          <Link
+            href={adminRoutes.product(props.getValue())}
+            className="btn rounded-xl btn-square btn-sm p-1"
+            aria-label="Sửa sản phẩm"
+          >
+            <Icon icon="tabler:edit" />
+          </Link>
         );
       },
       meta: {

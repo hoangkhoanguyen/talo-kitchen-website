@@ -33,9 +33,7 @@ function OrderItem({ data }: { data: AdminOrderItem }) {
         </div>
         <div className="flex justify-between gap-3 items-start text-xs font-semibold text-gray-500">
           <p>x {data.quantity}</p>
-          <p className="text-end">
-            {formatCurrency(data.price * data.quantity)}
-          </p>
+          <p className="text-end">{formatCurrency(data.price)}</p>
         </div>
 
         {data.addons.length > 0 && (

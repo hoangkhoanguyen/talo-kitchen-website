@@ -2,7 +2,8 @@ import React from "react";
 import { BasicTable } from "../../ui/table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IconButton } from "../../ui/button";
-import { useRouter } from "next/navigation";
+import Icon from "@/components/common/Icon";
+import Link from "next/link";
 import { adminRoutes } from "@/constants/route";
 import { AdminReservationTable } from "@/types/reservations";
 import { STATUS_RENDER } from "@/constants/reservation";
@@ -17,19 +18,18 @@ export default function ReservationTable({
   onReloadData(): void;
   loading?: boolean;
 }) {
-  const route = useRouter();
-
   const columns = [
     columnHelper.accessor("id", {
       header: () => <IconButton onClick={onReloadData} icon="mdi:reload" />,
       cell(props) {
         return (
-          <IconButton
-            icon="ph:eye"
-            onClick={() =>
-              route.push(adminRoutes.reservation(props.getValue()))
-            }
-          />
+          <Link
+            href={adminRoutes.reservation(props.getValue())}
+            className="btn rounded-xl btn-square btn-sm p-1"
+            aria-label="Xem chi tiết đặt bàn"
+          >
+            <Icon icon="ph:eye" />
+          </Link>
         );
       },
       meta: {
