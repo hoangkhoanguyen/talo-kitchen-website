@@ -31,31 +31,26 @@ function OrderItem({
   canToggle: boolean;
 }) {
   const { mutate, isPending } = useToggleOrderItemEnabled();
+  // Item đã tắt: làm mờ nội dung, riêng công tắc giữ rõ nét để dễ bật lại
+  const dimmed = data.isEnabled === false && "opacity-50";
 
   return (
-    <div
-      className={cn(
-        "border border-gray-200 rounded p-4 flex items-start gap-4 w-full",
-        data.isEnabled === false && "opacity-50",
-      )}
-    >
-      <div className="w-16 aspect-square relative bg-gray-200 rounded overflow-hidden">
+    <div className="border border-gray-200 rounded p-4 flex items-start gap-4 w-full">
+      <div
+        className={cn(
+          "w-16 aspect-square relative bg-gray-200 rounded overflow-hidden",
+          dimmed,
+        )}
+      >
         {data.image && <Image fill src={data.image} alt={data.productName} />}
       </div>
-      <div className="flex-1 flex flex-col gap-2 items-stretch font-semibold">
-        <div className="flex justify-between gap-3 items-center font-bold text-gray-700">
-          {canToggle && (
-            <input
-              type="checkbox"
-              className="toggle toggle-primary toggle-sm shrink-0"
-              aria-label="Bật/tắt sản phẩm"
-              checked={data.isEnabled !== false}
-              disabled={isPending}
-              onChange={(e) =>
-                mutate({ itemId: data.id, isEnabled: e.target.checked })
-              }
-            />
-          )}
+      <div
+        className={cn(
+          "flex-1 flex flex-col gap-2 items-stretch font-semibold",
+          dimmed,
+        )}
+      >
+        <div className="flex justify-between gap-3 items-start font-bold text-gray-700">
           <p className="flex-1">{data.productName}</p>
           <p className="text-end">{formatCurrency(data.totalPrice)}</p>
         </div>
@@ -109,6 +104,18 @@ function OrderItem({
           </details>
         )}
       </div>
+      {canToggle && (
+        <input
+          type="checkbox"
+          className="toggle toggle-primary toggle-sm shrink-0 self-start"
+          aria-label="Bật/tắt sản phẩm"
+          checked={data.isEnabled !== false}
+          disabled={isPending}
+          onChange={(e) =>
+            mutate({ itemId: data.id, isEnabled: e.target.checked })
+          }
+        />
+      )}
     </div>
   );
 }
