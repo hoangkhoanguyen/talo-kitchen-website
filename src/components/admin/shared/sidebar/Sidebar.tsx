@@ -8,8 +8,11 @@ import { useLogout } from "@/hooks/admin/features/auth/useLogout";
 import { useAdminConfigs } from "@/store";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import NotificationSoundSetting from "./NotificationSoundSetting";
+import { useCurrentUser } from "@/providers/current-user-provider";
 
 const Sidebar = () => {
+  // talo_kitchen → sidebar màu đỏ để dễ nhận biết
+  const { name, isTaloKitchen: highlight } = useCurrentUser();
   const isOpenSidebar = useAdminConfigs((state) => state.isSidebarOpen);
   const onClose = useAdminConfigs((state) => state.closeSidebar);
   const { mutate: logout, isPending } = useLogout();
@@ -19,7 +22,12 @@ const Sidebar = () => {
   };
 
   const renderSidebar = () => (
-    <div className="bg-slate-900 dark:bg-gray-900 flex flex-col h-full w-64">
+    <div
+      className={cn(
+        "flex flex-col h-full w-64",
+        highlight ? "bg-red-900" : "bg-slate-900 dark:bg-gray-900",
+      )}
+    >
       <div className={cn("flex items-center gap-4 pt-4 duration-200 px-5")}>
         <Image
           src={"/talo-logo-bg.svg"}
@@ -39,7 +47,7 @@ const Sidebar = () => {
 
       {/* Menu items - takes remaining space */}
       <div className="flex-1">
-        <Menu />
+        <Menu highlight={highlight} />
       </div>
 
       {/* Cài đặt âm báo đơn mới */}
@@ -49,12 +57,25 @@ const Sidebar = () => {
 
       {/* Logout button at bottom */}
       <div className="p-4">
+        {name && (
+          <div className="flex items-center gap-3 px-4 pb-3 text-white">
+            <Icon
+              icon="material-symbols:account-circle"
+              className="text-xl shrink-0"
+            />
+            <span className="text-sm font-medium truncate" title={name}>
+              {name}
+            </span>
+          </div>
+        )}
         <button
           onClick={handleLogout}
           disabled={isPending}
           className={cn(
             "w-full flex items-center gap-3 px-4 py-3 rounded-lg",
-            "text-white hover:bg-slate-800 dark:hover:bg-gray-800",
+            highlight
+              ? "text-white hover:bg-red-800"
+              : "text-white hover:bg-slate-800 dark:hover:bg-gray-800",
             "transition-colors duration-200",
             "disabled:opacity-50 disabled:cursor-not-allowed",
           )}

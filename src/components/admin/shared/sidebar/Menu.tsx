@@ -55,13 +55,18 @@ const menuItems: IMenuItem[] = [
   },
 ];
 
-export const Menu = () => {
+export const Menu = ({ highlight = false }: { highlight?: boolean }) => {
   const pathname = usePathname();
 
   return (
     <div className={cn("pt-7 flex flex-col gap-2 px-4")}>
       {menuItems.map((item, index) => (
-        <MenuItem key={index} pathname={pathname} {...item} />
+        <MenuItem
+          key={index}
+          pathname={pathname}
+          highlight={highlight}
+          {...item}
+        />
       ))}
     </div>
   );
