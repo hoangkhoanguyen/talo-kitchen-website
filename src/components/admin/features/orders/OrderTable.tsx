@@ -55,7 +55,7 @@ export default function OrderTable({
         return (
           <div className="flex items-center justify-center gap-2">
             <span>{props.getValue()}</span>
-            {!props.row.original.isEnabled && (
+            {props.row.original.isEnabled === false && (
               <span className="badge badge-soft badge-neutral">Đã tắt</span>
             )}
           </div>

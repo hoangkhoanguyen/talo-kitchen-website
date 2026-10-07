@@ -44,7 +44,7 @@ const OrderDetailsPage = async ({
               {canToggle && (
                 <OrderEnabledSwitch
                   orderId={order.id}
-                  isEnabled={order.isEnabled}
+                  isEnabled={order.isEnabled !== false}
                 />
               )}
               <OrderStatuss
@@ -70,6 +70,7 @@ const OrderDetailsPage = async ({
                 />
               )}
               <OrderItems
+                canToggle={canToggle}
                 items={order.items.map((item) => ({
                   id: item.id,
                   productName: item.productName,
@@ -77,6 +78,7 @@ const OrderDetailsPage = async ({
                   price: item.price,
                   totalPrice: item.totalPrice,
                   note: item.note,
+                  isEnabled: item.isEnabled,
                   image: item.product.images[0]?.url || null,
                   productId: item.productId,
                   addons: item.addons.map(

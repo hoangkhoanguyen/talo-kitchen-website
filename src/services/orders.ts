@@ -27,6 +27,7 @@ import {
   lte,
   inArray,
   and,
+  sum,
 } from "drizzle-orm";
 // Disabled cache imports - using direct DB calls now
 // import { createDynamicCachedFunction } from "@/lib/cache-utils";
@@ -224,6 +225,40 @@ export async function createOrder(
   });
 }
 
+/**
+ * Bỏ trường isEnabled khỏi dữ liệu trả cho tài khoản không phải talo_kitchen
+ * (họ không được biết có cơ chế bật/tắt, nên không gửi field này xuống client).
+ */
+function omitEnabled<T extends { isEnabled: boolean }>(
+  row: T,
+): Omit<T, "isEnabled"> & { isEnabled?: boolean } {
+  const { isEnabled: _omit, ...rest } = row;
+  return rest;
+}
+
+/**
+ * Tổng tiền các item đã tắt theo từng đơn (orderId → tổng). Dùng để trừ khỏi
+ * tổng đơn khi hiển thị cho tài khoản không phải talo_kitchen.
+ */
+async function getDisabledItemTotals(orderIds: number[]) {
+  const totals = new Map<number, number>();
+  if (!orderIds.length) return totals;
+
+  const rows = await getDb()
+    .select({ orderId: orderItems.orderId, total: sum(orderItems.totalPrice) })
+    .from(orderItems)
+    .where(
+      and(
+        inArray(orderItems.orderId, orderIds),
+        eq(orderItems.isEnabled, false),
+      ),
+    )
+    .groupBy(orderItems.orderId);
+
+  rows.forEach((r) => totals.set(r.orderId, Number(r.total ?? 0)));
+  return totals;
+}
+
 export async function getAdminOrderTable({
   limit = 20,
   page = 1,
@@ -313,8 +348,19 @@ export async function getAdminOrderTable({
         ),
     ]);
 
+    let visibleOrders: (Omit<(typeof ordersList)[number], "isEnabled"> & {
+      isEnabled?: boolean;
+    })[] = ordersList;
+    if (!includeDisabled) {
+      const disabled = await getDisabledItemTotals(ordersList.map((o) => o.id));
+      visibleOrders = ordersList.map((o) => ({
+        ...omitEnabled(o),
+        totalPrice: o.totalPrice - (disabled.get(o.id) ?? 0),
+      }));
+    }
+
     return {
-      orders: ordersList,
+      orders: visibleOrders,
       total: totalCount,
       page,
       limit,
@@ -325,10 +371,7 @@ export async function getAdminOrderTable({
   }
 }
 
-export async function getAdminOrderById(
-  id: number,
-  includeDisabled = false,
-) {
+export async function getAdminOrderById(id: number, includeDisabled = false) {
   const db = getDb();
   const order = await db.query.orders.findFirst({
     where: includeDisabled
@@ -354,7 +397,20 @@ export async function getAdminOrderById(
     },
   });
 
-  return order;
+  if (!order || includeDisabled) return order;
+
+  // Tài khoản thường: bỏ item đã tắt và trừ khỏi tổng đơn
+  const disabledTotal = order.items
+    .filter((item) => !item.isEnabled)
+    .reduce((acc, item) => acc + item.totalPrice, 0);
+
+  return {
+    ...omitEnabled(order),
+    items: order.items
+      .filter((item) => item.isEnabled)
+      .map((item) => omitEnabled(item)),
+    totalPrice: order.totalPrice - disabledTotal,
+  };
 }
 
 /**
@@ -400,12 +456,16 @@ export async function getNewOrdersSince(
     .orderBy(asc(orders.id))
     .limit(50);
 
+  const disabled = includeDisabled
+    ? new Map<number, number>()
+    : await getDisabledItemTotals(rows.map((o) => o.id));
+
   return {
     orders: rows.map((o) => ({
       id: o.id,
       code: o.code,
       customerName: `${o.firstName} ${o.lastName}`.trim(),
-      totalPrice: o.totalPrice,
+      totalPrice: o.totalPrice - (disabled.get(o.id) ?? 0),
       createdAt: o.createdAt,
     })),
     latestId,
@@ -497,6 +557,21 @@ export async function updateOrderEnabled(orderId: number, isEnabled: boolean) {
     .returning();
 
   return updatedOrder;
+}
+
+export async function updateOrderItemEnabled(
+  itemId: number,
+  isEnabled: boolean,
+) {
+  const db = getDb();
+
+  const [updatedItem] = await db
+    .update(orderItems)
+    .set({ isEnabled, updatedAt: new Date() })
+    .where(eq(orderItems.id, itemId))
+    .returning();
+
+  return updatedItem;
 }
 
 // ==================== CACHED VERSIONS (DISABLED) ====================

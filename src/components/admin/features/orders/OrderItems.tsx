@@ -1,16 +1,20 @@
 "use client";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
+import useToggleOrderItemEnabled from "@/hooks/admin/features/orders/useToggleOrderItemEnabled";
 import { AdminOrderItem } from "@/types/orders";
 import Image from "next/image";
 import React, { FC } from "react";
 
-const OrderItems: FC<{ items: AdminOrderItem[] }> = ({ items }) => {
+const OrderItems: FC<{ items: AdminOrderItem[]; canToggle?: boolean }> = ({
+  items,
+  canToggle = false,
+}) => {
   return (
     <div className="card p-5 bg-white">
       <h2 className="card-title">Order Items</h2>
       <div className="mt-4 flex flex-col gap-4">
         {items.map((item) => (
-          <OrderItem key={item.id} data={item} />
+          <OrderItem key={item.id} data={item} canToggle={canToggle} />
         ))}
       </div>
     </div>
@@ -19,15 +23,40 @@ const OrderItems: FC<{ items: AdminOrderItem[] }> = ({ items }) => {
 
 export default OrderItems;
 
-function OrderItem({ data }: { data: AdminOrderItem }) {
+function OrderItem({
+  data,
+  canToggle,
+}: {
+  data: AdminOrderItem;
+  canToggle: boolean;
+}) {
+  const { mutate, isPending } = useToggleOrderItemEnabled();
+
   return (
-    <div className="border border-gray-200 rounded p-4 flex items-start gap-4 w-full">
+    <div
+      className={cn(
+        "border border-gray-200 rounded p-4 flex items-start gap-4 w-full",
+        data.isEnabled === false && "opacity-50",
+      )}
+    >
       <div className="w-16 aspect-square relative bg-gray-200 rounded overflow-hidden">
         {data.image && <Image fill src={data.image} alt={data.productName} />}
       </div>
       <div className="flex-1 flex flex-col gap-2 items-stretch font-semibold">
         <div className="flex justify-between gap-3 items-start font-bold text-gray-700">
           <p>{data.productName}</p>
+          {canToggle && (
+            <input
+              type="checkbox"
+              className="toggle toggle-primary toggle-sm shrink-0"
+              aria-label="Bật/tắt sản phẩm"
+              checked={data.isEnabled !== false}
+              disabled={isPending}
+              onChange={(e) =>
+                mutate({ itemId: data.id, isEnabled: e.target.checked })
+              }
+            />
+          )}
 
           <p className="text-end">{formatCurrency(data.totalPrice)}</p>
         </div>

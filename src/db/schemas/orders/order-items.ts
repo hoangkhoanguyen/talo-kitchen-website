@@ -1,6 +1,7 @@
 import { dbSchema } from "@/db/schema";
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   foreignKey,
   integer,
   real,
@@ -26,6 +27,8 @@ export const orderItems = dbSchema.table(
     quantity: integer("quantity").notNull(),
     totalPrice: real("total_price").notNull(), // quantity * price + total addons
     note: text("note").notNull().default(""),
+    // Chỉ tài khoản talo_kitchen mới bật/tắt và thấy item đã tắt
+    isEnabled: boolean("is_enabled").notNull().default(true),
     createdAt: timestamp("created_at", {
       withTimezone: true,
     })

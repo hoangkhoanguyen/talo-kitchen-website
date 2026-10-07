@@ -24,7 +24,8 @@ export interface AdminOrderTable {
   orderTypeLabel: string;
   deliveryAddress: string | null;
   status: OrderStatus;
-  isEnabled: boolean;
+  // Chỉ có khi là tài khoản talo_kitchen
+  isEnabled?: boolean;
 }
 
 export interface AdminOrderAddon {
@@ -46,6 +47,8 @@ export interface AdminOrderItem {
   addons: AdminOrderAddon[];
   totalPrice: number; // unit * quan + total addons
   note: string | null;
+  // Chỉ có khi là tài khoản talo_kitchen
+  isEnabled?: boolean;
 }
 
 export interface AdminOrderDetails extends AdminOrderTable {

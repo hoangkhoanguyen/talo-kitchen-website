@@ -6,6 +6,7 @@ import {
   checkOrderExists,
   canEditOrderNote,
   updateOrderEnabled,
+  updateOrderItemEnabled,
 } from "@/services/orders";
 import { verifyAdminAuthSimple } from "@/services/auth";
 import { revalidatePath } from "next/cache";
@@ -172,6 +173,55 @@ export async function toggleOrderEnabledAction({
     return {
       success: false,
       error: "Không thể cập nhật trạng thái bật/tắt đơn hàng",
+    };
+  }
+}
+
+export async function toggleOrderItemEnabledAction({
+  itemId,
+  isEnabled,
+}: {
+  itemId: number;
+  isEnabled: boolean;
+}) {
+  try {
+    const authResult = await verifyAdminAuthSimple("/admin/orders");
+    if (!authResult.isValid) {
+      return {
+        success: false,
+        error: "Không có quyền truy cập",
+        code: "UNAUTHORIZED",
+      };
+    }
+
+    // Chỉ talo_kitchen mới được bật/tắt item
+    if (!isTaloKitchen(authResult.user?.username)) {
+      return {
+        success: false,
+        error: "Bạn không có quyền thực hiện thao tác này",
+        code: "FORBIDDEN",
+      };
+    }
+
+    const updatedItem = await updateOrderItemEnabled(itemId, isEnabled);
+    if (!updatedItem) {
+      return {
+        success: false,
+        error: "Sản phẩm trong đơn không tồn tại",
+        code: "ORDER_ITEM_NOT_FOUND",
+      };
+    }
+
+    revalidatePath(adminRoutes.order(updatedItem.orderId));
+    return {
+      success: true,
+      data: { updatedItem },
+    };
+  } catch (error) {
+    console.log("Error toggling order item enabled:", error);
+    return {
+      success: false,
+      error: "Không thể cập nhật trạng thái bật/tắt sản phẩm",
     };
   }
 }
