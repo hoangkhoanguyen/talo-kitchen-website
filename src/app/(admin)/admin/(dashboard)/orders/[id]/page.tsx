@@ -10,6 +10,9 @@ import { AdminOrderAddon, OrderStatus } from "@/types/orders";
 import OrderInternalNote from "@/components/admin/features/orders/OrderInternalNote";
 import { EShippingMethod } from "@/types/app-configs";
 import { formatDateVN } from "@/lib/date";
+import { verifyAdminAuthSimple } from "@/services/auth";
+import { isTaloKitchen } from "@/lib/order-visibility";
+import OrderEnabledSwitch from "@/components/admin/features/orders/OrderEnabledSwitch";
 
 const OrderDetailsPage = async ({
   params,
@@ -18,7 +21,10 @@ const OrderDetailsPage = async ({
 }) => {
   const id = (await params).id;
 
-  const order = await getAdminOrderById(Number(id));
+  const authResult = await verifyAdminAuthSimple(`/admin/orders/${id}`);
+  const canToggle = isTaloKitchen(authResult.user?.username);
+
+  const order = await getAdminOrderById(Number(id), canToggle);
 
   if (!order) {
     return <div>Order not found</div>;
@@ -35,6 +41,12 @@ const OrderDetailsPage = async ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_320px] gap-5">
           <div className="col-span-1">
             <div className="grid gap-5">
+              {canToggle && (
+                <OrderEnabledSwitch
+                  orderId={order.id}
+                  isEnabled={order.isEnabled}
+                />
+              )}
               <OrderStatuss
                 historyStatus={historyStatus}
                 status={order.status as OrderStatus}

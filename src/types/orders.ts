@@ -24,6 +24,7 @@ export interface AdminOrderTable {
   orderTypeLabel: string;
   deliveryAddress: string | null;
   status: OrderStatus;
+  isEnabled: boolean;
 }
 
 export interface AdminOrderAddon {

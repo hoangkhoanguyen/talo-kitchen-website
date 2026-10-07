@@ -43,6 +43,7 @@ const ProductPage = () => {
         note: item.note,
         deliveryAddress: item.deliveryAddress,
         internalNote: item.internalNote,
+        isEnabled: item.isEnabled,
       })) || [],
     [data],
   );

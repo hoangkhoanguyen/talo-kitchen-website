@@ -5,9 +5,11 @@ import {
   updateOrderStatus,
   checkOrderExists,
   canEditOrderNote,
+  updateOrderEnabled,
 } from "@/services/orders";
 import { verifyAdminAuthSimple } from "@/services/auth";
 import { revalidatePath } from "next/cache";
+import { isTaloKitchen } from "@/lib/order-visibility";
 
 export async function updateOrderStatusAction({
   orderId,
@@ -28,7 +30,10 @@ export async function updateOrderStatusAction({
     }
 
     // 1. Check if order exists
-    const order = await checkOrderExists(orderId);
+    const order = await checkOrderExists(
+      orderId,
+      isTaloKitchen(authResult.user?.username),
+    );
     if (!order) {
       return {
         success: false,
@@ -82,7 +87,10 @@ export async function updateOrderInternalNoteAction({
     }
 
     // 1. Check if order exists
-    const order = await checkOrderExists(orderId);
+    const order = await checkOrderExists(
+      orderId,
+      isTaloKitchen(authResult.user?.username),
+    );
     if (!order) {
       return {
         success: false,
@@ -113,6 +121,57 @@ export async function updateOrderInternalNoteAction({
     return {
       success: false,
       error: "Không thể cập nhật ghi chú đơn hàng",
+    };
+  }
+}
+
+export async function toggleOrderEnabledAction({
+  orderId,
+  isEnabled,
+}: {
+  orderId: number;
+  isEnabled: boolean;
+}) {
+  try {
+    const authResult = await verifyAdminAuthSimple("/admin/orders");
+    if (!authResult.isValid) {
+      return {
+        success: false,
+        error: "Không có quyền truy cập",
+        code: "UNAUTHORIZED",
+      };
+    }
+
+    // Chỉ talo_kitchen mới được bật/tắt đơn
+    if (!isTaloKitchen(authResult.user?.username)) {
+      return {
+        success: false,
+        error: "Bạn không có quyền thực hiện thao tác này",
+        code: "FORBIDDEN",
+      };
+    }
+
+    const order = await checkOrderExists(orderId, true);
+    if (!order) {
+      return {
+        success: false,
+        error: "Đơn hàng không tồn tại",
+        code: "ORDER_NOT_FOUND",
+      };
+    }
+
+    const updatedOrder = await updateOrderEnabled(orderId, isEnabled);
+
+    revalidatePath(adminRoutes.order(orderId));
+    return {
+      success: true,
+      data: { updatedOrder },
+    };
+  } catch (error) {
+    console.log("Error toggling order enabled:", error);
+    return {
+      success: false,
+      error: "Không thể cập nhật trạng thái bật/tắt đơn hàng",
     };
   }
 }

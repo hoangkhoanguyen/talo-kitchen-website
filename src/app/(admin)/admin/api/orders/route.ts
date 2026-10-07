@@ -3,6 +3,7 @@ import { withAuth } from "@/providers/withAuth";
 import { getAdminOrderTable } from "@/services/orders";
 import { NextRequest, NextResponse } from "next/server";
 import { AccessTokenPayload } from "@/lib/auth";
+import { isTaloKitchen } from "@/lib/order-visibility";
 import z from "zod";
 
 const schema = z.object({
@@ -51,7 +52,10 @@ async function getOrdersApi(payload: AccessTokenPayload, req: NextRequest) {
       message: "error in query",
     });
 
-  const result = await getAdminOrderTable(query);
+  const result = await getAdminOrderTable({
+    ...query,
+    includeDisabled: isTaloKitchen(payload.username),
+  });
 
   return NextResponse.json(result);
 }

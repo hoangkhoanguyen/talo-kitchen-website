@@ -1,6 +1,8 @@
 import { getAdminOrderById } from "@/services/orders";
 import { notFound } from "next/navigation";
 import { formatDateVN } from "@/lib/date";
+import { verifyAdminAuthSimple } from "@/services/auth";
+import { isTaloKitchen } from "@/lib/order-visibility";
 import { Poppins } from "next/font/google";
 import BillReceipt, {
   BillData,
@@ -18,7 +20,11 @@ const PrintOrderBillPage = async ({
   params: Promise<{ id: string }>;
 }) => {
   const id = (await params).id;
-  const order = await getAdminOrderById(Number(id));
+  const authResult = await verifyAdminAuthSimple(`/admin/print/orders/${id}`);
+  const order = await getAdminOrderById(
+    Number(id),
+    isTaloKitchen(authResult.user?.username),
+  );
 
   if (!order) {
     notFound();

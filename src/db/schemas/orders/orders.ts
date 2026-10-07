@@ -1,7 +1,14 @@
 import { dbSchema } from "@/db/schema";
 import { relations } from "drizzle-orm";
 import { uuid } from "drizzle-orm/pg-core";
-import { real, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  real,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { orderItems } from "./order-items";
 import { orderStatusHistory } from "./order-status-history";
 // export const orderTypeEnum = pgEnum("order_type", ["delivery", "pickup"]);
@@ -43,6 +50,8 @@ export const orders = dbSchema.table("orders", {
     .default("pending"),
   paymentMethod: varchar("payment_method", { length: 50 }).notNull(),
   shippingFee: real("shipping_fee").notNull().default(0),
+  // Chỉ tài khoản talo_kitchen mới bật/tắt và thấy đơn đã tắt
+  isEnabled: boolean("is_enabled").notNull().default(true),
   createdAt: timestamp("created_at", {
     withTimezone: true,
   })

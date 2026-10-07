@@ -232,7 +232,9 @@ export async function getAdminOrderTable({
   start_date,
   status,
   order_type,
+  includeDisabled = false,
 }: {
+  includeDisabled?: boolean;
   limit?: number;
   page?: number;
   search: string | null;
@@ -248,7 +250,11 @@ export async function getAdminOrderTable({
     // Extract the where conditions into a reusable function
     const buildWhereConditions = (fields: any, operators: any) => {
       const conditions = [];
-      const { or, ilike, gte, lte, inArray, and } = operators;
+      const { or, ilike, gte, lte, inArray, and, eq } = operators;
+
+      if (!includeDisabled) {
+        conditions.push(eq(fields.isEnabled, true));
+      }
 
       if (search) {
         conditions.push(
@@ -295,7 +301,15 @@ export async function getAdminOrderTable({
         .select({ count: count(orders.id) })
         .from(orders)
         .where(
-          buildWhereConditions(orders, { or, ilike, gte, lte, inArray, and }),
+          buildWhereConditions(orders, {
+            or,
+            ilike,
+            gte,
+            lte,
+            inArray,
+            and,
+            eq,
+          }),
         ),
     ]);
 
@@ -311,10 +325,15 @@ export async function getAdminOrderTable({
   }
 }
 
-export async function getAdminOrderById(id: number) {
+export async function getAdminOrderById(
+  id: number,
+  includeDisabled = false,
+) {
   const db = getDb();
   const order = await db.query.orders.findFirst({
-    where: eq(orders.id, id),
+    where: includeDisabled
+      ? eq(orders.id, id)
+      : and(eq(orders.id, id), eq(orders.isEnabled, true)),
     with: {
       items: {
         with: {
@@ -344,13 +363,17 @@ export async function getAdminOrderById(id: number) {
  *   khởi tạo, KHÔNG trả đơn nào (tránh nổ thông báo cho đơn cũ khi vừa mở trang).
  * - Ngược lại: trả về các đơn có `id > sinceId` (tối đa 50, sắp xếp id tăng dần).
  */
-export async function getNewOrdersSince(sinceId: number | null) {
+export async function getNewOrdersSince(
+  sinceId: number | null,
+  includeDisabled = false,
+) {
   const db = getDb();
 
   // id đơn mới nhất — dùng để khởi tạo con trỏ ở client
   const [latest] = await db
     .select({ id: orders.id })
     .from(orders)
+    .where(includeDisabled ? undefined : eq(orders.isEnabled, true))
     .orderBy(desc(orders.id))
     .limit(1);
   const latestId = latest?.id ?? 0;
@@ -369,7 +392,11 @@ export async function getNewOrdersSince(sinceId: number | null) {
       createdAt: orders.createdAt,
     })
     .from(orders)
-    .where(gt(orders.id, sinceId))
+    .where(
+      includeDisabled
+        ? gt(orders.id, sinceId)
+        : and(gt(orders.id, sinceId), eq(orders.isEnabled, true)),
+    )
     .orderBy(asc(orders.id))
     .limit(50);
 
@@ -392,11 +419,16 @@ export async function getNewOrdersSince(sinceId: number | null) {
  * @param orderId - The order ID to check
  * @returns The order object if found, null if not found
  */
-export async function checkOrderExists(orderId: number) {
+export async function checkOrderExists(
+  orderId: number,
+  includeDisabled = false,
+) {
   const db = getDb();
 
   const order = await db.query.orders.findFirst({
-    where: eq(orders.id, orderId),
+    where: includeDisabled
+      ? eq(orders.id, orderId)
+      : and(eq(orders.id, orderId), eq(orders.isEnabled, true)),
   });
 
   return order;
@@ -449,6 +481,18 @@ export async function updateOrderInternalNote(
   const [updatedOrder] = await db
     .update(orders)
     .set({ internalNote, updatedAt: new Date() })
+    .where(eq(orders.id, orderId))
+    .returning();
+
+  return updatedOrder;
+}
+
+export async function updateOrderEnabled(orderId: number, isEnabled: boolean) {
+  const db = getDb();
+
+  const [updatedOrder] = await db
+    .update(orders)
+    .set({ isEnabled })
     .where(eq(orders.id, orderId))
     .returning();
 

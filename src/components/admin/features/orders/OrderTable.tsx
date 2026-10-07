@@ -51,6 +51,16 @@ export default function OrderTable({
     }),
     columnHelper.accessor("code", {
       header: "Order Code",
+      cell(props) {
+        return (
+          <div className="flex items-center justify-center gap-2">
+            <span>{props.getValue()}</span>
+            {!props.row.original.isEnabled && (
+              <span className="badge badge-soft badge-neutral">Đã tắt</span>
+            )}
+          </div>
+        );
+      },
       meta: {
         align: "center",
       },

@@ -3,9 +3,10 @@ import { withAuth } from "@/providers/withAuth";
 import { getNewOrdersSince } from "@/services/orders";
 import { NextRequest, NextResponse } from "next/server";
 import { AccessTokenPayload } from "@/lib/auth";
+import { isTaloKitchen } from "@/lib/order-visibility";
 
 async function getNewOrdersApi(
-  _payload: AccessTokenPayload,
+  payload: AccessTokenPayload,
   req: NextRequest,
 ) {
   const sinceParam = req.nextUrl.searchParams.get("since");
@@ -16,7 +17,10 @@ async function getNewOrdersApi(
       ? Number(sinceParam)
       : null;
 
-  const result = await getNewOrdersSince(since);
+  const result = await getNewOrdersSince(
+    since,
+    isTaloKitchen(payload.username),
+  );
 
   return NextResponse.json(result);
 }
