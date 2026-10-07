@@ -10,7 +10,7 @@ import { AdminOrderAddon, OrderStatus } from "@/types/orders";
 import OrderInternalNote from "@/components/admin/features/orders/OrderInternalNote";
 import { EShippingMethod } from "@/types/app-configs";
 import { formatDateVN } from "@/lib/date";
-import { verifyAdminAuthSimple } from "@/services/auth";
+import { getCurrentAdminFromCookie } from "@/lib/auth";
 import { isTaloKitchen } from "@/lib/order-visibility";
 import OrderEnabledSwitch from "@/components/admin/features/orders/OrderEnabledSwitch";
 
@@ -21,8 +21,8 @@ const OrderDetailsPage = async ({
 }) => {
   const id = (await params).id;
 
-  const authResult = await verifyAdminAuthSimple(`/admin/orders/${id}`);
-  const canToggle = isTaloKitchen(authResult.user?.username);
+  const { user } = await getCurrentAdminFromCookie();
+  const canToggle = isTaloKitchen(user?.username);
 
   const order = await getAdminOrderById(Number(id), canToggle);
 

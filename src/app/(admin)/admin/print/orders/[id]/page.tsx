@@ -1,7 +1,7 @@
 import { getAdminOrderById } from "@/services/orders";
 import { notFound } from "next/navigation";
 import { formatDateVN } from "@/lib/date";
-import { verifyAdminAuthSimple } from "@/services/auth";
+import { getCurrentAdminFromCookie } from "@/lib/auth";
 import { isTaloKitchen } from "@/lib/order-visibility";
 import { Poppins } from "next/font/google";
 import BillReceipt, {
@@ -20,10 +20,10 @@ const PrintOrderBillPage = async ({
   params: Promise<{ id: string }>;
 }) => {
   const id = (await params).id;
-  const authResult = await verifyAdminAuthSimple(`/admin/print/orders/${id}`);
+  const { user } = await getCurrentAdminFromCookie();
   const order = await getAdminOrderById(
     Number(id),
-    isTaloKitchen(authResult.user?.username),
+    isTaloKitchen(user?.username),
   );
 
   if (!order) {

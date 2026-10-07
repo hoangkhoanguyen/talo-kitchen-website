@@ -112,6 +112,32 @@ export async function verifyAccessToken(token: string) {
   return await verifyToken<AccessTokenPayload>(token, secret);
 }
 
+/**
+ * Đọc user admin hiện tại từ access token trong cookie — CHỈ ĐỌC.
+ * Không refresh, không ghi/xóa cookie, không redirect nên dùng an toàn trong
+ * layout / server component (các nơi Next không cho sửa cookie).
+ * - `user`: có khi token còn hạn và hợp lệ.
+ * - `expired`: token đã hết hạn → client nên gọi refresh rồi `router.refresh()`.
+ */
+export async function getCurrentAdminFromCookie() {
+  const token = await getAccessTokenFromCookie();
+  if (!token) return { user: null, expired: false };
+
+  const result = await verifyAccessToken(token);
+  if (!result.isValid || !result.payload) {
+    return { user: null, expired: result.isExpired };
+  }
+
+  const { username, firstName, lastName } = result.payload;
+  return {
+    user: {
+      username,
+      displayName: [firstName, lastName].filter(Boolean).join(" "),
+    },
+    expired: false,
+  };
+}
+
 // ===== REFRESH TOKEN FUNCTIONS =====
 
 // Interface cho Refresh Token payload
