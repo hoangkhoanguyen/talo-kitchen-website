@@ -43,8 +43,7 @@ function OrderItem({
         {data.image && <Image fill src={data.image} alt={data.productName} />}
       </div>
       <div className="flex-1 flex flex-col gap-2 items-stretch font-semibold">
-        <div className="flex justify-between gap-3 items-start font-bold text-gray-700">
-          <p>{data.productName}</p>
+        <div className="flex justify-between gap-3 items-center font-bold text-gray-700">
           {canToggle && (
             <input
               type="checkbox"
@@ -57,7 +56,7 @@ function OrderItem({
               }
             />
           )}
-
+          <p className="flex-1">{data.productName}</p>
           <p className="text-end">{formatCurrency(data.totalPrice)}</p>
         </div>
         <div className="flex justify-between gap-3 items-start text-xs font-semibold text-gray-500">
