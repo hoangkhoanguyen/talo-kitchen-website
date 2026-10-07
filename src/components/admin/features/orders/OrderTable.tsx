@@ -8,7 +8,29 @@ import { adminRoutes } from "@/constants/route";
 import { AdminOrderTable } from "@/types/orders";
 import moment from "moment";
 import { ORDER_STATUS, ORDER_TYPE } from "@/constants/orders";
+import { useCurrentUser } from "@/providers/current-user-provider";
+import useToggleOrderEnabled from "@/hooks/admin/features/orders/useToggleOrderEnabled";
 const columnHelper = createColumnHelper<AdminOrderTable>();
+
+function EnabledSwitchCell({
+  orderId,
+  isEnabled,
+}: {
+  orderId: number;
+  isEnabled: boolean;
+}) {
+  const { mutate, isPending } = useToggleOrderEnabled();
+  return (
+    <input
+      type="checkbox"
+      className="toggle toggle-primary toggle-sm"
+      aria-label="Bật/tắt đơn hàng"
+      checked={isEnabled}
+      disabled={isPending}
+      onChange={(e) => mutate({ orderId, isEnabled: e.target.checked })}
+    />
+  );
+}
 
 export default function OrderTable({
   data,
@@ -19,6 +41,8 @@ export default function OrderTable({
   onReloadData(): void;
   loading?: boolean;
 }) {
+  const { isTaloKitchen } = useCurrentUser();
+
   const columns = [
     columnHelper.accessor("id", {
       header: () => <IconButton onClick={onReloadData} icon="mdi:reload" />,
@@ -51,16 +75,6 @@ export default function OrderTable({
     }),
     columnHelper.accessor("code", {
       header: "Order Code",
-      cell(props) {
-        return (
-          <div className="flex items-center justify-center gap-2">
-            <span>{props.getValue()}</span>
-            {props.row.original.isEnabled === false && (
-              <span className="badge badge-soft badge-neutral">Đã tắt</span>
-            )}
-          </div>
-        );
-      },
       meta: {
         align: "center",
       },
@@ -96,6 +110,23 @@ export default function OrderTable({
     columnHelper.accessor("createdAt", {
       header: "Created At",
     }),
+    // Chỉ talo_kitchen thấy cột này
+    ...(isTaloKitchen
+      ? [
+          columnHelper.accessor("isEnabled", {
+            header: "Enabled",
+            cell(props) {
+              return (
+                <EnabledSwitchCell
+                  orderId={props.row.original.id}
+                  isEnabled={props.getValue() !== false}
+                />
+              );
+            },
+            meta: { align: "center" },
+          }),
+        ]
+      : []),
   ];
   return (
     <BasicTable
