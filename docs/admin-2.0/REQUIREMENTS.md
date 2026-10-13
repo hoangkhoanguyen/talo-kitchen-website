@@ -3,7 +3,7 @@
 > File ghi lại toàn bộ bối cảnh, thảo luận và quyết định của đợt nâng cấp admin này để phiên làm việc sau dùng tiếp.
 > **Không chứa báo giá** (báo giá nằm riêng trên Google Drive).
 >
-> - Cập nhật lần cuối: 2026-10-13
+> - Cập nhật lần cuối: 2026-10-13 (thêm hạng mục 6)
 > - Trạng thái: **ĐANG CHỜ KHÁCH PHẢN HỒI** file chốt yêu cầu. Chưa code dòng nào.
 
 ---
@@ -28,7 +28,13 @@ Folder: `Team Khoa - Hưng / TALO-Kitchen-Website / Requirements & Planning`
 | File | Link | Ghi chú |
 |---|---|---|
 | CHỐT YÊU CẦU ADMIN 2.0 (BẢN KHÁCH HÀNG) | https://docs.google.com/document/d/1jnA15YQHaEQrXzL1c8GYsEneexHmgaJ_rrHQfaibkPo/edit | File gửi khách để chốt. **Đây là bản hiện hành**; các bản trước đã chuyển vào thùng rác. |
-| BÁO GIÁ ADMIN 2.0 (BẢN KHÁCH HÀNG) | https://docs.google.com/document/d/17sY2ArU_3C7ZIY2yTyQgST9VRfX-urau25BCX-6mUA8/edit | Báo giá, không ghi chi tiết ở đây. |
+| BÁO GIÁ ADMIN 2.0 (BẢN KHÁCH HÀNG) | https://docs.google.com/document/d/17sY2ArU_3C7ZIY2yTyQgST9VRfX-urau25BCX-6mUA8/edit | Báo giá, **không ghi giá ở đây**. Có 6 hạng mục: 5 hạng mục từ mục 1 đến 5 của file này, cộng hạng mục 6 "Nhập nội dung tiếng Việt" (xem mục 5.6). Hạng mục "Xuất bill Excel" và hạng mục 6 được **tặng kèm, không tính phí**. Hạng mục 6 **chỉ có trong file báo giá**, file chốt yêu cầu không hỏi khách về nó. |
+
+**Quyền chia sẻ (kiểm tra 2026-10-13):**
+- File chốt yêu cầu: bất kỳ ai có link đều **sửa** được (để khách tick thẳng). Người có quyền sửa chỉ định: `zearth113@gmail.com`, `minhhungtr77@gmail.com`.
+- File báo giá: bất kỳ ai có link chỉ **xem** được.
+- **Không thể biết ai đã mở file.** Tài khoản Gmail cá nhân không có "Trang tổng quan hoạt động" của Google Docs (chỉ có ở Google Workspace), và người mở link không đăng nhập thì không hiện tên. Chỉ xem được **lịch sử chỉnh sửa** (biểu tượng đồng hồ góc trên bên phải) và có thể bật **Công cụ → Cài đặt thông báo** để nhận email khi có bình luận/chỉnh sửa. Muốn chắc khách đã xem thì nhắn hỏi trực tiếp.
+- File chốt yêu cầu có một lần sửa lúc 2026-09-25 16:41 (giờ VN), khoảng 30 phút sau khi tạo, không phải do Claude làm. Chưa rõ ai sửa; xem Lịch sử phiên bản trước khi đọc câu trả lời của khách.
 
 **Khi khách phản hồi:** đọc lại file chốt yêu cầu (Drive `read_file_content`, id `1jnA15YQHaEQrXzL1c8GYsEneexHmgaJ_rrHQfaibkPo`), so với bảng quyết định ở mục 4, rồi cập nhật mục 4 và mục 9 của file này.
 
@@ -185,6 +191,20 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
    - Tổng doanh thu, số đơn, bảng theo ngày, tách theo phương thức thanh toán, cột phí ship.
    - Xuất Excel; chặn role không phải quản lý.
 5. **Thống kê món**: nằm trong trang Báo cáo, aggregate `order_items` join `orders` (status completed, theo khoảng ngày), lọc danh mục, gồm món 0 lượt (LEFT JOIN products), xuất Excel.
+6. **Nhập nội dung tiếng Việt cho website** (hạng mục tặng kèm, không tính phí; **chỉ nằm trong báo giá**, không có câu hỏi nào trong file chốt yêu cầu)
+   - Bối cảnh: đợt đa ngôn ngữ trước đã dựng **cơ chế** (routing `/en` `/vi`, bảng dịch, form admin nhập theo từng ngôn ngữ) và để **khách tự nhập** nội dung tiếng Việt. Đợt này **chủ dự án tự nhập sẵn luôn**; khách chỉ cần **xem lại và sửa nếu cần** vì họ bận.
+   - Tình trạng hiện tại: `messages/vi.json` (chuỗi tĩnh giao diện) đã đủ key, đối xứng với `en.json` (217 dòng mỗi file). Nội dung **trong DB** thì mới có bản `en`: seed ban đầu (`scripts/seed-entities-i18n.ts`) chỉ tạo dòng `locale = 'en'`, còn UI config có cấu trúc `{ en: "...", vi: "" }` với `vi` để trống. Việc cần làm là điền phần `vi`.
+   - Nội dung cần dịch (không dịch slug, giá, thứ tự, ảnh, số, boolean):
+     - Sản phẩm (`product_translations`): `title`, `description`, `subDescription`, `allergenInfo`.
+     - Danh mục (`product_category_translations`) và addon/topping (`product_addon_translations`): các cột chữ tương ứng.
+     - UI config (bảng `configs`, `config_type = 'ui'`): các field có `localized: true` (hero, our story, gallery/reviews/contact text, menu page labels, SEO title/description…). `title`/`sub_title` dạng mảng hiệu ứng xoay chữ **không** thuộc i18n.
+   - Cần thống nhất trước khi làm:
+     - **Nhập bằng cách nào**: qua form admin có sẵn (có badge "chưa dịch") hay viết script ghi thẳng DB. Script nhanh hơn với số lượng lớn nhưng phải **idempotent và không ghi đè** bản `vi` mà khách đã sửa.
+     - **Nhập ở môi trường nào**: DB production (`prod` / `prod_v2` chọn bằng `DB_SCHEMA`) hay staging rồi mới đưa lên. Nên backup trước khi ghi.
+     - **Quy trình khách review**: khách xem trực tiếp trên web `/vi` hay nhận danh sách nội dung để duyệt. Chưa có kết luận.
+     - **Văn phong**: tên món, thuật ngữ ẩm thực, giọng điệu quán. Nên hỏi khách có tên món nào muốn giữ nguyên tiếng Anh không.
+     - **Phạm vi trang**: chưa có danh sách chốt các trang cần dịch hết hay chỉ phần chính.
+   - Sau khi nhập: kiểm tra không còn field `vi` trống (script quét giống bước "fallback sweep" ở sprint-4-i18n-polish), mở `/vi` kiểm tra từng trang, kiểm tra cache theo locale đã được revalidate.
 
 ---
 
@@ -217,6 +237,10 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
   - Rà soát tổng thể: đưa 3.7, 6.1, 2.2 lên bảng tóm tắt; đổi "(có sẵn)" thành "(mặc định có)"; ghi rõ QR ở mục 4 là QR đánh giá Google.
   - Thảo luận 5.4: giữ lại (xem lý do ở mục 4).
 - **2026-10-13**: làm báo giá (file riêng trên Drive), bật connector Google Docs.
+  - Thêm **hạng mục 6**: chủ dự án tự nhập nội dung tiếng Việt, khách chỉ review và sửa; tặng kèm, không tính phí, để khuyến khích khách. Chỉ ghi vào báo giá, không thêm vào file chốt yêu cầu.
+  - Hạng mục "Xuất bill Excel" cũng được tặng. Bỏ dòng "test/deploy" riêng khỏi báo giá vì coi là mặc định.
+  - Tìm hiểu chuyện xem ai đã mở file: không làm được với Gmail cá nhân (chi tiết ở mục 2).
+  - Giải thích với chủ dự án cách app chạy trên Vercel (Next.js trên Vercel Functions, DB Postgres trên Supabase, ảnh trên Cloudflare R2). Kết luận: **không cần ignore folder `docs`**, vì folder này không đi vào bản build. Chỉ có tùy chọn `ignoreCommand` trong `vercel.json` để commit chỉ sửa docs không kích hoạt build lại; chưa làm.
 
 ---
 
@@ -224,4 +248,5 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
 
 1. Chờ khách phản hồi file chốt yêu cầu, rồi điền cột "Khách chốt" ở mục 4.
 2. Nếu khách đổi sang phương án ngoài gợi ý (mục 6), báo chủ dự án để báo giá bổ sung.
-3. Chốt xong thì tạo sprint mới trong `.sdlc/` (ví dụ `/sdlc:sprint-plan v2` hoặc `/sdlc:replan`), dùng file này làm business doc đầu vào, triển khai theo thứ tự ở 6.2.
+3. Hạng mục 6: thống nhất 4 điểm cần chốt ở mục 5.6 (cách nhập, môi trường, quy trình review, văn phong) rồi mới bắt tay làm. Việc này không phụ thuộc phản hồi của khách ở file chốt yêu cầu nên có thể làm song song, nhưng nên làm **sau khi** các mục 1 đến 5 xong nếu có thêm field/nội dung cần dịch (ví dụ text checkout cho phương thức thanh toán mới).
+4. Chốt xong thì tạo sprint mới trong `.sdlc/` (ví dụ `/sdlc:sprint-plan v2` hoặc `/sdlc:replan`), dùng file này làm business doc đầu vào, triển khai theo thứ tự ở 6.2.
