@@ -3,8 +3,8 @@
 > File ghi lại toàn bộ bối cảnh, thảo luận và quyết định của đợt nâng cấp admin này để phiên làm việc sau dùng tiếp.
 > **Không chứa báo giá** (báo giá nằm riêng trên Google Drive).
 >
-> - Cập nhật lần cuối: 2026-10-13 (thêm hạng mục 6)
-> - Trạng thái: **ĐANG CHỜ KHÁCH PHẢN HỒI** file chốt yêu cầu. Chưa code dòng nào.
+> - Cập nhật lần cuối: 2026-10-13
+> - Trạng thái: **KHÁCH ĐÃ CHỐT THEO ĐỀ XUẤT** (toàn bộ gợi ý ⭐, theo lời chủ dự án ngày 2026-10-13). Chưa code dòng nào.
 
 ---
 
@@ -98,39 +98,39 @@ Folder: `Team Khoa - Hưng / TALO-Kitchen-Website / Requirements & Planning`
 
 ---
 
-## 4. Bảng quyết định (mặc định = gợi ý ⭐, chờ khách xác nhận)
+## 4. Bảng quyết định (khách đã chốt theo gợi ý ⭐)
 
-Câu nào khách không sửa thì giữ gợi ý ⭐. Cột "Khách chốt" điền khi có phản hồi.
+Khách đã **chốt theo đúng hướng đề xuất**, tức là mọi câu lấy phương án gợi ý ⭐. Nguồn xác nhận: chủ dự án báo lại ngày 2026-10-13. File Google Docs gửi khách (đọc lại cùng ngày) **không có thay đổi nào** so với bản tick sẵn: không có phương án khác được chọn, không có bình luận, các ô ghi thêm để trống; nên không có câu nào bị đổi. Cột "Khách chốt" bên dưới vì vậy đều là "Theo gợi ý ⭐".
 
 ### Mục 1: Thanh toán (Tiền mặt / Chuyển khoản)
 | Câu | Nội dung | Gợi ý ⭐ (mặc định) | Phương án khác | Khách chốt |
 |---|---|---|---|---|
-| 1.1 | Ai chọn cách thanh toán | **Khách chọn lúc checkout trên web, nhân viên sửa lại được trong admin** | B. Chỉ khách chọn, NV không sửa · C. Khách không chọn, NV chọn trong admin | |
-| 1.2 | Đơn chuyển khoản có đánh dấu "Đã nhận tiền" không | **Có**, NV tick sau khi kiểm tra tài khoản (để đối soát) | B. Không, đơn "Hoàn thành" = đã thu | |
-| 1.3 | Một đơn trả tách tiền mặt + chuyển khoản | **Không** | B. Có, ghi số tiền từng phần | |
-| 1.4 | Đơn cũ | **Mặc định "Tiền mặt"** | B. "Chưa xác định" | |
+| 1.1 | Ai chọn cách thanh toán | **Khách chọn lúc checkout trên web, nhân viên sửa lại được trong admin** | B. Chỉ khách chọn, NV không sửa · C. Khách không chọn, NV chọn trong admin | ✅ Theo gợi ý ⭐ |
+| 1.2 | Đơn chuyển khoản có đánh dấu "Đã nhận tiền" không | **Có**, NV tick sau khi kiểm tra tài khoản (để đối soát) | B. Không, đơn "Hoàn thành" = đã thu | ✅ Theo gợi ý ⭐ |
+| 1.3 | Một đơn trả tách tiền mặt + chuyển khoản | **Không** | B. Có, ghi số tiền từng phần | ✅ Theo gợi ý ⭐ |
+| 1.4 | Đơn cũ | **Mặc định "Tiền mặt"** | B. "Chưa xác định" | ✅ Theo gợi ý ⭐ |
 
 **ĐÃ LOẠI KHỎI PHẠM VI (chủ dự án quyết định):** không hiện QR ngân hàng hay số tài khoản ở trang "Đặt hàng thành công", không in QR chuyển khoản lên bill. Không đề cập trong tài liệu với khách. Trang đặt hàng thành công giữ nguyên như hiện tại.
 
 ### Mục 2: Doanh thu theo ngày
 | Câu | Nội dung | Gợi ý ⭐ | Phương án khác | Khách chốt |
 |---|---|---|---|---|
-| 2.1 | Tính từ đơn nào | **Chỉ đơn "Hoàn thành"** (luôn loại đơn hủy) | B. Hoàn thành + Đang xử lý | |
-| 2.2 | Phí ship | **Có tính, tách cột riêng** | B. Không tính | |
-| 2.3 | Mốc ngày của đơn | **Ngày khách đặt** (`createdAt`) | B. Ngày hoàn thành | |
-| 2.4 | Số liệu hiển thị | Mặc định có: Tổng doanh thu, Số đơn, Doanh thu từng ngày. **⭐ Thêm: Tách theo Tiền mặt / Chuyển khoản** | Tách theo Giao hàng/Lấy tại quán · Trung bình mỗi đơn · Biểu đồ | |
-| 2.5 | Chọn nhanh thời gian | **Có: Hôm nay, Hôm qua, 7 ngày qua, Tháng này, Tháng trước + tự chọn ngày** | B. Chỉ tự chọn ngày | |
+| 2.1 | Tính từ đơn nào | **Chỉ đơn "Hoàn thành"** (luôn loại đơn hủy) | B. Hoàn thành + Đang xử lý | ✅ Theo gợi ý ⭐ |
+| 2.2 | Phí ship | **Có tính, tách cột riêng** | B. Không tính | ✅ Theo gợi ý ⭐ |
+| 2.3 | Mốc ngày của đơn | **Ngày khách đặt** (`createdAt`) | B. Ngày hoàn thành | ✅ Theo gợi ý ⭐ |
+| 2.4 | Số liệu hiển thị | Mặc định có: Tổng doanh thu, Số đơn, Doanh thu từng ngày. **⭐ Thêm: Tách theo Tiền mặt / Chuyển khoản** | Tách theo Giao hàng/Lấy tại quán · Trung bình mỗi đơn · Biểu đồ | ✅ Theo gợi ý ⭐ |
+| 2.5 | Chọn nhanh thời gian | **Có: Hôm nay, Hôm qua, 7 ngày qua, Tháng này, Tháng trước + tự chọn ngày** | B. Chỉ tự chọn ngày | ✅ Theo gợi ý ⭐ |
 
 ### Mục 3: Thống kê lượt đặt từng món
 | Câu | Nội dung | Gợi ý ⭐ | Phương án khác | Khách chốt |
 |---|---|---|---|---|
-| 3.1 | Cách đếm "lượt đặt" | **Hiện cả 2 cột: "Số phần bán" (SUM quantity) và "Số đơn" (COUNT DISTINCT order), xếp theo số phần bán giảm dần** | B. Chỉ số phần · C. Chỉ số đơn | |
-| 3.2 | Doanh thu món có gồm topping | **Có** (dùng `order_items.totalPrice`) | B. Chỉ giá món chính | |
-| 3.3 | Bảng xếp hạng riêng cho topping | **Chưa cần** | A. Có | |
-| 3.4 | Lọc theo danh mục món | **Có** | B. Không | |
-| 3.5 | Hiện món không bán được | **Có, xếp cuối bảng** | B. Không | |
-| 3.6 | Quy tắc tính đơn giống 2.1 | **Giống**, để hai bảng khớp số | B. Khác | |
-| 3.7 | Xuất trang Báo cáo (mục 2 + 3) ra Excel | **Có** | B. Không | |
+| 3.1 | Cách đếm "lượt đặt" | **Hiện cả 2 cột: "Số phần bán" (SUM quantity) và "Số đơn" (COUNT DISTINCT order), xếp theo số phần bán giảm dần** | B. Chỉ số phần · C. Chỉ số đơn | ✅ Theo gợi ý ⭐ |
+| 3.2 | Doanh thu món có gồm topping | **Có** (dùng `order_items.totalPrice`) | B. Chỉ giá món chính | ✅ Theo gợi ý ⭐ |
+| 3.3 | Bảng xếp hạng riêng cho topping | **Chưa cần** | A. Có | ✅ Theo gợi ý ⭐ |
+| 3.4 | Lọc theo danh mục món | **Có** | B. Không | ✅ Theo gợi ý ⭐ |
+| 3.5 | Hiện món không bán được | **Có, xếp cuối bảng** | B. Không | ✅ Theo gợi ý ⭐ |
+| 3.6 | Quy tắc tính đơn giống 2.1 | **Giống**, để hai bảng khớp số | B. Khác | ✅ Theo gợi ý ⭐ |
+| 3.7 | Xuất trang Báo cáo (mục 2 + 3) ra Excel | **Có** | B. Không | ✅ Theo gợi ý ⭐ |
 
 Mặc định khoảng thời gian: **tháng hiện tại**, đổi được sang khoảng bất kỳ. Trang Báo cáo dùng chung bộ lọc ngày cho mục 2 và 3.
 
@@ -139,21 +139,21 @@ Mặc định khoảng thời gian: **tháng hiện tại**, đổi được san
 
 | Câu | Nội dung | Gợi ý ⭐ | Phương án khác | Khách chốt |
 |---|---|---|---|---|
-| 4.1 | Mục đích | **Lưu trữ / đối chiếu → Excel** | B. Gửi khách → PDF · C. Cả Excel lẫn PDF | |
-| 4.2 | Thông tin trong file | Mặc định: toàn bộ nội dung bill hiện tại. **⭐ Thêm: tên + SĐT khách, hình thức nhận hàng + địa chỉ, phí ship, cách thanh toán, người tạo bill** | Ghi chú đơn (không tick sẵn) | |
-| 4.3 | Chọn nhiều đơn xuất 1 lần | **Không, mỗi lần 1 đơn** | B. Gộp 1 file mỗi đơn 1 sheet · C. Mỗi đơn 1 file | |
-| 4.4 | Vị trí nút | **Trang chi tiết đơn, cạnh nút "In bill"** | B. Thêm trên từng dòng danh sách đơn | |
-| 4.5 | Logo + QR đánh giá Google trong file | **Không**, chỉ chữ và số | A. Có | |
+| 4.1 | Mục đích | **Lưu trữ / đối chiếu → Excel** | B. Gửi khách → PDF · C. Cả Excel lẫn PDF | ✅ Theo gợi ý ⭐ |
+| 4.2 | Thông tin trong file | Mặc định: toàn bộ nội dung bill hiện tại. **⭐ Thêm: tên + SĐT khách, hình thức nhận hàng + địa chỉ, phí ship, cách thanh toán, người tạo bill** | Ghi chú đơn (không tick sẵn) | ✅ Theo gợi ý ⭐ |
+| 4.3 | Chọn nhiều đơn xuất 1 lần | **Không, mỗi lần 1 đơn** | B. Gộp 1 file mỗi đơn 1 sheet · C. Mỗi đơn 1 file | ✅ Theo gợi ý ⭐ |
+| 4.4 | Vị trí nút | **Trang chi tiết đơn, cạnh nút "In bill"** | B. Thêm trên từng dòng danh sách đơn | ✅ Theo gợi ý ⭐ |
+| 4.5 | Logo + QR đánh giá Google trong file | **Không**, chỉ chữ và số | A. Có | ✅ Theo gợi ý ⭐ |
 
 Gợi ý kỹ thuật: số tiền để dạng number (không phải text) để cộng trừ được, addon thụt dưới món chính, tên file dạng `Bill_<mã đơn>_<ngày>.xlsx`.
 
 ### Mục 5: Người tạo bill
 | Câu | Nội dung | Gợi ý ⭐ | Phương án khác | Khách chốt |
 |---|---|---|---|---|
-| 5.1 | "Người tạo bill" là ai | **Nhân viên xác nhận / xử lý đơn** | B. NV bấm in bill · C. ⚠️ NV tạo đơn tại quầy (tính năng mới "Tạo đơn tại quầy", báo giá riêng) | |
-| 5.2 | NV có tài khoản riêng chưa | **(Giả định) Đang dùng chung → cần tạo riêng cho từng người**; khách gửi danh sách tên NV | A. Đã có riêng | |
-| 5.3 | Tên người tạo hiện ở đâu | **In trên bill ("Thu ngân: …"), trang chi tiết đơn, file Excel** | Thêm cột ở danh sách đơn (không tick sẵn) | |
-| 5.4 | Lưu lịch sử "ai đổi trạng thái, lúc mấy giờ" | **Có** | B. Không | |
+| 5.1 | "Người tạo bill" là ai | **Nhân viên xác nhận / xử lý đơn** | B. NV bấm in bill · C. ⚠️ NV tạo đơn tại quầy (tính năng mới "Tạo đơn tại quầy", báo giá riêng) | ✅ Theo gợi ý ⭐ |
+| 5.2 | NV có tài khoản riêng chưa | **(Giả định) Đang dùng chung → cần tạo riêng cho từng người**; khách gửi danh sách tên NV | A. Đã có riêng | ✅ Theo gợi ý ⭐ |
+| 5.3 | Tên người tạo hiện ở đâu | **In trên bill ("Thu ngân: …"), trang chi tiết đơn, file Excel** | Thêm cột ở danh sách đơn (không tick sẵn) | ✅ Theo gợi ý ⭐ |
+| 5.4 | Lưu lịch sử "ai đổi trạng thái, lúc mấy giờ" | **Có** | B. Không | ✅ Theo gợi ý ⭐ |
 
 Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình phạm vi không, vì khách không yêu cầu. Kết luận là **giữ lại**, vì:
 - Không cần bảng mới, chỉ thêm cột `changed_by` vào `order_status_history` có sẵn.
@@ -163,8 +163,8 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
 ### Mục 6: Câu hỏi chung
 | Câu | Nội dung | Gợi ý ⭐ | Phương án khác | Khách chốt |
 |---|---|---|---|---|
-| 6.1 | Ai được xem Báo cáo doanh thu | **Chỉ chủ quán / quản lý** | B. Tất cả NV | |
-| 6.2 | Thứ tự triển khai | **Thanh toán → Người tạo bill → Xuất Excel → Doanh thu → Thống kê món** (mục đầu tạo dữ liệu cho mục sau) | B. Khách tự chọn | |
+| 6.1 | Ai được xem Báo cáo doanh thu | **Chỉ chủ quán / quản lý** | B. Tất cả NV | ✅ Theo gợi ý ⭐ |
+| 6.2 | Thứ tự triển khai | **Thanh toán → Người tạo bill → Xuất Excel → Doanh thu → Thống kê món** (mục đầu tạo dữ liệu cho mục sau) | B. Khách tự chọn | ✅ Theo gợi ý ⭐ |
 
 ---
 
@@ -198,12 +198,16 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
      - Sản phẩm (`product_translations`): `title`, `description`, `subDescription`, `allergenInfo`.
      - Danh mục (`product_category_translations`) và addon/topping (`product_addon_translations`): các cột chữ tương ứng.
      - UI config (bảng `configs`, `config_type = 'ui'`): các field có `localized: true` (hero, our story, gallery/reviews/contact text, menu page labels, SEO title/description…). `title`/`sub_title` dạng mảng hiệu ứng xoay chữ **không** thuộc i18n.
-   - Cần thống nhất trước khi làm:
-     - **Nhập bằng cách nào**: qua form admin có sẵn (có badge "chưa dịch") hay viết script ghi thẳng DB. Script nhanh hơn với số lượng lớn nhưng phải **idempotent và không ghi đè** bản `vi` mà khách đã sửa.
-     - **Nhập ở môi trường nào**: DB production (`prod` / `prod_v2` chọn bằng `DB_SCHEMA`) hay staging rồi mới đưa lên. Nên backup trước khi ghi.
-     - **Quy trình khách review**: khách xem trực tiếp trên web `/vi` hay nhận danh sách nội dung để duyệt. Chưa có kết luận.
-     - **Văn phong**: tên món, thuật ngữ ẩm thực, giọng điệu quán. Nên hỏi khách có tên món nào muốn giữ nguyên tiếng Anh không.
-     - **Phạm vi trang**: chưa có danh sách chốt các trang cần dịch hết hay chỉ phần chính.
+   - **Đã chốt với chủ dự án (2026-10-13):**
+     - **Cách nhập**: viết **script ghi thẳng vào DB** (không nhập qua form admin).
+     - **Môi trường**: **cả 2**, tức cả staging/dev và production.
+     - **Review**: **không cần thiết kế quy trình**. Khách tự vào xem trên web (`/vi`) và tự sửa nếu cần (qua form admin có sẵn).
+   - **Yêu cầu kỹ thuật cho script** (Claude ghi theo kinh nghiệm từ `scripts/seed-entities-i18n.ts`, chưa phải điều khách yêu cầu):
+     - Chạy lại nhiều lần không hỏng (idempotent) và **không ghi đè bản `vi` đã có**, vì khách có thể đã sửa tay sau khi script chạy lần đầu. Cách làm tương tự seed hiện có: `ON CONFLICT (entity_id, locale) DO NOTHING` cho bảng dịch; với JSON config chỉ điền khi `vi` còn rỗng.
+     - Bắt buộc truyền `DB_SCHEMA` rõ ràng, từ chối chạy nếu thiếu (như script seed hiện có), vì production dùng `prod` hoặc `prod_v2` tùy lúc cắt.
+     - Chạy trên staging/dev trước, kiểm tra, rồi mới chạy production. Backup production trước khi ghi.
+     - Sau khi ghi xong phải revalidate cache theo locale (xem `src/app/api/revalidate-all/route.ts`), nếu không khách sẽ thấy dữ liệu cũ.
+   - **Chưa chốt** (chủ dự án chưa trả lời): văn phong dịch, tên món nào giữ nguyên tiếng Anh, và danh sách trang cần dịch (hết hay chỉ phần chính). Khi làm cứ dịch toàn bộ field đã liệt kê ở trên, gặp tên món khó thì giữ nguyên rồi để khách sửa.
    - Sau khi nhập: kiểm tra không còn field `vi` trống (script quét giống bước "fallback sweep" ở sprint-4-i18n-polish), mở `/vi` kiểm tra từng trang, kiểm tra cache theo locale đã được revalidate.
 
 ---
@@ -220,7 +224,7 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
 
 ## 7. Việc khách cần gửi
 
-- Phản hồi file chốt yêu cầu (chỉ những câu muốn đổi).
+- ~~Phản hồi file chốt yêu cầu~~: **đã xong**, khách chốt theo gợi ý.
 - Danh sách tên nhân viên để tạo tài khoản (nếu giữ 5.2 B).
 
 ---
@@ -239,6 +243,8 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
 - **2026-10-13**: làm báo giá (file riêng trên Drive), bật connector Google Docs.
   - Thêm **hạng mục 6**: chủ dự án tự nhập nội dung tiếng Việt, khách chỉ review và sửa; tặng kèm, không tính phí, để khuyến khích khách. Chỉ ghi vào báo giá, không thêm vào file chốt yêu cầu.
   - Hạng mục "Xuất bill Excel" cũng được tặng. Bỏ dòng "test/deploy" riêng khỏi báo giá vì coi là mặc định.
+  - **Khách chốt theo đúng hướng đề xuất** (chủ dự án báo lại). Đọc lại file Google Docs gửi khách: không có thay đổi nào so với bản tick sẵn.
+  - Chốt 3 điểm của hạng mục 6: script ghi thẳng DB, chạy cả staging và production, không cần quy trình review (khách tự vào xem).
   - Tìm hiểu chuyện xem ai đã mở file: không làm được với Gmail cá nhân (chi tiết ở mục 2).
   - Giải thích với chủ dự án cách app chạy trên Vercel (Next.js trên Vercel Functions, DB Postgres trên Supabase, ảnh trên Cloudflare R2). Kết luận: **không cần ignore folder `docs`**, vì folder này không đi vào bản build. Chỉ có tùy chọn `ignoreCommand` trong `vercel.json` để commit chỉ sửa docs không kích hoạt build lại; chưa làm.
 
@@ -246,7 +252,8 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
 
 ## 9. Bước tiếp theo
 
-1. Chờ khách phản hồi file chốt yêu cầu, rồi điền cột "Khách chốt" ở mục 4.
+1. ~~Chờ khách phản hồi~~: đã chốt theo gợi ý (cột "Khách chốt" ở mục 4 đã điền).
 2. Nếu khách đổi sang phương án ngoài gợi ý (mục 6), báo chủ dự án để báo giá bổ sung.
-3. Hạng mục 6: thống nhất 4 điểm cần chốt ở mục 5.6 (cách nhập, môi trường, quy trình review, văn phong) rồi mới bắt tay làm. Việc này không phụ thuộc phản hồi của khách ở file chốt yêu cầu nên có thể làm song song, nhưng nên làm **sau khi** các mục 1 đến 5 xong nếu có thêm field/nội dung cần dịch (ví dụ text checkout cho phương thức thanh toán mới).
+3. Hạng mục 6: các điểm chính đã chốt (mục 5.6). Nên viết script **sau khi** các mục 1 đến 5 xong, vì mục 1 thêm text mới ở checkout (phương thức Chuyển khoản) và cần có bản `vi` cho nó; text này nằm ở `messages/*.json`, không thuộc phần DB nên script không đụng tới, nhưng nhớ dịch cùng lúc.
+   - Còn cần khách gửi **danh sách tên nhân viên** để tạo tài khoản riêng (câu 5.2 B).
 4. Chốt xong thì tạo sprint mới trong `.sdlc/` (ví dụ `/sdlc:sprint-plan v2` hoặc `/sdlc:replan`), dùng file này làm business doc đầu vào, triển khai theo thứ tự ở 6.2.
