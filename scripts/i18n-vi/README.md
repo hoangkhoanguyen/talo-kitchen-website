@@ -5,7 +5,7 @@ Không đụng slug, giá, ảnh, thứ tự. Chạy lại nhiều lần an toà
 
 ## Chuẩn bị (một lần)
 1. `git pull` rồi `npm install`.
-2. Copy `scripts/i18n-vi/env.example` vào `.env.local`, điền `DATABASE_URL`, `ANTHROPIC_API_KEY` (và `REVALIDATE_URL` nếu muốn). `DB_SCHEMA` truyền theo từng lệnh để khỏi nhầm môi trường.
+2. Copy `scripts/i18n-vi/env.example` thành 2 file ở thư mục gốc: `.env.dev` và `.env.prod`, điền `DATABASE_URL`, `DB_SCHEMA` (và `ANTHROPIC_API_KEY`, `REVALIDATE_URL` nếu cần). Chọn môi trường bằng `--env=dev` / `--env=prod`; script chỉ đọc đúng file đó.
 3. (tuỳ chọn) Sửa `scripts/i18n-vi/style-guide.md` để chỉnh văn phong/thuật ngữ trước khi dịch.
 
 ## Quy trình
@@ -13,22 +13,22 @@ Làm trên dev/staging trước, rồi mới tới production.
 
 ```bash
 # 1. Xem còn bao nhiêu chuỗi chưa có tiếng Việt (chỉ đọc)
-DB_SCHEMA=dev_multi_lang npm run vi:check
+npm run vi:check -- --env=dev
 
 # 2. Dịch bằng Claude -> ghi scripts/i18n-vi/vi.json (chưa đụng DB)
-DB_SCHEMA=dev_multi_lang npm run vi:translate
+npm run vi:translate -- --env=dev
 #    Mở vi.json đọc nhanh, sửa chỗ nào chưa ưng (chỉ sửa trường "vi").
 
 # 3. Thử ghi (dry-run, không ghi gì)
-DB_SCHEMA=dev_multi_lang npm run vi:apply
+npm run vi:apply -- --env=dev
 
 # 4. Ghi thật (có backup + hỏi gõ lại tên schema để xác nhận)
-DB_SCHEMA=dev_multi_lang npm run vi:apply -- --apply
+npm run vi:apply -- --env=dev --apply
 ```
 
-Kiểm tra `/vi` trên dev. Ổn thì làm lại bước 3-4 với `DB_SCHEMA=prod` (hoặc `prod_v2`).
+Kiểm tra `/vi` trên dev. Ổn thì làm lại bước 3-4 với `--env=prod`.
 `vi.json` dùng chung cho mọi môi trường (key theo id), nhưng id sản phẩm giữa dev và prod có thể khác nhau;
-nếu vậy hãy chạy lại `vi:translate` cho prod (dùng file `vi.json` mới) thay vì dùng lại file của dev.
+nếu vậy hãy chạy lại `vi:translate -- --env=prod` (dùng file `vi.json` mới) thay vì dùng lại file của dev.
 Chuỗi không có trong DB đích sẽ bị bỏ qua và được báo "skipped (not in DB)".
 
 ## Trước khi ghi production

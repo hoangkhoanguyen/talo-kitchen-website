@@ -14,15 +14,13 @@
  *              Never overwrites a non-empty `vi` (customer edits are safe).
  *
  * Usage:
- *   DB_SCHEMA=dev_multi_lang npm run vi:check
- *   DB_SCHEMA=dev_multi_lang npm run vi:translate
- *   DB_SCHEMA=prod           npm run vi:apply              # dry-run
- *   DB_SCHEMA=prod           npm run vi:apply -- --apply   # real write
+ *   npm run vi:check     -- --env=dev
+ *   npm run vi:translate -- --env=dev
+ *   npm run vi:apply     -- --env=prod             # dry-run
+ *   npm run vi:apply     -- --env=prod --apply     # real write
+ * --env=<name> loads .env.<name> (DATABASE_URL, DB_SCHEMA, ANTHROPIC_API_KEY...).
  */
 import { config as loadEnv } from "dotenv";
-
-loadEnv({ path: ".env.local", override: true });
-loadEnv({ path: ".env" });
 
 import fs from "node:fs";
 import path from "node:path";
@@ -37,6 +35,22 @@ import {
   type Item,
   type Sql,
 } from "./i18n-vi/lib";
+
+// --env=dev|prod (required) -> loads ONLY .env.<name>. Deliberately does not
+// read .env / .env.local, so a stray DATABASE_URL there can't hit the wrong DB.
+const envArg = process.argv.find((a) => a.startsWith("--env="))?.slice(6);
+if (!envArg || !/^[\w-]+$/.test(envArg)) {
+  console.error(
+    "[seed-vi-content] ERROR: pass --env=<name> (e.g. --env=dev or --env=prod) to load .env.<name>.",
+  );
+  process.exit(1);
+}
+const envFile = `.env.${envArg}`;
+if (!fs.existsSync(envFile)) {
+  console.error(`[seed-vi-content] ERROR: ${envFile} not found in ${process.cwd()}.`);
+  process.exit(1);
+}
+loadEnv({ path: envFile });
 
 const DIR = path.join(process.cwd(), "scripts", "i18n-vi");
 const VI_FILE = path.join(DIR, "vi.json");
@@ -321,7 +335,7 @@ async function apply(
 async function main() {
   const mode = process.argv[2];
   if (!["check", "translate", "apply"].includes(mode)) {
-    fail("usage: seed-vi-content.ts <check|translate|apply> [--apply]");
+    fail("usage: seed-vi-content.ts <check|translate|apply> --env=<dev|prod> [--apply]");
   }
   const schema = process.env.DB_SCHEMA;
   if (!schema) {
@@ -341,7 +355,7 @@ async function main() {
         return "?";
       }
     })();
-    console.log(`[seed-vi-content] mode=${mode} host=${host} schema="${schema}"`);
+    console.log(`[seed-vi-content] mode=${mode} env=${envFile} host=${host} schema="${schema}"`);
 
     await assertTablesExist(sql, schema);
     const { items, configs } = await collectAllItems(sql, schema);
