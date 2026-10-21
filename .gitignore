@@ -59,3 +59,6 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+
+# DB dumps from seed/rollback scripts (contain real data)
+scripts/backups/

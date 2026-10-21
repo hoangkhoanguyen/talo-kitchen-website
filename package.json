@@ -16,7 +16,10 @@
     "migrate:configs-i18n": "tsx scripts/migrate-configs-i18n.ts",
     "rollback:configs-i18n": "tsx scripts/rollback-configs-i18n.ts",
     "seed:entities-i18n": "tsx scripts/seed-entities-i18n.ts",
-    "rollback:entities-i18n": "tsx scripts/rollback-entities-i18n.ts"
+    "rollback:entities-i18n": "tsx scripts/rollback-entities-i18n.ts",
+    "vi:check": "tsx scripts/seed-vi-content.ts check",
+    "vi:translate": "tsx scripts/seed-vi-content.ts translate",
+    "vi:apply": "tsx scripts/seed-vi-content.ts apply"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1085.0",
