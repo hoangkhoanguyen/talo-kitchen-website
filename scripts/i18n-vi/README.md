@@ -39,3 +39,21 @@ Chuỗi không có trong DB đích sẽ bị bỏ qua và được báo "skipped
 ## Rollback
 Mỗi lần ghi tạo `scripts/backups/vi-content-seed-<time>.json` chứa nguyên các bảng dịch + configs trước khi ghi.
 Muốn bỏ hẳn bản `vi` vừa seed: restore từ backup Supabase, hoặc từ file này.
+
+---
+
+## Cách B: không cần chạy script với DB (export -> dịch -> SQL)
+
+Dùng khi không muốn đưa credential vào script. Chỉ cần DBeaver/Supabase SQL Editor.
+
+1. Chạy query export (một ô JSON duy nhất) trên DB cần seed, lưu ra file `export-<schema>.json`.
+   DBeaver bọc kết quả trong một lớp JSON ngoài; `offline.ts` tự tách lớp này.
+2. `npx tsx scripts/i18n-vi/offline.ts extract export-<schema>.json todo.json` -> danh sách chuỗi chưa có `vi`.
+3. Dịch `todo.json` thành `vi-<schema>.json` (key -> bản dịch, dùng `style-guide.md`).
+4. `npx tsx scripts/i18n-vi/offline.ts sql export-<schema>.json vi-<schema>.json seed-vi-<schema>.sql`.
+5. Mở `seed-vi-<schema>.sql` trong DBeaver, đọc lại, chạy cả file (`Alt+X`). File nằm trong `BEGIN ... COMMIT`.
+
+SQL sinh ra không ghi đè `vi` đã có. Với `configs`, câu UPDATE chỉ khớp khi giá trị hiện tại còn y như lúc export,
+nên báo `UPDATE 1` lần đầu; nếu khách vừa sửa config giữa lúc export và lúc chạy thì báo `UPDATE 0` (cần export lại).
+Chạy lại file lần hai an toàn: phần bảng dịch không đổi gì, phần configs báo `UPDATE 0`.
+Đã có sẵn cho schema `prod_v2`: `seed-vi-prod_v2.sql` (bản dịch ở `vi-prod_v2.json`).
