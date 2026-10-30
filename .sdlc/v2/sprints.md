@@ -18,10 +18,11 @@ Tech stack (kế thừa): Next.js 16 (App Router, RSC), React 19, TypeScript, Po
   - Trang Báo cáo mới trong admin + mục sidebar "Báo cáo".
   - Bộ lọc ngày giờ VN: Hôm nay, Hôm qua, 7 ngày qua, Tháng này, Tháng trước, tự chọn khoảng ngày. Mặc định tháng hiện tại.
   - Chỉ tính đơn `completed`, mốc ngày = `createdAt`.
+  - **Tôn trọng cơ chế bật/tắt đơn và món có sẵn** (`orders.isEnabled`, `order_items.isEnabled`; xem `src/services/orders.ts`, `src/lib/order-visibility.ts`): với tài khoản thường, loại đơn đã tắt và trừ `totalPrice` của item đã tắt khỏi doanh thu từng đơn (giống `getDisabledItemTotals`); không để lộ field `isEnabled` xuống client. Với `talo_kitchen` (`isTaloKitchen`), hành vi giống danh sách đơn (`includeDisabled`) — cần xác nhận. Áp dụng cho cả bảng, tổng, số đơn, tách thanh toán và file Excel.
   - Hiển thị: tổng doanh thu, số đơn, bảng doanh thu từng ngày (hiện cả ngày 0 đơn) với cột phí ship riêng.
   - Tách theo phương thức thanh toán: nhóm động theo `paymentMethod`, tên hiển thị từ bảng nhãn; `cash` và `cash_on_delivery` đều là "Tiền mặt"; giá trị lạ hiện nguyên giá trị thô.
   - Xuất Excel bằng `exceljs` (số tiền dạng number, tên file có khoảng ngày), chạy phía server.
   - Đóng `/admin/register`: chặn cả trang lẫn server action/API đăng ký; tạo admin sau này qua script/SQL.
 - **Ngoài phạm vi**: chuyển khoản / đã nhận tiền, người tạo bill / role / `changed_by`, kiểm tra role xem báo cáo (hiện mọi tài khoản đăng nhập đều xem được), thống kê lượt đặt từng món, xuất bill Excel, nhập nội dung tiếng Việt, biểu đồ, chuẩn hóa `paymentMethod` cũ trong DB.
-- **Giả định cần xác nhận**: Tổng doanh thu = tổng `totalPrice` (đã gồm ship), cột ship hiển thị riêng; trang đặt ở route mới `reports`, giữ Dashboard như cũ.
+- **Giả định cần xác nhận**: `talo_kitchen` thấy số liệu gồm cả đơn/món đã tắt (giống danh sách đơn); Tổng doanh thu = tổng `totalPrice` (đã gồm ship), cột ship hiển thị riêng; trang đặt ở route mới `reports`, giữ Dashboard như cũ.
 - **Phụ thuộc**: không.

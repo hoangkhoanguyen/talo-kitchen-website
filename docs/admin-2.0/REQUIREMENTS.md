@@ -63,6 +63,10 @@ Folder: `Team Khoa - Hưng / TALO-Kitchen-Website / Requirements & Planning`
   - Text checkout đã có i18n (`messages/en.json`, `messages/vi.json`). Thêm lựa chọn mới thì phải thêm key cho **cả 2 ngôn ngữ**.
 - `src/components/admin/features/orders/OrderSummary.tsx`: hiển thị `paymentMethod`.
 
+### Bật/tắt đơn và từng món (cơ chế ẩn, đã có sẵn)
+- `orders.isEnabled` và `order_items.isEnabled` (mặc định `true`). Chỉ tài khoản username `talo_kitchen` (`src/lib/order-visibility.ts`, sidebar màu đỏ) bật/tắt được và thấy đơn/món đã tắt. Các tài khoản khác không biết cơ chế này: đơn tắt bị ẩn, món tắt bị ẩn và bị **trừ khỏi tổng đơn** (`getDisabledItemTotals`, `getAdminOrderById` trong `src/services/orders.ts`), field `isEnabled` không gửi xuống client.
+- ⚠️ **Mọi báo cáo/thống kê/xuất Excel/bill phải áp quy tắc này**, nếu không số liệu của tài khoản thường sẽ lệch với danh sách đơn.
+
 ### Trạng thái đơn & lịch sử
 - `OrderStatus`: `pending`, `processing`, `completed`, `cancelled`.
 - `src/db/schemas/orders/order-status-history.ts`: **đã có bảng** `order_status_history` (`orderId`, `previousStatus`, `newStatus`, `createdAt`). **Chưa có cột người đổi.**
