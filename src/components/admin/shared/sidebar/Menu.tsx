@@ -36,6 +36,13 @@ const menuItems: IMenuItem[] = [
     type: "link",
   },
   {
+    label: "Báo cáo",
+    href: adminRoutes.reports(),
+    icon: "mdi:chart-box-outline",
+    activeIcon: "mdi:chart-box",
+    type: "link",
+  },
+  {
     label: "Cài đặt",
     icon: "material-symbols:settings-outline-rounded",
     activeIcon: "material-symbols:settings-rounded",

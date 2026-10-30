@@ -263,3 +263,12 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
 3. Hạng mục 6: các điểm chính đã chốt (mục 5.6). Nên viết script **sau khi** các mục 1 đến 5 xong, vì mục 1 thêm text mới ở checkout (phương thức Chuyển khoản) và cần có bản `vi` cho nó; text này nằm ở `messages/*.json`, không thuộc phần DB nên script không đụng tới, nhưng nhớ dịch cùng lúc.
    - Còn cần khách gửi **danh sách tên nhân viên** để tạo tài khoản riêng (câu 5.2 B).
 4. Chốt xong thì tạo sprint mới trong `.sdlc/` (ví dụ `/sdlc:sprint-plan v2` hoặc `/sdlc:replan`), dùng file này làm business doc đầu vào, triển khai theo thứ tự ở 6.2.
+
+---
+
+## 10. Ghi chú triển khai: báo cáo doanh thu và đóng đăng ký (v2 / sprint-1)
+
+- **Đã đóng `/admin/register`**: trang trả 404, `registerAction` và `registerUser` từ chối vô điều kiện (mã `REGISTRATION_CLOSED`). Biến `REGISTER_SECRET_CODE` **không còn tác dụng** nhưng vẫn giữ trong `src/lib/env.ts` (zod bắt buộc) để không làm vỡ môi trường đã deploy.
+- **Tạo admin mới bằng SQL** (chạy tay): băm mật khẩu bằng bcrypt `saltRounds = 12` (ví dụ `node -e "console.log(require('bcrypt').hashSync('MAT_KHAU', 12))"`), rồi `INSERT` vào bảng `users` với `role = 'admin'`, `is_active = true`, cùng `username`, `email`, `password` (đã băm), `first_name`, `last_name`. Trước khi deploy đảm bảo đã có ít nhất một tài khoản đăng nhập được (vd `talo_kitchen`).
+- **Khoảng trống phân quyền (câu 6.1)**: trang `/admin/reports` và API báo cáo hiện cho MỌI tài khoản đã đăng nhập xem, chưa kiểm tra role "chủ quán/quản lý". Việc bịt khoảng trống này để sprint sau.
+- **Quy tắc bật/tắt áp cho báo cáo**: tài khoản thường loại đơn `is_enabled = false` và trừ tổng các món đã tắt khỏi doanh thu đơn; `talo_kitchen` thấy tất cả đơn và không trừ món tắt. Quyền này chỉ lấy từ access token, client không điều khiển được.
