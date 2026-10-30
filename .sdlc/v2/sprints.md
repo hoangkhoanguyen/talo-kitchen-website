@@ -12,7 +12,7 @@ Tech stack (kế thừa): Next.js 16 (App Router, RSC), React 19, TypeScript, Po
 ---
 
 ## sprint-1-revenue-report
-- **Trạng thái**: planned
+- **Trạng thái**: in-progress
 - **Mô tả**: Trang Báo cáo doanh thu theo ngày cho admin (lọc giờ VN, chọn nhanh, tách theo thanh toán, phí ship cột riêng), xuất Excel, và đóng route `/admin/register`.
 - **Features**:
   - Trang Báo cáo mới trong admin + mục sidebar "Báo cáo".
