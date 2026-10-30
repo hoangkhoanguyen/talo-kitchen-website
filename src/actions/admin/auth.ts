@@ -1,6 +1,6 @@
 "use server";
 
-import { loginUser, registerUser } from "@/services/auth";
+import { loginUser } from "@/services/auth";
 import { setAuthCookies, deleteAuthCookies } from "@/lib/auth";
 import type { LoginFormData, RegisterFormData } from "@/validations/auth";
 
@@ -71,65 +71,16 @@ export async function loginAction(
   }
 }
 
-// Register action
+// Register action: đã đóng đăng ký, từ chối vô điều kiện và không gọi service
 export async function registerAction(
-  formData: RegisterFormData,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _formData: RegisterFormData,
 ): Promise<RegisterActionResult> {
-  try {
-    const { username, email, password, firstName, lastName, secretCode } =
-      formData;
-
-    // Call service function
-    const result = await registerUser({
-      username,
-      email,
-      password,
-      firstName,
-      lastName,
-      secretCode,
-    });
-
-    if (result.success) {
-      return {
-        success: true,
-        user: result.user,
-      };
-    } else {
-      // Map service error codes to user-friendly messages
-      let errorMessage = result.error || "Tạo tài khoản thất bại";
-
-      switch (result.code) {
-        case "MISSING_FIELDS":
-          errorMessage = "Tất cả các trường đều bắt buộc";
-          break;
-        case "INVALID_SECRET_CODE":
-          errorMessage = "Secret code không đúng";
-          break;
-        case "EMAIL_EXISTS":
-          errorMessage = "Email đã được sử dụng";
-          break;
-        case "USERNAME_EXISTS":
-          errorMessage = "Username đã được sử dụng";
-          break;
-        case "INTERNAL_ERROR":
-          errorMessage = "Đã xảy ra lỗi hệ thống";
-          break;
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        code: result.code,
-      };
-    }
-  } catch (error) {
-    console.error("Error in register action:", error);
-    return {
-      success: false,
-      error: "Đã xảy ra lỗi server",
-      code: "INTERNAL_ERROR",
-    };
-  }
+  return {
+    success: false,
+    error: "Đăng ký tài khoản đã bị đóng",
+    code: "REGISTRATION_CLOSED",
+  };
 }
 
 // Logout action

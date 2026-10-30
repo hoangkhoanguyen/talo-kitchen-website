@@ -7,14 +7,12 @@ import {
   UserDB,
 } from "@/db/schemas";
 import { eq, and, or, ilike, sql, gt } from "drizzle-orm";
-import bcrypt from "bcrypt";
 import {
   comparePassword,
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken,
 } from "@/lib/auth";
-import { getEnv } from "@/lib/env";
 
 // Interface cho login credentials
 export interface LoginCredentials {
@@ -314,93 +312,16 @@ export async function createUser(userData: NewUserDB) {
   }
 }
 
-// Đăng ký user mới với validation
+// Đăng ký tài khoản đã bị đóng: từ chối vô điều kiện (tạo admin qua SQL/script)
 export async function registerUser(
-  userData: RegisterUserData,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _userData: RegisterUserData,
 ): Promise<RegisterResponse> {
-  try {
-    const { username, email, password, firstName, lastName, secretCode } =
-      userData;
-
-    // 1. Validate input
-    if (
-      !username ||
-      !email ||
-      !password ||
-      !firstName ||
-      !lastName ||
-      !secretCode
-    ) {
-      return {
-        success: false,
-        error: "Tất cả các trường đều bắt buộc",
-        code: "MISSING_FIELDS",
-      };
-    }
-
-    // 2. Validate secret code
-    const env = getEnv();
-    if (secretCode !== env.REGISTER_SECRET_CODE) {
-      return {
-        success: false,
-        error: "Secret code không đúng",
-        code: "INVALID_SECRET_CODE",
-      };
-    }
-
-    // 3. Kiểm tra email đã tồn tại
-    const existingEmailUser = await getUserByEmail(email);
-    if (existingEmailUser) {
-      return {
-        success: false,
-        error: "Email đã được sử dụng",
-        code: "EMAIL_EXISTS",
-      };
-    }
-
-    // 4. Kiểm tra username đã tồn tại
-    const existingUsernameUser = await getUserByUsername(username);
-    if (existingUsernameUser) {
-      return {
-        success: false,
-        error: "Username đã được sử dụng",
-        code: "USERNAME_EXISTS",
-      };
-    }
-
-    // 5. Hash password
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // 6. Tạo user mới
-    const newUser = await createUser({
-      username,
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
-      role: "admin", // Mặc định role là admin
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    // 7. Return user without password
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...userWithoutPassword } = newUser;
-
-    return {
-      success: true,
-      user: userWithoutPassword,
-    };
-  } catch (error) {
-    console.error("Error in registerUser:", error);
-    return {
-      success: false,
-      error: "Đã xảy ra lỗi khi tạo tài khoản",
-      code: "INTERNAL_ERROR",
-    };
-  }
+  return {
+    success: false,
+    error: "Đăng ký tài khoản đã bị đóng",
+    code: "REGISTRATION_CLOSED",
+  };
 }
 
 // Lấy user theo ID
