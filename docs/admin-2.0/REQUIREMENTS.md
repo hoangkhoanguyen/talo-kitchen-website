@@ -28,7 +28,7 @@ Folder: `Team Khoa - Hưng / TALO-Kitchen-Website / Requirements & Planning`
 | File | Link | Ghi chú |
 |---|---|---|
 | CHỐT YÊU CẦU ADMIN 2.0 (BẢN KHÁCH HÀNG) | https://docs.google.com/document/d/1jnA15YQHaEQrXzL1c8GYsEneexHmgaJ_rrHQfaibkPo/edit | File gửi khách để chốt. **Đây là bản hiện hành**; các bản trước đã chuyển vào thùng rác. |
-| BÁO GIÁ ADMIN 2.0 (BẢN KHÁCH HÀNG) | https://docs.google.com/document/d/17sY2ArU_3C7ZIY2yTyQgST9VRfX-urau25BCX-6mUA8/edit | Báo giá, **không ghi giá ở đây**. Có 6 hạng mục: 5 hạng mục từ mục 1 đến 5 của file này, cộng hạng mục 6 "Nhập nội dung tiếng Việt" (xem mục 5.6). Hạng mục "Xuất bill Excel" và hạng mục 6 được **tặng kèm, không tính phí**. Hạng mục 6 **chỉ có trong file báo giá**, file chốt yêu cầu không hỏi khách về nó. |
+| BÁO GIÁ ADMIN 2.0 (BẢN KHÁCH HÀNG) | https://docs.google.com/document/d/17sY2ArU_3C7ZIY2yTyQgST9VRfX-urau25BCX-6mUA8/edit | Báo giá, **không ghi giá ở đây**. Có 6 hạng mục: 5 hạng mục tương ứng mục 5.1 đến 5.5 của file này, cộng hạng mục 6 "Nhập nội dung tiếng Việt" (xem mục 5.6). Hạng mục "Xuất bill Excel" và hạng mục 6 được **tặng kèm, không tính phí**. Hạng mục 6 **chỉ có trong file báo giá**, file chốt yêu cầu không hỏi khách về nó. |
 
 **Quyền chia sẻ (kiểm tra 2026-10-13):**
 - File chốt yêu cầu: bất kỳ ai có link đều **sửa** được (để khách tick thẳng). Người có quyền sửa chỉ định: `zearth113@gmail.com`, `minhhungtr77@gmail.com`.
@@ -89,7 +89,7 @@ Folder: `Team Khoa - Hưng / TALO-Kitchen-Website / Requirements & Planning`
 - `src/db/schemas/auth/users.ts`: có `role varchar(50) default "user"` (comment: admin, manager, user), `isActive`, `firstName`, `lastName`.
 - JWT access token (`src/lib/auth.ts`) đã mang `role`, nhưng **không thấy action nào kiểm tra role**: mọi tài khoản đăng nhập đều toàn quyền.
 - `src/services/auth.ts` → `registerUser` gán cứng `role: "admin"`.
-- ⚠️ Trang `/admin/register` ("Tạo tài khoản nhân viên mới") được `src/proxy.ts` cho qua không cần đăng nhập. Đây có thể là lỗ hổng: ai cũng tự tạo được tài khoản admin. Nên xử lý khi làm mục 5.
+- ⚠️ Trang `/admin/register` ("Tạo tài khoản nhân viên mới") được `src/proxy.ts` cho qua không cần đăng nhập. Đây có thể là lỗ hổng: ai cũng tự tạo được tài khoản admin. Nên xử lý khi làm Người tạo bill (mục 5.2).
 - **Chưa có trang quản lý nhân viên** trong admin. Đơn hàng đều do khách tự đặt trên web; admin không tạo đơn.
 
 ### Khác
@@ -170,6 +170,8 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
 
 ## 5. Phạm vi dự kiến nếu khách chốt toàn bộ gợi ý ⭐
 
+> Đánh số mục 1 đến 6 ở đây **theo file báo giá** (cũng là thứ tự triển khai 6.2). Mục 1 đến 5 của bảng quyết định ở mục 4 (và các câu 1.1, 2.1, 3.1…) thì theo **file chốt yêu cầu gửi khách**: 1 Thanh toán, 2 Doanh thu, 3 Thống kê món, 4 Xuất bill Excel, 5 Người tạo bill.
+
 1. **Thanh toán**
    - Thêm `bank_transfer` vào enum; chuẩn hóa giá trị cũ `"cash"` / `cash_on_delivery`.
    - Checkout web: thêm radio Chuyển khoản, cập nhật zod và i18n en/vi.
@@ -184,13 +186,13 @@ Ghi chú về 5.4: chủ dự án từng băn khoăn câu này có làm phình p
    - Hiện "Thu ngân: …" trên bill và chi tiết đơn, tên người đổi trên timeline.
    - Xử lý trang `/admin/register` đang public.
    - Chưa rõ: khách có cần **trang quản lý nhân viên** (tự thêm/khóa tài khoản) không. Nếu không thì dev tạo sẵn tài khoản.
-3. **Xuất bill Excel**: thêm thư viện (ví dụ `exceljs`), nút cạnh "In bill", layout theo bill và thêm các thông tin ở 4.2.
-4. **Báo cáo doanh thu**
+3. **Báo cáo doanh thu theo ngày**
    - Trang mới (có thể dùng làm Dashboard, bật lại mục Dashboard trong sidebar).
    - Lọc ngày theo giờ VN, nút chọn nhanh.
    - Tổng doanh thu, số đơn, bảng theo ngày, tách theo phương thức thanh toán, cột phí ship.
    - Xuất Excel; chặn role không phải quản lý.
-5. **Thống kê món**: nằm trong trang Báo cáo, aggregate `order_items` join `orders` (status completed, theo khoảng ngày), lọc danh mục, gồm món 0 lượt (LEFT JOIN products), xuất Excel.
+4. **Thống kê lượt đặt từng món**: nằm trong trang Báo cáo, aggregate `order_items` join `orders` (status completed, theo khoảng ngày), lọc danh mục, gồm món 0 lượt (LEFT JOIN products), xuất Excel.
+5. **Xuất bill Excel**: thêm thư viện (ví dụ `exceljs`), nút cạnh "In bill", layout theo bill và thêm các thông tin ở 4.2.
 6. **Nhập nội dung tiếng Việt cho website** (hạng mục tặng kèm, không tính phí; **chỉ nằm trong báo giá**, không có câu hỏi nào trong file chốt yêu cầu)
    - Bối cảnh: đợt đa ngôn ngữ trước đã dựng **cơ chế** (routing `/en` `/vi`, bảng dịch, form admin nhập theo từng ngôn ngữ) và để **khách tự nhập** nội dung tiếng Việt. Đợt này **chủ dự án tự nhập sẵn luôn**; khách chỉ cần **xem lại và sửa nếu cần** vì họ bận.
    - Tình trạng hiện tại: `messages/vi.json` (chuỗi tĩnh giao diện) đã đủ key, đối xứng với `en.json` (217 dòng mỗi file). Nội dung **trong DB** thì mới có bản `en`: seed ban đầu (`scripts/seed-entities-i18n.ts`) chỉ tạo dòng `locale = 'en'`, còn UI config có cấu trúc `{ en: "...", vi: "" }` với `vi` để trống. Việc cần làm là điền phần `vi`.
