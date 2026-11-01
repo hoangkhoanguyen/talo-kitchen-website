@@ -47,7 +47,8 @@ test("filterVisibleItems: talo_kitchen thấy hết, tài khoản thường bỏ
   assert.equal(filterVisibleItems(items, true).length, 3);
   assert.equal(filterVisibleItems(items, false).length, 2);
   // field isEnabled bị omit (undefined) → coi là bật
-  assert.equal(filterVisibleItems([{ totalPrice: 1 }], false).length, 1);
+  const omitted = [{ totalPrice: 1 }];
+  assert.equal(filterVisibleItems(omitted, false).length, 1);
 });
 
 test("bill talo_kitchen: subtotal gồm item tắt, total = subtotal + ship", () => {

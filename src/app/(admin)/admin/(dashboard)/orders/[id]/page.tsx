@@ -12,6 +12,7 @@ import { EShippingMethod } from "@/types/app-configs";
 import { formatDateVN } from "@/lib/date";
 import { getCurrentAdminFromCookie } from "@/lib/auth";
 import { isTaloKitchen } from "@/lib/order-visibility";
+import { canEditOrder } from "@/lib/order-edit";
 import OrderEnabledSwitch from "@/components/admin/features/orders/OrderEnabledSwitch";
 
 const OrderDetailsPage = async ({
@@ -29,6 +30,9 @@ const OrderDetailsPage = async ({
   if (!order) {
     return <div>Order not found</div>;
   }
+
+  // Chỉ đơn pending/processing mới sửa được (server cũng kiểm tra lại)
+  const canEdit = canEditOrder(order);
 
   const historyStatus = order.statusHistory.map(
     (item) => item.previousStatus as OrderStatus,
@@ -53,6 +57,8 @@ const OrderDetailsPage = async ({
                 orderId={order.id}
               />
               <OrderInformation
+                orderId={order.id}
+                canEdit={canEdit}
                 data={{
                   customerName: order.firstName + " " + order.lastName,
                   customerPhone: order.customerPhone,
@@ -70,6 +76,8 @@ const OrderDetailsPage = async ({
                 />
               )}
               <OrderItems
+                orderId={order.id}
+                canEdit={canEdit}
                 canToggle={canToggle}
                 items={order.items.map((item) => ({
                   id: item.id,

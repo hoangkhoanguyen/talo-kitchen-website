@@ -3,20 +3,66 @@ import { cn, formatCurrency } from "@/lib/utils";
 import useToggleOrderItemEnabled from "@/hooks/admin/features/orders/useToggleOrderItemEnabled";
 import { AdminOrderItem } from "@/types/orders";
 import Image from "next/image";
-import React, { FC } from "react";
+import React, { FC, useRef } from "react";
+import { Button, IconButton } from "../../ui/button";
+import { LayoutRef } from "../../ui/layout";
+import ProductSelectorModal from "../products/ProductSelectorModal";
+import useAddOrderItem from "@/hooks/admin/features/orders/useAddOrderItem";
+import useUpdateOrderItemQuantity from "@/hooks/admin/features/orders/useUpdateOrderItemQuantity";
+import useRemoveOrderItem from "@/hooks/admin/features/orders/useRemoveOrderItem";
+import { useSetLoading } from "@/hooks/admin/loading";
+import { MAX_ITEM_QUANTITY } from "@/lib/order-edit";
 
-const OrderItems: FC<{ items: AdminOrderItem[]; canToggle?: boolean }> = ({
-  items,
-  canToggle = false,
-}) => {
+const OrderItems: FC<{
+  orderId: number;
+  items: AdminOrderItem[];
+  canToggle?: boolean;
+  // Đơn pending/processing mới sửa được
+  canEdit?: boolean;
+}> = ({ orderId, items, canToggle = false, canEdit = false }) => {
+  const pickerRef = useRef<LayoutRef>(null);
+  const { mutate: addItem, isPending: isAdding } = useAddOrderItem();
+
+  useSetLoading(isAdding);
+
   return (
     <div className="card p-5 bg-white">
-      <h2 className="card-title">Order Items</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="card-title">Order Items</h2>
+        {canEdit && (
+          <Button color="primary" onClick={() => pickerRef.current?.open()}>
+            + Thêm sản phẩm
+          </Button>
+        )}
+      </div>
       <div className="mt-4 flex flex-col gap-4">
         {items.map((item) => (
-          <OrderItem key={item.id} data={item} canToggle={canToggle} />
+          <OrderItem
+            key={item.id}
+            orderId={orderId}
+            data={item}
+            canToggle={canToggle}
+            canEdit={canEdit}
+            canRemove={items.length > 1}
+          />
         ))}
       </div>
+      {canEdit && (
+        <ProductSelectorModal
+          ref={pickerRef}
+          isPending={isAdding}
+          onSubmit={(payload) =>
+            addItem(
+              { orderId, ...payload },
+              {
+                onSuccess: (res) => {
+                  if (res.success) pickerRef.current?.close();
+                },
+              },
+            )
+          }
+        />
+      )}
     </div>
   );
 };
@@ -24,13 +70,25 @@ const OrderItems: FC<{ items: AdminOrderItem[]; canToggle?: boolean }> = ({
 export default OrderItems;
 
 function OrderItem({
+  orderId,
   data,
   canToggle,
+  canEdit,
+  canRemove,
 }: {
+  orderId: number;
   data: AdminOrderItem;
   canToggle: boolean;
+  canEdit: boolean;
+  canRemove: boolean;
 }) {
   const { mutate, isPending } = useToggleOrderItemEnabled();
+  const { mutate: updateQty, isPending: isUpdatingQty } =
+    useUpdateOrderItemQuantity();
+  const { mutate: removeItem, isPending: isRemoving } = useRemoveOrderItem();
+  const editBusy = isUpdatingQty || isRemoving;
+
+  useSetLoading(isUpdatingQty, isRemoving);
   // Item đã tắt: làm mờ nội dung, riêng công tắc giữ rõ nét để dễ bật lại
   const dimmed = data.isEnabled === false && "opacity-50";
 
@@ -55,7 +113,39 @@ function OrderItem({
           <p className="text-end">{formatCurrency(data.totalPrice)}</p>
         </div>
         <div className="flex justify-between gap-3 items-start text-xs font-semibold text-gray-500">
-          <p>x {data.quantity}</p>
+          {canEdit ? (
+            <div className="flex items-center gap-2 text-gray-700">
+              <IconButton
+                icon="mdi:minus"
+                size="xs"
+                aria-label="Giảm số lượng"
+                disabled={editBusy || data.quantity <= 1}
+                onClick={() =>
+                  updateQty({
+                    orderId,
+                    itemId: data.id,
+                    quantity: data.quantity - 1,
+                  })
+                }
+              />
+              <span>x {data.quantity}</span>
+              <IconButton
+                icon="mdi:plus"
+                size="xs"
+                aria-label="Tăng số lượng"
+                disabled={editBusy || data.quantity >= MAX_ITEM_QUANTITY}
+                onClick={() =>
+                  updateQty({
+                    orderId,
+                    itemId: data.id,
+                    quantity: data.quantity + 1,
+                  })
+                }
+              />
+            </div>
+          ) : (
+            <p>x {data.quantity}</p>
+          )}
           <p className="text-end">{formatCurrency(data.price)}</p>
         </div>
 
@@ -104,6 +194,22 @@ function OrderItem({
           </details>
         )}
       </div>
+      {canEdit && (
+        <IconButton
+          icon="mdi:trash-outline"
+          color="error"
+          variant="soft"
+          size="xs"
+          aria-label="Xoá sản phẩm"
+          title={canRemove ? "Xoá sản phẩm" : "Đơn phải còn ít nhất 1 sản phẩm"}
+          disabled={editBusy || !canRemove}
+          onClick={() => {
+            if (window.confirm(`Xoá "${data.productName}" khỏi đơn hàng?`)) {
+              removeItem({ orderId, itemId: data.id });
+            }
+          }}
+        />
+      )}
       {canToggle && (
         <input
           type="checkbox"

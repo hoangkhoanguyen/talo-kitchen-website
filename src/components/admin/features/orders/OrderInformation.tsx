@@ -1,12 +1,16 @@
 import { AdminOrderDetails } from "@/types/orders";
 import React, { FC } from "react";
+import EditCustomerPhone from "./EditCustomerPhone";
 
 const OrderInformation: FC<{
+  orderId: number;
+  // Đơn pending/processing mới sửa được
+  canEdit?: boolean;
   data: Pick<
     AdminOrderDetails,
     "customerName" | "customerPhone" | "code" | "orderTypeLabel" | "note"
   >;
-}> = ({ data }) => {
+}> = ({ data, orderId, canEdit = false }) => {
   return (
     <div className="card p-5 bg-white">
       <h2 className="card-title">Order Information</h2>
@@ -17,7 +21,12 @@ const OrderInformation: FC<{
         </div>
         <div>
           <h3 className="font-medium text-gray-500 text-sm">Customer Phone</h3>
-          <p className="text-gray-700 font-semibold">{data.customerPhone}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-gray-700 font-semibold">{data.customerPhone}</p>
+            {canEdit && (
+              <EditCustomerPhone orderId={orderId} phone={data.customerPhone} />
+            )}
+          </div>
         </div>
         <div>
           <h3 className="font-medium text-gray-500 text-sm">Order Code</h3>

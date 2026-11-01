@@ -42,11 +42,13 @@ export function computeOrderTotal(
 }
 
 /** Item mà tài khoản được thấy: talo_kitchen thấy hết, tài khoản thường chỉ thấy item bật. */
-export function filterVisibleItems<T extends { isEnabled?: boolean }>(
+export function filterVisibleItems<T extends object>(
   items: T[],
   includeDisabled: boolean,
 ) {
-  return includeDisabled ? items : items.filter((i) => i.isEnabled !== false);
+  return includeDisabled
+    ? items
+    : items.filter((i) => (i as { isEnabled?: boolean }).isEnabled !== false);
 }
 
 /**

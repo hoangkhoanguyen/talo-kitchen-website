@@ -1,4 +1,4 @@
-import { getDb } from "@/db/drizzle";
+import { getDb, TransactionType } from "@/db/drizzle";
 import {
   orders,
   orderItems,
@@ -6,6 +6,7 @@ import {
   customers,
   orderStatusHistory,
   products,
+  productAddons as productAddonsTable,
 } from "@/db/schemas";
 import {
   OrderDB,
@@ -29,6 +30,12 @@ import {
   and,
   sum,
 } from "drizzle-orm";
+import {
+  canEditOrder,
+  computeItemTotal,
+  computeOrderTotal,
+  filterVisibleItems,
+} from "@/lib/order-edit";
 // Disabled cache imports - using direct DB calls now
 // import { createDynamicCachedFunction } from "@/lib/cache-utils";
 // import { CACHE_TAGS } from "@/constants/cache";
@@ -572,6 +579,254 @@ export async function updateOrderItemEnabled(
     .returning();
 
   return updatedItem;
+}
+
+// ==================== EDIT ORDER (ADMIN) ====================
+
+export type OrderEditErrorCode =
+  | "ORDER_NOT_FOUND"
+  | "CANNOT_EDIT_ORDER"
+  | "ORDER_ITEM_NOT_FOUND"
+  | "PRODUCT_NOT_FOUND"
+  | "ADDON_NOT_FOUND"
+  | "LAST_ITEM";
+
+export type OrderEditResult<T extends object = object> =
+  | ({ ok: true } & T)
+  | { ok: false; code: OrderEditErrorCode };
+
+/**
+ * Khoá dòng đơn (FOR UPDATE) trong transaction rồi kiểm tra lại quyền xem + trạng thái:
+ * - tài khoản thường không thấy/sửa được đơn đã tắt (ORDER_NOT_FOUND)
+ * - chỉ pending/processing mới sửa được (CANNOT_EDIT_ORDER)
+ */
+async function lockEditableOrder(
+  tx: TransactionType,
+  orderId: number,
+  includeDisabled: boolean,
+) {
+  const [order] = await tx
+    .select()
+    .from(orders)
+    .where(eq(orders.id, orderId))
+    .for("update");
+
+  if (!order || (!includeDisabled && !order.isEnabled)) {
+    return { ok: false, code: "ORDER_NOT_FOUND" } as const;
+  }
+  if (!canEditOrder(order)) {
+    return { ok: false, code: "CANNOT_EDIT_ORDER" } as const;
+  }
+  return { ok: true, order } as const;
+}
+
+/**
+ * Tính lại orders.total_price = Σ total_price của TẤT CẢ item (kể cả item tắt)
+ * + shipping_fee. Gọi trong cùng transaction với thay đổi item.
+ */
+async function recomputeOrderTotal(
+  tx: TransactionType,
+  order: { id: number; shippingFee: number },
+) {
+  const items = await tx
+    .select({ totalPrice: orderItems.totalPrice })
+    .from(orderItems)
+    .where(eq(orderItems.orderId, order.id));
+
+  const totalPrice = computeOrderTotal(items, order.shippingFee);
+  await tx
+    .update(orders)
+    .set({ totalPrice, updatedAt: new Date() })
+    .where(eq(orders.id, order.id));
+  return totalPrice;
+}
+
+/** Item thuộc đơn và tài khoản được phép thấy (item tắt chỉ talo_kitchen thấy). */
+async function findVisibleOrderItem(
+  tx: TransactionType,
+  orderId: number,
+  itemId: number,
+  includeDisabled: boolean,
+) {
+  const item = await tx.query.orderItems.findFirst({
+    where: and(eq(orderItems.id, itemId), eq(orderItems.orderId, orderId)),
+    with: { addons: true },
+  });
+  if (!item || (!includeDisabled && !item.isEnabled)) return null;
+  return item;
+}
+
+/** Danh sách sản phẩm đang bán (kèm addon đang bán) cho bộ chọn thêm món. */
+export async function getOrderProductOptions() {
+  const rows = await getDb().query.products.findMany({
+    where: eq(products.isActive, true),
+    columns: { id: true, title: true, price: true },
+    with: {
+      addons: {
+        where: (fields, { eq }) => eq(fields.isActive, true),
+        orderBy: [asc(productAddonsTable.sortOrder)],
+        columns: { id: true, name: true, price: true },
+      },
+    },
+    orderBy: [desc(products.priority), desc(products.createdAt)],
+  });
+  return rows;
+}
+
+export type AddOrderItemInput = {
+  productId: number;
+  quantity: number;
+  note: string;
+  addons: { addonId: number; quantity: number }[];
+};
+
+/**
+ * Thêm món vào đơn. Giá lấy từ DB (giá sản phẩm/addon hiện tại), không tin client.
+ * Item mới mặc định is_enabled = true.
+ */
+export async function addOrderItem(
+  orderId: number,
+  input: AddOrderItemInput,
+  includeDisabled: boolean,
+): Promise<OrderEditResult<{ itemId: number }>> {
+  return await getDb().transaction(async (tx) => {
+    const locked = await lockEditableOrder(tx, orderId, includeDisabled);
+    if (!locked.ok) return locked;
+
+    const product = await tx.query.products.findFirst({
+      where: eq(products.id, input.productId),
+      with: { addons: true },
+    });
+    if (!product || !product.isActive) {
+      return { ok: false, code: "PRODUCT_NOT_FOUND" } as const;
+    }
+
+    const addonMap = new Map(product.addons.map((a) => [a.id, a]));
+    const addonRows: Omit<NewOrderItemAddonDB, "orderItemId">[] = [];
+    for (const req of input.addons) {
+      const addon = addonMap.get(req.addonId);
+      if (!addon || !addon.isActive) {
+        return { ok: false, code: "ADDON_NOT_FOUND" } as const;
+      }
+      addonRows.push({
+        addonId: addon.id,
+        addonName: addon.name,
+        price: addon.price,
+        quantity: req.quantity,
+        totalPrice: addon.price * req.quantity,
+      });
+    }
+
+    const [item] = await tx
+      .insert(orderItems)
+      .values({
+        orderId,
+        productId: product.id,
+        productName: product.title,
+        price: product.price,
+        quantity: input.quantity,
+        totalPrice: computeItemTotal(product.price, input.quantity, addonRows),
+        note: input.note,
+        isEnabled: true,
+      })
+      .returning();
+
+    if (addonRows.length) {
+      await tx
+        .insert(orderItemAddons)
+        .values(addonRows.map((a) => ({ ...a, orderItemId: item.id })));
+    }
+
+    await recomputeOrderTotal(tx, locked.order);
+    return { ok: true, itemId: item.id } as const;
+  });
+}
+
+/** Đổi số lượng món (giữ nguyên giá đã chốt của món/addon, chỉ tính lại tổng). */
+export async function updateOrderItemQuantity(
+  orderId: number,
+  itemId: number,
+  quantity: number,
+  includeDisabled: boolean,
+): Promise<OrderEditResult> {
+  return await getDb().transaction(async (tx) => {
+    const locked = await lockEditableOrder(tx, orderId, includeDisabled);
+    if (!locked.ok) return locked;
+
+    const item = await findVisibleOrderItem(
+      tx,
+      orderId,
+      itemId,
+      includeDisabled,
+    );
+    if (!item) return { ok: false, code: "ORDER_ITEM_NOT_FOUND" } as const;
+
+    await tx
+      .update(orderItems)
+      .set({
+        quantity,
+        totalPrice: computeItemTotal(item.price, quantity, item.addons),
+        updatedAt: new Date(),
+      })
+      .where(eq(orderItems.id, item.id));
+
+    await recomputeOrderTotal(tx, locked.order);
+    return { ok: true } as const;
+  });
+}
+
+/** Xoá cứng món + addon của món. Không cho xoá món cuối cùng mà tài khoản đang thấy. */
+export async function removeOrderItem(
+  orderId: number,
+  itemId: number,
+  includeDisabled: boolean,
+): Promise<OrderEditResult> {
+  return await getDb().transaction(async (tx) => {
+    const locked = await lockEditableOrder(tx, orderId, includeDisabled);
+    if (!locked.ok) return locked;
+
+    const item = await findVisibleOrderItem(
+      tx,
+      orderId,
+      itemId,
+      includeDisabled,
+    );
+    if (!item) return { ok: false, code: "ORDER_ITEM_NOT_FOUND" } as const;
+
+    const allItems = await tx
+      .select({ id: orderItems.id, isEnabled: orderItems.isEnabled })
+      .from(orderItems)
+      .where(eq(orderItems.orderId, orderId));
+    if (filterVisibleItems(allItems, includeDisabled).length <= 1) {
+      return { ok: false, code: "LAST_ITEM" } as const;
+    }
+
+    await tx
+      .delete(orderItemAddons)
+      .where(eq(orderItemAddons.orderItemId, item.id));
+    await tx.delete(orderItems).where(eq(orderItems.id, item.id));
+
+    await recomputeOrderTotal(tx, locked.order);
+    return { ok: true } as const;
+  });
+}
+
+/** Đổi số điện thoại khách của đơn (chỉ pending/processing). */
+export async function updateOrderCustomerPhone(
+  orderId: number,
+  customerPhone: string,
+  includeDisabled: boolean,
+): Promise<OrderEditResult> {
+  return await getDb().transaction(async (tx) => {
+    const locked = await lockEditableOrder(tx, orderId, includeDisabled);
+    if (!locked.ok) return locked;
+
+    await tx
+      .update(orders)
+      .set({ customerPhone, updatedAt: new Date() })
+      .where(eq(orders.id, orderId));
+    return { ok: true } as const;
+  });
 }
 
 // ==================== CACHED VERSIONS (DISABLED) ====================

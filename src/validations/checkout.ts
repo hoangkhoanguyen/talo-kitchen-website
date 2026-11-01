@@ -1,12 +1,14 @@
 import { EShippingMethod } from "@/types/app-configs";
 import z from "zod";
 
+export const customerPhoneSchema = z
+  .string({ error: "Phone number is required" })
+  .min(10, "Phone number must be at least 10 digits")
+  .max(20, "Phone number must be at most 20 digits");
+
 export const checkoutSchema = z
   .object({
-    customerPhone: z
-      .string({ error: "Phone number is required" })
-      .min(10, "Phone number must be at least 10 digits")
-      .max(20, "Phone number must be at most 20 digits"),
+    customerPhone: customerPhoneSchema,
     customerName: z
       .string({ error: "Name is required" })
       .min(1, "Name is required")
