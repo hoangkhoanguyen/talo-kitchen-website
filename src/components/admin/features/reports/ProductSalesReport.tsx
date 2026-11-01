@@ -30,10 +30,36 @@ const ProductSalesReport = ({
         "Không tải được thống kê theo món, vui lòng thử lại"
       : null;
 
+  const sold = report?.items.filter((item) => item.quantity > 0) ?? [];
+  const unsold = report?.items.filter((item) => item.quantity === 0) ?? [];
+
+  const renderRow = (
+    item: NonNullable<typeof report>["items"][number],
+    index: number,
+  ) => (
+    <tr
+      key={item.productId}
+      className={cn(item.quantity === 0 && "text-gray-400")}
+    >
+      <td>{index + 1}</td>
+      <td className={cn(item.quantity > 0 && "font-medium")}>{item.name}</td>
+      <td>{item.categoryName ?? "—"}</td>
+      <td className="text-right">{item.quantity}</td>
+      <td className="text-right">{item.orderCount}</td>
+      <td className="text-right">{formatCurrency(item.revenue)}</td>
+    </tr>
+  );
+
   return (
-    <div className="rounded-lg bg-white p-4 shadow">
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-        <h2 className="font-semibold">Thống kê theo món</h2>
+    <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h2 className="font-semibold">Thống kê lượt đặt từng món</h2>
+          <p className="text-xs text-gray-500">
+            Xếp theo số phần bán, nhiều → ít · doanh thu gồm topping · cùng
+            khoảng ngày ở trên
+          </p>
+        </div>
         <label className="flex items-center gap-2 text-sm">
           Danh mục
           <select
@@ -72,7 +98,7 @@ const ProductSalesReport = ({
             <table className="table table-sm">
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th className="w-10">#</th>
                   <th>Món</th>
                   <th>Danh mục</th>
                   <th className="text-right">Số phần bán</th>
@@ -81,29 +107,26 @@ const ProductSalesReport = ({
                 </tr>
               </thead>
               <tbody>
-                {report.items.map((item, index) => (
-                  <tr
-                    key={item.productId}
-                    className={cn(item.quantity === 0 && "opacity-50")}
-                  >
-                    <td>{index + 1}</td>
-                    <td>{item.name}</td>
-                    <td>{item.categoryName ?? "—"}</td>
-                    <td className="text-right">{item.quantity}</td>
-                    <td className="text-right">{item.orderCount}</td>
-                    <td className="text-right">
-                      {formatCurrency(item.revenue)}
+                {sold.map((item, index) => renderRow(item, index))}
+                {unsold.length > 0 && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="bg-gray-50 text-xs font-semibold text-gray-600"
+                    >
+                      Món chưa bán trong kỳ ({unsold.length})
                     </td>
                   </tr>
-                ))}
+                )}
+                {unsold.map((item, index) => renderRow(item, sold.length + index))}
               </tbody>
               <tfoot>
-                <tr className="font-semibold">
+                <tr className="font-semibold text-gray-900">
                   <td />
                   <td>Tổng</td>
                   <td />
                   <td className="text-right">{report.summary.quantity}</td>
-                  <td />
+                  <td className="text-right text-gray-400">—</td>
                   <td className="text-right">
                     {formatCurrency(report.summary.revenue)}
                   </td>
@@ -112,6 +135,13 @@ const ProductSalesReport = ({
             </table>
           </div>
         ))}
+
+      {report && report.items.length > 0 && (
+        <p className="text-xs text-gray-500">
+          Doanh thu món + Phí ship = Tổng doanh thu. &quot;Số đơn&quot; ở dòng
+          tổng để trống vì 1 đơn có thể có nhiều món.
+        </p>
+      )}
     </div>
   );
 };
