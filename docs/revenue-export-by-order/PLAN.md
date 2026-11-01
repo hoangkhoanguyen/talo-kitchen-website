@@ -1,6 +1,6 @@
 # Báo cáo doanh thu — Xuất Excel theo đơn (Plan)
 
-> Trạng thái: **plan, CHƯA code** — chờ duyệt.
+> Trạng thái: **đã code** (chưa chạy trên DB thật).
 
 ## 1. Yêu cầu
 

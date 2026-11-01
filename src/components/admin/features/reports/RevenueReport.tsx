@@ -4,6 +4,7 @@ import { adminRoutes } from "@/constants/route";
 import { formatCurrency, cn } from "@/lib/utils";
 import useReportParams from "@/hooks/admin/features/reports/useReportParams";
 import useFetchRevenueReport from "@/hooks/admin/features/reports/useFetchRevenueReport";
+import ProductSalesReport from "./ProductSalesReport";
 
 const PRESETS = [
   { value: "today", label: "Hôm nay" },
@@ -12,6 +13,11 @@ const PRESETS = [
   { value: "this_month", label: "Tháng này" },
   { value: "last_month", label: "Tháng trước" },
   { value: "custom", label: "Tự chọn" },
+];
+
+const EXPORT_MODES = [
+  { value: "daily", label: "Xuất theo ngày" },
+  { value: "orders", label: "Xuất theo đơn" },
 ];
 
 // YYYY-MM-DD → DD/MM/YYYY
@@ -135,13 +141,25 @@ const RevenueReport = () => {
             : " "}
         </p>
         {canFetch && !errorMessage ? (
-          <a
-            className="btn btn-sm btn-outline"
-            href={adminRoutes.revenueReportExportApi(params)}
-            download
-          >
-            Xuất Excel
-          </a>
+          <details className="dropdown dropdown-end">
+            <summary className="btn btn-sm btn-outline">Xuất Excel</summary>
+            <ul className="menu dropdown-content bg-base-100 rounded-box z-10 w-44 p-2 shadow">
+              {EXPORT_MODES.map((item) => (
+                <li key={item.value}>
+                  <a
+                    href={adminRoutes.revenueReportExportApi({
+                      ...params,
+                      mode: item.value,
+                      category_id: query.category_id,
+                    })}
+                    download
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
         ) : (
           <button type="button" className="btn btn-sm btn-outline" disabled>
             Xuất Excel
@@ -257,6 +275,15 @@ const RevenueReport = () => {
             )}
           </div>
         </>
+      )}
+
+      {canFetch && (
+        <ProductSalesReport
+          params={params}
+          canFetch={canFetch}
+          categoryId={query.category_id}
+          onCategoryChange={(value) => setQuery({ category_id: value || null })}
+        />
       )}
     </div>
   );

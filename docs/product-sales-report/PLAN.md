@@ -1,6 +1,6 @@
 # Thống kê lượt đặt từng món (có xuất Excel) — Plan
 
-> Trạng thái: **plan, CHƯA code** — chờ duyệt.
+> Trạng thái: **đã code** (chưa chạy trên DB thật).
 > Yêu cầu chi tiết đã chốt: `docs/admin-2.0/REQUIREMENTS.md` mục 4 "Mục 3" (câu 3.1–3.7) và mục 5.4. Hạng mục 4 trong báo giá Admin 2.0 (800.000đ).
 
 ## 1. Yêu cầu đã chốt (theo gợi ý ⭐)

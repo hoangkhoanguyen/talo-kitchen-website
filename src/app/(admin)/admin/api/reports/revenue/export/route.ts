@@ -3,9 +3,20 @@ import { withError } from "@/providers/withError";
 import { withAuth } from "@/providers/withAuth";
 import { AccessTokenPayload } from "@/lib/auth";
 import { isTaloKitchen } from "@/lib/order-visibility";
-import { parseReportRange } from "@/lib/report-query";
-import { getRevenueReport } from "@/services/reports";
-import { buildRevenueWorkbook } from "@/services/reports-excel";
+import {
+  parseReportCategoryId,
+  parseReportExportModeParam,
+  parseReportRange,
+} from "@/lib/report-query";
+import {
+  getProductSalesReport,
+  getRevenueOrders,
+  getRevenueReport,
+} from "@/services/reports";
+import {
+  buildRevenueOrdersWorkbook,
+  buildRevenueWorkbook,
+} from "@/services/reports-excel";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,15 +27,35 @@ async function exportRevenueReportApi(
 ) {
   const parsed = parseReportRange(req);
   if ("error" in parsed) return parsed.error;
+  const modeParsed = parseReportExportModeParam(req);
+  if ("error" in modeParsed) return modeParsed.error;
+  const categoryParsed = parseReportCategoryId(req);
+  if ("error" in categoryParsed) return categoryParsed.error;
 
-  const report = await getRevenueReport({
-    start: parsed.range.start,
-    end: parsed.range.end,
-    includeDisabled: isTaloKitchen(payload.username),
+  const { start, end } = parsed.range;
+  // Chỉ lấy từ token, không tin tham số client
+  const includeDisabled = isTaloKitchen(payload.username);
+
+  const productSales = await getProductSalesReport({
+    start,
+    end,
+    categoryId: categoryParsed.categoryId,
+    includeDisabled,
   });
 
-  const buffer = await buildRevenueWorkbook(report);
-  const filename = `bao-cao-doanh-thu_${report.range.start}_${report.range.end}.xlsx`;
+  let buffer: ArrayBuffer | Buffer;
+  let filename: string;
+  if (modeParsed.mode === "orders") {
+    const report = await getRevenueOrders({ start, end, includeDisabled });
+    buffer = await buildRevenueOrdersWorkbook(report, productSales, {
+      showDisabledColumn: includeDisabled,
+    });
+    filename = `bao-cao-doanh-thu-theo-don_${start}_${end}.xlsx`;
+  } else {
+    const report = await getRevenueReport({ start, end, includeDisabled });
+    buffer = await buildRevenueWorkbook(report, productSales);
+    filename = `bao-cao-doanh-thu_${start}_${end}.xlsx`;
+  }
 
   return new NextResponse(buffer as ArrayBuffer, {
     headers: {
