@@ -16,8 +16,8 @@ const PRESETS = [
 ];
 
 const EXPORT_MODES = [
-  { value: "daily", label: "Xuất theo ngày" },
-  { value: "orders", label: "Xuất theo đơn" },
+  { value: "daily", label: "Xuất Excel theo ngày" },
+  { value: "orders", label: "Xuất Excel theo đơn" },
 ];
 
 // YYYY-MM-DD → DD/MM/YYYY
@@ -141,29 +141,35 @@ const RevenueReport = () => {
             : " "}
         </p>
         {canFetch && !errorMessage ? (
-          <details className="dropdown dropdown-end">
-            <summary className="btn btn-sm btn-outline">Xuất Excel</summary>
-            <ul className="menu dropdown-content bg-base-100 rounded-box z-10 w-44 p-2 shadow">
-              {EXPORT_MODES.map((item) => (
-                <li key={item.value}>
-                  <a
-                    href={adminRoutes.revenueReportExportApi({
-                      ...params,
-                      mode: item.value,
-                      category_id: query.category_id,
-                    })}
-                    download
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </details>
+          <div className="flex gap-2">
+            {EXPORT_MODES.map((item) => (
+              <a
+                key={item.value}
+                className="btn btn-sm btn-outline"
+                href={adminRoutes.revenueReportExportApi({
+                  ...params,
+                  mode: item.value,
+                  category_id: query.category_id,
+                })}
+                download
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
         ) : (
-          <button type="button" className="btn btn-sm btn-outline" disabled>
-            Xuất Excel
-          </button>
+          <div className="flex gap-2">
+            {EXPORT_MODES.map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                className="btn btn-sm btn-outline"
+                disabled
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
