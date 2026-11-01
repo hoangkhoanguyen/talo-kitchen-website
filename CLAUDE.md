@@ -1,5 +1,16 @@
 # CLAUDE.md
 
+## 🚀 Môi trường deploy: Vercel (serverless)
+
+App (Next.js) chạy trên **Vercel**, DB Postgres (Supabase). Mọi thiết kế phải chạy đúng trong môi trường này:
+
+- **Timezone server = UTC.** Không dùng `new Date().getHours()/getDay()`, `moment()` local… để ra quyết định nghiệp vụ theo giờ. Luôn quy về giờ VN (UTC+7, không DST) bằng helper trong `src/lib/date.ts` (`formatDateVN`, `todayVN`, …). Client (trình duyệt) có thể ở tz bất kỳ → logic theo giờ phải lấy **server làm nguồn sự thật**.
+- **Không có tiến trình chạy nền / state trong RAM.** Mỗi request có thể rơi vào instance khác, instance bị tắt bất kỳ lúc nào → không `setInterval`, không cache biến global làm nguồn dữ liệu, không job chạy ngầm sau khi trả response.
+- **Ưu tiên tính toán theo thời điểm request thay vì job hẹn giờ.** Vercel Cron có giới hạn (gói Hobby chỉ chạy tối đa 1 lần/ngày, giờ không chính xác) và có thể fail im lặng → không dùng cron để "bật/tắt" dữ liệu theo giờ (ví dụ đổi giá), hãy tính trên mỗi request.
+- **Data Cache (`unstable_cache` trong `src/lib/cache.ts`) dùng chung giữa các instance, tồn tại qua nhiều request (có thể qua cả các lần deploy)**; mặc định không tự hết hạn, chỉ xoá qua tag (`src/lib/revalidate.ts`). Không đưa dữ liệu phụ thuộc thời gian (giá theo giờ, "đang mở cửa"…) vào cache — cache dữ liệu gốc, áp logic thời gian sau khi đọc cache.
+- **Env vars** cấu hình trên Vercel Dashboard (Production/Preview riêng). `DB_SCHEMA` quyết định schema Postgres (`src/db/schema.ts`), mặc định `prod`.
+- **Rollback** = Vercel Instant Rollback (xem `deploy/DEPLOY_GUIDE.md`). Migration DB phải tương thích ngược với code cũ (chỉ thêm cột/bảng, có default) để rollback code không vỡ.
+
 ## ⚠️ Cờ bật/tắt đơn hàng & món (`is_enabled`) — LUÔN kiểm tra khi động vào đơn hàng
 
 Mọi thay đổi liên quan tới đơn hàng (tạo/sửa đơn, thêm món, hiển thị, tổng tiền, in bill, thông báo đơn mới, báo cáo, lọc/tìm kiếm) **phải xét cờ này** và ghi rõ cách xử lý trong phân tích/thiết kế.
