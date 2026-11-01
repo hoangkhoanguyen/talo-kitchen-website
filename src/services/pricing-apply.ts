@@ -1,4 +1,5 @@
 import { withEffectivePrice, type PricedFields } from "@/lib/pricing";
+import { FEATURES } from "@/constants/features";
 import { getActivePriceRulesCached } from "@/services/price-programs";
 
 type Priceable = { id: number; price: number };
@@ -9,7 +10,7 @@ export async function applyPricing<T extends Priceable>(
   now: Date = new Date(),
 ): Promise<(T & PricedFields)[]> {
   if (!items.length) return items as (T & PricedFields)[];
-  const rules = await getActivePriceRulesCached();
+  const rules = FEATURES.PRICE_PROGRAMS ? await getActivePriceRulesCached() : [];
   return items.map((item) => withEffectivePrice(item, rules, now));
 }
 

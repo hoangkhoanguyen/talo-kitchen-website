@@ -12,6 +12,7 @@ import {
 import { revalidatePricePrograms } from "@/lib/revalidate";
 import { priceProgramSchema } from "@/validations/price-program";
 import { ADMIN_ROUTE } from "@/constants/route";
+import { FEATURES } from "@/constants/features";
 
 type Failure = { success: false; error: string; code?: string };
 type Result<T> = Failure | { success: true; data: T };
@@ -33,6 +34,7 @@ const NOT_FOUND: Failure = {
 };
 
 async function isAuthorized() {
+  if (!FEATURES.PRICE_PROGRAMS) return false; // tính năng đang ẩn
   const auth = await verifyAdminAuthSimple(ADMIN_ROUTE.pricePrograms);
   return auth.isValid;
 }

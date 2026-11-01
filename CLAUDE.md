@@ -35,6 +35,8 @@ Mọi thay đổi liên quan tới đơn hàng (tạo/sửa đơn, thêm món, h
 
 ## 💰 Giá theo khung giờ (Happy Hour)
 
+- **Đang TẮT** bằng cờ `FEATURES.PRICE_PROGRAMS` (`src/constants/features.ts`): ẩn menu/trang admin (404), chặn action, không áp giá ở web/đơn. Bật lại: đổi thành `true` rồi deploy. Code mới đụng tới tính năng này phải tôn trọng cờ.
+
 - `products.price` là **giá gốc**. Giá bán thực tế = giá hiệu lực tính lúc request: `getEffectivePrice` / `withEffectivePrice` (`src/lib/pricing.ts`) với cấu hình từ `src/services/price-programs.ts`. Addon không áp giá khung giờ.
 - Mọi chỗ hiển thị giá cho khách / tạo món trong đơn phải dùng giá hiệu lực (web: `applyPricing` trong `src/services/pricing-apply.ts`, áp **sau** cache; đơn: `validateOrderData`, `addOrderItem`). Không so/ghi `products.price` trực tiếp.
 - Server là nguồn sự thật: giá client gửi lệch giá server → `PRICE_CHANGED`. `order_items.price` = giá đã chốt; `original_price`, `price_program_id` lưu vết.

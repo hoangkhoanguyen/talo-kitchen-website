@@ -4,6 +4,7 @@ import React from "react";
 import { IMenuItem, MenuItem } from "./MenuItem";
 import { cn } from "@/lib/utils";
 import { adminRoutes } from "@/constants/route";
+import { FEATURES } from "@/constants/features";
 
 const menuItems: IMenuItem[] = [
   // { label: "Dashboard", href: "/admin", icon: "dashboard" },
@@ -28,13 +29,17 @@ const menuItems: IMenuItem[] = [
     activeIcon: "bxs:food-menu",
     type: "link",
   },
-  {
-    label: "Giá theo khung giờ",
-    href: adminRoutes.pricePrograms(),
-    icon: "mdi:clock-outline",
-    activeIcon: "mdi:clock",
-    type: "link",
-  },
+  ...(FEATURES.PRICE_PROGRAMS
+    ? [
+        {
+          label: "Giá theo khung giờ",
+          href: adminRoutes.pricePrograms(),
+          icon: "mdi:clock-outline",
+          activeIcon: "mdi:clock",
+          type: "link",
+        } satisfies IMenuItem,
+      ]
+    : []),
   {
     label: "Reservations",
     href: adminRoutes.reservations(),

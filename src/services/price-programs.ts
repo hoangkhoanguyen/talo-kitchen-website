@@ -7,6 +7,7 @@ import {
   products,
 } from "@/db/schemas";
 import { CACHE_TAGS } from "@/constants/cache";
+import { FEATURES } from "@/constants/features";
 import { createCachedFunction } from "@/lib/cache";
 import type { PriceProgramRule } from "@/lib/pricing";
 import type {
@@ -19,6 +20,8 @@ import type {
  * Đọc trực tiếp DB — dùng trong transaction đặt đơn / sửa đơn.
  */
 export async function getActivePriceRules(db: DB = getDb()): Promise<PriceProgramRule[]> {
+  // Tính năng đang tắt → không áp chương trình nào (giá = giá gốc)
+  if (!FEATURES.PRICE_PROGRAMS) return [];
   const rows = await db.query.pricePrograms.findMany({
     where: eq(pricePrograms.isActive, true),
     columns: { id: true },
