@@ -21,6 +21,8 @@ export interface BillData {
   code: string;
   dateTime: string;
   items: BillItem[];
+  subtotal: number;
+  shippingFee: number;
   total: number;
 }
 
@@ -157,7 +159,17 @@ export default function BillReceipt({
             </tbody>
           </table>
 
-          {/* Total */}
+          {/* Subtotal + Delivery fee + Total (luôn hiển thị đủ 3 dòng) */}
+          <div className="bill-sum">
+            <div className="bill-sum-row">
+              <span>Subtotal</span>
+              <span>{fmt(data.subtotal)}</span>
+            </div>
+            <div className="bill-sum-row">
+              <span>Delivery fee</span>
+              <span>{fmt(data.shippingFee)}</span>
+            </div>
+          </div>
           <div className="bill-total">
             <span className="bill-total-label">Total</span>
             <span className="bill-total-value">{fmt(data.total)}</span>
@@ -266,6 +278,21 @@ const printStyles = `
 .row-item td.col-name { font-weight: 500; }
 .row-addon td { font-size: 11px; }
 .row-addon td.col-name { padding-left: 6px; }
+
+.bill-sum {
+  border-top: 1px dashed #000;
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.bill-sum-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 1px 0;
+}
 
 .bill-total {
   display: flex;

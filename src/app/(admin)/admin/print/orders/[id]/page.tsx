@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { formatDateVN } from "@/lib/date";
 import { getCurrentAdminFromCookie } from "@/lib/auth";
 import { isTaloKitchen } from "@/lib/order-visibility";
+import { computeBillTotals } from "@/lib/order-edit";
 import { Poppins } from "next/font/google";
 import BillReceipt, {
   BillData,
@@ -30,6 +31,12 @@ const PrintOrderBillPage = async ({
     notFound();
   }
 
+  // order.items đã lọc theo tài khoản (item tắt bị loại với tài khoản thường)
+  const { subtotal, shippingFee, total } = computeBillTotals(
+    order.items,
+    order.shippingFee,
+  );
+
   const data: BillData = {
     code: order.code,
     dateTime: formatDateVN(order.createdAt, "MM/DD/YYYY   HH:mm:ss"),
@@ -45,8 +52,9 @@ const PrintOrderBillPage = async ({
         amount: addon.price * addon.quantity,
       })),
     })),
-    // Bill không tính phí ship → trừ phí ship ra khỏi tổng (ship = 0 thì giữ nguyên)
-    total: order.totalPrice - order.shippingFee,
+    subtotal,
+    shippingFee,
+    total,
   };
 
   return <BillReceipt data={data} fontClassName={poppins.className} />;
