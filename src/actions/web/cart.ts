@@ -26,7 +26,14 @@ export async function getCartProductsByIdsAction({
 }): Promise<
   (Pick<
     WebProduct,
-    "id" | "category" | "imageUrl" | "price" | "slug" | "title"
+    | "id"
+    | "category"
+    | "imageUrl"
+    | "price"
+    | "slug"
+    | "title"
+    | "originalPrice"
+    | "priceEndsAt"
   > & {
     addons: Pick<ProductAddOnDB, "id" | "name" | "price">[];
   })[]

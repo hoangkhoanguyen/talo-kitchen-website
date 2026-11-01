@@ -4,7 +4,7 @@ import QuickCartButton from "./quick-cart/QuickCartButton";
 import { Link } from "@/i18n/navigation";
 import { webRoutes } from "@/constants/route";
 import { WebProduct } from "@/types/products";
-import { formatCurrencyWebsite } from "@/lib/utils";
+import PriceTag from "./PriceTag";
 import type { Locale } from "@/types/configs";
 
 const ProductCard: FC<{
@@ -40,7 +40,11 @@ const ProductCard: FC<{
         </div>
         <div className="flex justify-between items-center">
           <span className="text-web-h4-mobile lg:text-web-h4 text-web-primary">
-            {formatCurrencyWebsite(product.price, locale)}
+            <PriceTag
+              price={product.price}
+              originalPrice={product.originalPrice}
+              locale={locale}
+            />
           </span>
           <QuickCartButton data={{ id: product.id, title: product.title }} />
         </div>

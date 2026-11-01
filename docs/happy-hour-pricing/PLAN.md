@@ -1,6 +1,6 @@
 # Giá theo khung giờ (Happy Hour) — Plan triển khai (phương án B)
 
-> Trạng thái: **plan, CHƯA code** — chờ duyệt. Phân tích gốc: `ANALYSIS.md`.
+> Trạng thái: **đã code** (chưa chạy trên DB thật). Phân tích gốc: `ANALYSIS.md`.
 
 ## 1. Quyết định đã chốt với khách
 

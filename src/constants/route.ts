@@ -12,6 +12,7 @@ export const ADMIN_ROUTE = {
   orders: "/admin/orders",
   order: "/admin/orders/[id]",
   reports: "/admin/reports",
+  pricePrograms: "/admin/price-programs",
   settings: "/admin/settings/[setting_type]/[key]",
   refreshTokenApi: "/admin/api/auth/refresh-token",
   imagesApi: "/admin/api/images",
@@ -22,6 +23,7 @@ export const ADMIN_ROUTE = {
   newOrdersApi: "/admin/api/orders/new",
   revenueReportApi: "/admin/api/reports/revenue",
   revenueReportExportApi: "/admin/api/reports/revenue/export",
+  productSalesReportApi: "/admin/api/reports/products",
   reservationsApi: "/admin/api/reservations",
   login: "/admin/login",
   register: "/admin/register",
@@ -125,6 +127,8 @@ export const adminRoutes = {
       : generateRoute("admin", "order", { id }),
   // báo cáo
   reports: () => ADMIN_ROUTE.reports,
+  // giá theo khung giờ
+  pricePrograms: () => ADMIN_ROUTE.pricePrograms,
   revenueReportApi: (query?: any) =>
     query
       ? `${ADMIN_ROUTE.revenueReportApi}?${queryString.stringify(query, {
@@ -139,6 +143,13 @@ export const adminRoutes = {
           skipNull: true,
         })}`
       : ADMIN_ROUTE.revenueReportExportApi,
+  productSalesReportApi: (query?: any) =>
+    query
+      ? `${ADMIN_ROUTE.productSalesReportApi}?${queryString.stringify(query, {
+          skipEmptyString: true,
+          skipNull: true,
+        })}`
+      : ADMIN_ROUTE.productSalesReportApi,
   imagesApi: () => ADMIN_ROUTE.imagesApi,
   categoriesApi: (query?: any) =>
     query

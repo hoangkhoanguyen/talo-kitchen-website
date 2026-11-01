@@ -42,7 +42,7 @@ const CheckoutProvider: FC<
   );
   const { mutate, isPending } = useCheckout();
   const clearCart = useCartStore((state) => state.actions.clearCart);
-  const { cartItems, isLoading } = useGetCartProducts();
+  const { cartItems, isLoading, refetch } = useGetCartProducts();
   const { control, handleSubmit } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     mode: "onSubmit",
@@ -126,6 +126,8 @@ const CheckoutProvider: FC<
       },
       {
         onSuccess: (data) => {
+          // Giá vừa đổi (vd. hết khung giờ giảm giá) → tải lại giá để khách xem rồi đặt lại
+          if (!data.success && data.code === "PRICE_CHANGED") refetch();
           if (data.success && data.data) {
             flushSync(() => {
               setSuccessOrder(data.data);

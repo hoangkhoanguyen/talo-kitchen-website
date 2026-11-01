@@ -29,6 +29,13 @@ const menuItems: IMenuItem[] = [
     type: "link",
   },
   {
+    label: "Giá theo khung giờ",
+    href: adminRoutes.pricePrograms(),
+    icon: "mdi:clock-outline",
+    activeIcon: "mdi:clock",
+    type: "link",
+  },
+  {
     label: "Reservations",
     href: adminRoutes.reservations(),
     icon: "material-symbols:food-bank-outline-rounded",

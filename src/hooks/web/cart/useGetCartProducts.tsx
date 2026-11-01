@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { earliestEndsAt } from "@/lib/pricing";
 import { useCartStore, useCartHydrated, useCrossTabSyncTrigger } from "./store";
 import useGetProductsDetailsByIds from "../products/useGetProductsDetailsByIds";
 import { CartItemDisplay } from "@/types/cart";
@@ -13,7 +14,11 @@ const useGetCartProducts = () => {
     [cart],
   );
 
-  const { data: products, isLoading: isProductsLoading } =
+  const {
+    data: products,
+    isLoading: isProductsLoading,
+    refetch,
+  } =
     useGetProductsDetailsByIds({
       ids: productIds,
       enabled: hydrated,
@@ -32,6 +37,7 @@ const useGetCartProducts = () => {
           imageUrl: product.imageUrl || "",
           category: product.category,
           price: product.price,
+          originalPrice: product.originalPrice,
           slug: product.slug,
           addons: product.addons.map((addon) => ({
             id: addon.id,
@@ -54,7 +60,17 @@ const useGetCartProducts = () => {
   // Loading nếu chưa hydrate hoặc đang fetch products
   const isLoading = !hydrated || isProductsLoading;
 
-  return { cartItems, isLoading };
+  // Giá khung giờ hết hiệu lực (mốc do server tính) → tải lại giá giỏ hàng
+  const endsAt = useMemo(() => earliestEndsAt(products ?? []), [products]);
+  useEffect(() => {
+    if (!endsAt) return;
+    const delay = new Date(endsAt).getTime() - Date.now() + 1000;
+    if (delay > 24 * 60 * 60 * 1000) return;
+    const timer = setTimeout(refetch, Math.max(delay, 0));
+    return () => clearTimeout(timer);
+  }, [endsAt, refetch]);
+
+  return { cartItems, isLoading, refetch };
 };
 
 export default useGetCartProducts;

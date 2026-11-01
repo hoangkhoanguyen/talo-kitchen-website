@@ -9,6 +9,7 @@ import {
   resolveProductFields,
 } from "@/services/products/translations";
 import { asc } from "drizzle-orm";
+import { applyPricing } from "@/services/pricing-apply";
 // Disabled cache imports - using direct DB calls now
 // import { createDynamicCachedFunction } from "@/lib/cache-utils";
 // import { CACHE_TAGS } from "@/constants/cache";
@@ -41,7 +42,14 @@ export async function getCartProductsByIds(
 ): Promise<
   (Pick<
     WebProduct,
-    "id" | "category" | "imageUrl" | "price" | "slug" | "title"
+    | "id"
+    | "category"
+    | "imageUrl"
+    | "price"
+    | "slug"
+    | "title"
+    | "originalPrice"
+    | "priceEndsAt"
   > & {
     addons: Pick<ProductAddOnDB, "id" | "name" | "price">[];
   })[]
@@ -130,7 +138,7 @@ export async function getCartProductsByIds(
     },
   });
 
-  return productList.map((product) => {
+  const result = productList.map((product) => {
     const { title } = resolveProductFields(
       {
         title: product.title,
@@ -163,6 +171,9 @@ export async function getCartProductsByIds(
       })),
     };
   });
+
+  // Giá theo khung giờ tính lúc request (không cache) — addon giữ giá
+  return applyPricing(result);
 }
 
 // ==================== CACHED VERSIONS (DISABLED) ====================

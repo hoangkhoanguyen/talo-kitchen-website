@@ -36,6 +36,8 @@ import {
   computeOrderTotal,
   filterVisibleItems,
 } from "@/lib/order-edit";
+import { getEffectivePrice, withEffectivePrice } from "@/lib/pricing";
+import { getActivePriceRules } from "@/services/price-programs";
 // Disabled cache imports - using direct DB calls now
 // import { createDynamicCachedFunction } from "@/lib/cache-utils";
 // import { CACHE_TAGS } from "@/constants/cache";
@@ -56,56 +58,75 @@ export type CreateOrderResponse = {
   })[];
 };
 
+export type ValidateOrderResult =
+  | { ok: true; orderItems: CreateOrderRequest["orderItems"] }
+  | { ok: false; code: "INVALID_ORDER_DATA" | "PRICE_CHANGED" };
+
+/**
+ * Kiểm tra món/addon còn bán và giá client gửi khớp giá SERVER tính lúc này
+ * (giá theo khung giờ — src/lib/pricing.ts). Trả về danh sách item với giá do
+ * server chốt (price, original_price, price_program_id, total_price) — không tin client.
+ * Giá lệch (vd. thêm giỏ 20:58, đặt 21:01) → PRICE_CHANGED để client tải lại giá.
+ */
 export async function validateOrderData(
   orderItems: CreateOrderRequest["orderItems"],
-) {
-  // Validate product price, active
-  // Validate addon price, active, check if addon belongs to product
-
+  now: Date = new Date(),
+): Promise<ValidateOrderResult> {
   const db = getDb();
 
   const productIds = Array.from(
     new Set(orderItems.map((item) => item.productId)),
   );
+  if (!productIds.length) return { ok: false, code: "INVALID_ORDER_DATA" };
 
-  const productsList = await db.query.products.findMany({
-    where: inArray(products.id, productIds),
-    with: { addons: true },
-  });
+  const [productsList, rules] = await Promise.all([
+    db.query.products.findMany({
+      where: inArray(products.id, productIds),
+      with: { addons: true },
+    }),
+    getActivePriceRules(db),
+  ]);
 
-  const productMap = new Map<number, (typeof productsList)[0]>();
-  for (const product of productsList) {
-    productMap.set(product.id, product);
-  }
+  const productMap = new Map(productsList.map((p) => [p.id, p]));
+  let priceChanged = false;
+  const priced: CreateOrderRequest["orderItems"] = [];
 
   for (const item of orderItems) {
     const product = productMap.get(item.productId);
-
     if (!product || !product.isActive) {
-      return false;
+      return { ok: false, code: "INVALID_ORDER_DATA" };
     }
 
-    if (item.price !== product.price) {
-      return false;
-    }
-
-    if (item.addons && item.addons.length > 0) {
-      const addonDbMap = new Map<number, (typeof product.addons)[0]>();
-      for (const addonDb of product.addons) {
-        addonDbMap.set(addonDb.id, addonDb);
+    const addonDbMap = new Map(product.addons.map((a) => [a.id, a]));
+    const addons: NonNullable<CreateOrderRequest["orderItems"][number]["addons"]> = [];
+    for (const addon of item.addons ?? []) {
+      const addonDb = addonDbMap.get(addon.addonId);
+      if (!addonDb || !addonDb.isActive) {
+        return { ok: false, code: "INVALID_ORDER_DATA" };
       }
-
-      for (const addon of item.addons) {
-        const addonDb = addonDbMap.get(addon.addonId);
-
-        if (!addonDb || !addonDb.isActive || addon.price !== addonDb.price) {
-          return false;
-        }
-      }
+      if (addon.price !== addonDb.price) priceChanged = true;
+      addons.push({
+        ...addon,
+        price: addonDb.price,
+        totalPrice: addonDb.price * addon.quantity,
+      });
     }
+
+    const eff = getEffectivePrice(product.id, product.price, rules, now);
+    if (item.price !== eff.price) priceChanged = true;
+
+    priced.push({
+      ...item,
+      price: eff.price,
+      originalPrice: eff.programId ? eff.originalPrice : null,
+      priceProgramId: eff.programId,
+      totalPrice: computeItemTotal(eff.price, item.quantity, addons),
+      addons,
+    });
   }
 
-  return true;
+  if (priceChanged) return { ok: false, code: "PRICE_CHANGED" };
+  return { ok: true, orderItems: priced };
 }
 
 export async function createOrder(
@@ -658,7 +679,9 @@ async function findVisibleOrderItem(
 
 /** Danh sách sản phẩm đang bán (kèm addon đang bán) cho bộ chọn thêm món. */
 export async function getOrderProductOptions() {
-  const rows = await getDb().query.products.findMany({
+  const db = getDb();
+  const [rows, rules] = await Promise.all([
+    db.query.products.findMany({
     where: eq(products.isActive, true),
     columns: { id: true, title: true, price: true },
     with: {
@@ -669,8 +692,12 @@ export async function getOrderProductOptions() {
       },
     },
     orderBy: [desc(products.priority), desc(products.createdAt)],
-  });
-  return rows;
+    }),
+    getActivePriceRules(db),
+  ]);
+  // Giá hiện hành (đã áp khung giờ) để nhân viên thấy đúng giá trước khi thêm
+  const now = new Date();
+  return rows.map((row) => withEffectivePrice(row, rules, now));
 }
 
 export type AddOrderItemInput = {
@@ -717,15 +744,24 @@ export async function addOrderItem(
       });
     }
 
+    // Giá theo khung giờ tại thời điểm nhân viên thêm món (addon giữ giá)
+    const eff = getEffectivePrice(
+      product.id,
+      product.price,
+      await getActivePriceRules(tx),
+    );
+
     const [item] = await tx
       .insert(orderItems)
       .values({
         orderId,
         productId: product.id,
         productName: product.title,
-        price: product.price,
+        price: eff.price,
+        originalPrice: eff.programId ? eff.originalPrice : null,
+        priceProgramId: eff.programId,
         quantity: input.quantity,
-        totalPrice: computeItemTotal(product.price, input.quantity, addonRows),
+        totalPrice: computeItemTotal(eff.price, input.quantity, addonRows),
         note: input.note,
         isEnabled: true,
       })

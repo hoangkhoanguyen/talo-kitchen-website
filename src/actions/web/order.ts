@@ -1,5 +1,6 @@
 "use server";
 import { createOrder, validateOrderData } from "@/services/orders";
+import { computeOrderTotal } from "@/lib/order-edit";
 import {
   NewOrderDB,
   NewOrderItemAddonDB,
@@ -13,17 +14,31 @@ export async function createOrderAction(data: {
   })[];
 }) {
   try {
-    const isValidOrderData = await validateOrderData(data.orderItems);
+    const validation = await validateOrderData(data.orderItems);
 
-    if (!isValidOrderData) {
-      return {
-        success: false,
-        error: "Invalid order data",
-        code: "INVALID_ORDER_DATA",
-      };
+    if (!validation.ok) {
+      return validation.code === "PRICE_CHANGED"
+        ? {
+            success: false,
+            error: "Prices have been updated. Please review your order.",
+            code: "PRICE_CHANGED",
+          }
+        : {
+            success: false,
+            error: "Invalid order data",
+            code: "INVALID_ORDER_DATA",
+          };
     }
 
-    const createdOrder = await createOrder(data);
+    // Giá món do server chốt → tổng đơn tính lại từ đó (phí ship giữ nguyên)
+    const shippingFee = data.orderData.shippingFee ?? 0;
+    const createdOrder = await createOrder({
+      orderData: {
+        ...data.orderData,
+        totalPrice: computeOrderTotal(validation.orderItems, shippingFee),
+      },
+      orderItems: validation.orderItems,
+    });
 
     return {
       success: true,

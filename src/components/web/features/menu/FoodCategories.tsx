@@ -8,6 +8,8 @@ import SectionTitleFromConfigs from "../../shared/SectionTitleFromConfigs";
 import { getProductsByCategorySlugCached } from "@/services/cached";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/types/configs";
+import PriceRefresher from "../../shared/PriceRefresher";
+import { earliestEndsAt } from "@/lib/pricing";
 
 const FoodCategories: FC<{
   activeCategoryKey: string;
@@ -26,6 +28,7 @@ const FoodCategories: FC<{
 
   return (
     <section className="pt-8 pb-24 bg-web-background-1">
+      <PriceRefresher endsAt={earliestEndsAt(products)} />
       <div className="container">
         <h3 className="section-subtitle text-center mb-5">
           <SectionSubTitleFromConfigs sub_title={configs.sub_title} />

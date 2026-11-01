@@ -2,7 +2,7 @@ import { getCartProductsByIdsAction } from "@/actions/web/cart";
 import { resolveLocale } from "@/lib/locale";
 import { useMutation } from "@tanstack/react-query";
 import { useLocale } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseGetProductsDetailsByIdsProps {
   ids: number[];
@@ -77,7 +77,12 @@ const useGetProductsDetailsByIds = ({
 
   const isLoading = !enabled || !isReady;
 
-  return { data, isLoading };
+  // Tải lại giá (vd. khi khung giờ giá kết thúc hoặc server báo PRICE_CHANGED)
+  const refetch = useCallback(() => {
+    if (ids.length > 0) mutate({ ids, locale });
+  }, [ids, locale, mutate]);
+
+  return { data, isLoading, refetch };
 };
 
 export default useGetProductsDetailsByIds;

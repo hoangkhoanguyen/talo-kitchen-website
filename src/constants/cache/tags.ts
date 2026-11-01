@@ -29,6 +29,11 @@ export const CACHE_TAGS = {
     BY_KEY: (key: string) => `configs:${key}`, // getConfig(key) - Specific config by key
   },
 
+  // Chương trình giá theo khung giờ: chỉ cache CẤU HÌNH, giá tính lúc request
+  PRICE_PROGRAMS: {
+    ACTIVE: "price-programs:active",
+  },
+
   // ==================== KHÔNG CACHE ====================
   // Admin services không cache - luôn fetch real-time
   // Cart validation không cache - luôn check real-time

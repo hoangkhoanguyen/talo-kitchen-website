@@ -14,7 +14,10 @@ export interface CartItem {
 }
 
 export type CartItemDisplay = Omit<CartItem, "addons"> &
-  Pick<WebProduct, "title" | "price" | "imageUrl" | "category" | "slug"> & {
+  Pick<
+    WebProduct,
+    "title" | "price" | "originalPrice" | "imageUrl" | "category" | "slug"
+  > & {
     addons: (CartItemAddon & {
       name: string;
       price: number;

@@ -29,6 +29,10 @@ export const orderItems = dbSchema.table(
     note: text("note").notNull().default(""),
     // Chỉ tài khoản talo_kitchen mới bật/tắt và thấy item đã tắt
     isEnabled: boolean("is_enabled").notNull().default(true),
+    // Giá gốc lúc đặt khi món được áp giá khung giờ (null = không áp / đơn cũ)
+    originalPrice: real("original_price"),
+    // Chương trình giá đã áp (không FK: xoá chương trình không ảnh hưởng đơn)
+    priceProgramId: integer("price_program_id"),
     createdAt: timestamp("created_at", {
       withTimezone: true,
     })

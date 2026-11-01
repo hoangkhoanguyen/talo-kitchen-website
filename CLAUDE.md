@@ -32,3 +32,10 @@ Mọi thay đổi liên quan tới đơn hàng (tạo/sửa đơn, thêm món, h
 5. Phía khách (web, không đăng nhập) không bao giờ thấy cờ này; nếu logic phía khách phải chọn một đơn có sẵn (ví dụ gộp món vào bill đang mở) thì phải quyết định rõ cách xử lý đơn đang bị tắt (tránh đẩy món mới vào đơn mà nhân viên tài khoản thường không thấy).
 6. In bill (`src/app/(admin)/admin/print/orders/[id]/page.tsx`) lọc theo tài khoản như trang chi tiết.
 7. Test: cover cả 2 vai trò (`talo_kitchen` và tài khoản thường) với đơn tắt và món tắt.
+
+## 💰 Giá theo khung giờ (Happy Hour)
+
+- `products.price` là **giá gốc**. Giá bán thực tế = giá hiệu lực tính lúc request: `getEffectivePrice` / `withEffectivePrice` (`src/lib/pricing.ts`) với cấu hình từ `src/services/price-programs.ts`. Addon không áp giá khung giờ.
+- Mọi chỗ hiển thị giá cho khách / tạo món trong đơn phải dùng giá hiệu lực (web: `applyPricing` trong `src/services/pricing-apply.ts`, áp **sau** cache; đơn: `validateOrderData`, `addOrderItem`). Không so/ghi `products.price` trực tiếp.
+- Server là nguồn sự thật: giá client gửi lệch giá server → `PRICE_CHANGED`. `order_items.price` = giá đã chốt; `original_price`, `price_program_id` lưu vết.
+- Migration: `deploy/add-price-programs.sql` (chạy trước khi deploy code).

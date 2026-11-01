@@ -1,4 +1,5 @@
 "use client";
+import PriceTag from "@/components/web/shared/PriceTag";
 import Image from "next/image";
 import React, { FC } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -45,7 +46,11 @@ const CartItem: FC<{ item: CartItemDisplay }> = ({ item }) => {
             <p className="text-web-h4-mobile lg:text-web-h4">
               <span className="text-web-content-1">{t("item.priceLabel")}</span>{" "}
               <span className="text-web-secondary-1 uppercase">
-                {formatCurrencyWebsite(item.price, locale)}
+                <PriceTag
+                  price={item.price}
+                  originalPrice={item.originalPrice}
+                  locale={locale}
+                />
               </span>
             </p>
           </div>

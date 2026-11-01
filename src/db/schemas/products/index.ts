@@ -5,3 +5,4 @@ export * from "./product-addons";
 export * from "./product-translations";
 export * from "./product-category-translations";
 export * from "./product-addon-translations";
+export * from "./price-programs";

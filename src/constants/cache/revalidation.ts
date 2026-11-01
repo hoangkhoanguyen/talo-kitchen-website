@@ -97,8 +97,11 @@ export const REVALIDATION_MAP = {
   /**
    * FULL REFRESH - Revalidate tất cả cache
    */
+  PRICE_PROGRAM_UPDATE: [CACHE_TAGS.PRICE_PROGRAMS.ACTIVE],
+
   FULL_REFRESH: [
     CACHE_TAGS.PRODUCTS.ALL,
+    CACHE_TAGS.PRICE_PROGRAMS.ACTIVE,
     // Note: Configs sẽ được revalidate theo từng key cụ thể
   ],
 } as const;

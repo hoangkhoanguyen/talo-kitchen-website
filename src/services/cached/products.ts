@@ -15,6 +15,7 @@ import {
   getProductDetailsForQuickCartById,
 } from "@/services/products";
 import type { Locale } from "@/types/configs";
+import { applyPricing, applyPricingOne } from "@/services/pricing-apply";
 
 /**
  * ✅ CACHED: Get products by category slug
@@ -22,7 +23,7 @@ import type { Locale } from "@/types/configs";
  * Cache key theo locale (mỗi locale 1 entry), tag GIỮ NGUYÊN (không kèm
  * locale) để 1 lần revalidate xoá cache của mọi locale (RULE-10).
  */
-export const getProductsByCategorySlugCached = createDynamicCachedFunction(
+const getProductsByCategorySlugCachedRaw = createDynamicCachedFunction(
   getProductsByCategorySlug,
   (categorySlug: string, locale: Locale) => [
     "products",
@@ -45,7 +46,7 @@ export const getProductsByCategorySlugCached = createDynamicCachedFunction(
  * ✅ CACHED: Get product by slug (for card display)
  * Dùng cho: Product card display
  */
-export const getProductBySlugCached = createDynamicCachedFunction(
+const getProductBySlugCachedRaw = createDynamicCachedFunction(
   getProductBySlug,
   (slug: string, locale: Locale) => ["products", "card", slug, locale],
   (slug: string) => [CACHE_TAGS.PRODUCTS.BY_SLUG(slug)],
@@ -55,7 +56,7 @@ export const getProductBySlugCached = createDynamicCachedFunction(
  * ✅ CACHED: Get product details by slug
  * Dùng cho: Product detail page - /dish/[slug]
  */
-export const getProductDetailsBySlugCached = createDynamicCachedFunction(
+const getProductDetailsBySlugCachedRaw = createDynamicCachedFunction(
   getProductDetailsBySlug,
   (slug: string, locale: Locale) => ["products", "details", slug, locale],
   (slug: string) => [CACHE_TAGS.PRODUCTS.BY_SLUG(slug)],
@@ -65,7 +66,7 @@ export const getProductDetailsBySlugCached = createDynamicCachedFunction(
  * ✅ CACHED: Get related products (multiple products by IDs)
  * Dùng cho: Related products section
  */
-export const getRelatedProductsCached = createDynamicCachedFunction(
+const getRelatedProductsCachedRaw = createDynamicCachedFunction(
   getMultipleProductsByIds,
   (ids: number[], locale: Locale) => [
     "products",
@@ -83,7 +84,7 @@ export const getRelatedProductsCached = createDynamicCachedFunction(
  * ✅ CACHED: Get product details for quick cart modal
  * Dùng cho: Quick cart modal/drawer
  */
-export const getProductDetailsForQuickCartByIdCached =
+const getProductDetailsForQuickCartByIdCachedRaw =
   createDynamicCachedFunction(
     getProductDetailsForQuickCartById,
     (id: number, locale: Locale) => [
@@ -94,3 +95,27 @@ export const getProductDetailsForQuickCartByIdCached =
     ],
     (id: number) => [CACHE_TAGS.PRODUCTS.BY_SLUG(`id:${id}`)],
   );
+
+/* ------------------------------------------------------------------ */
+/* Giá theo khung giờ: cache chỉ giữ GIÁ GỐC, giá hiệu lực áp SAU cache  */
+/* tại thời điểm request (Data Cache không được chứa dữ liệu theo giờ).  */
+/* ------------------------------------------------------------------ */
+
+export const getProductsByCategorySlugCached = async (
+  categorySlug: string,
+  locale: Locale,
+) => applyPricing(await getProductsByCategorySlugCachedRaw(categorySlug, locale));
+
+export const getProductBySlugCached = async (slug: string, locale: Locale) =>
+  applyPricingOne(await getProductBySlugCachedRaw(slug, locale));
+
+export const getProductDetailsBySlugCached = async (slug: string, locale: Locale) =>
+  applyPricingOne(await getProductDetailsBySlugCachedRaw(slug, locale));
+
+export const getRelatedProductsCached = async (ids: number[], locale: Locale) =>
+  applyPricing(await getRelatedProductsCachedRaw(ids, locale));
+
+export const getProductDetailsForQuickCartByIdCached = async (
+  id: number,
+  locale: Locale,
+) => applyPricingOne(await getProductDetailsForQuickCartByIdCachedRaw(id, locale));

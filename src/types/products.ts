@@ -145,7 +145,12 @@ export interface WebProduct {
   id: number;
   title: string;
   slug: string;
+  /** Giá hiệu lực (đã áp giá theo khung giờ nếu có) */
   price: number;
+  /** Giá gốc khi đang áp giá khung giờ; null/undefined = không giảm */
+  originalPrice?: number | null;
+  /** ISO time giá khung giờ hết hiệu lực (để client tự refresh) */
+  priceEndsAt?: string | null;
   imageUrl: string;
   subDescription: string;
   category: string;

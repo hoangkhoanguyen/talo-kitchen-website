@@ -128,6 +128,13 @@ export function revalidateImageChange(params: {
 }
 
 /**
+ * Revalidate khi tạo/sửa/xoá/bật tắt chương trình giá theo khung giờ
+ */
+export function revalidatePricePrograms() {
+  revalidateByAction("PRICE_PROGRAM_UPDATE");
+}
+
+/**
  * Revalidate toàn bộ cache (dùng khi cần)
  */
 export function revalidateAll() {
