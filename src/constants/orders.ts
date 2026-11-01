@@ -41,6 +41,10 @@ export const ORDER_TYPE: Record<
     color: "badge-success",
     label: "Door-to-Door Delivery",
   },
+  [EShippingMethod.dineIn]: {
+    color: "badge-info",
+    label: "Dine-in",
+  },
 };
 
 export const ORDER_PAYMENT_METHOD: Record<PaymentMethod, { label: string }> = {

@@ -18,6 +18,13 @@ export const shippingInitValue: ConfigValue = {
         "When you select this option, restaurant staff will contact you to ask for your pick-up time.",
       isDefault: false,
     },
+    {
+      method: EShippingMethod.dineIn,
+      label: "Dine-in",
+      description:
+        "Eat at the restaurant. Order from your table and our staff will serve you.",
+      isDefault: false,
+    },
   ],
   rules: [
     {
