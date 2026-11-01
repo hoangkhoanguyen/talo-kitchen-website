@@ -3,6 +3,7 @@ import CheckoutRender from "@/components/web/features/checkout/CheckoutRender";
 import { buildAlternates, getOgLocale } from "@/lib/i18n-meta";
 import { resolveLocale } from "@/lib/locale";
 import { getAppConfigsByKeyCached } from "@/services/cached";
+import { withDefaultShippingMethods } from "@/lib/shipping-methods";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import React from "react";
@@ -36,7 +37,13 @@ export async function generateMetadata({
 }
 
 const page = async () => {
-  const orderConfigs = await getAppConfigsByKeyCached("order");
+  const cachedOrderConfigs = await getAppConfigsByKeyCached("order");
+  // Bù phương thức mới trong code (vd: dineIn) mà config đã lưu ở DB chưa có.
+  // Làm sau khi đọc cache → deploy là có, không cần migrate data / xoá cache.
+  const orderConfigs = cachedOrderConfigs && {
+    ...cachedOrderConfigs,
+    value: withDefaultShippingMethods(cachedOrderConfigs.value),
+  };
 
   return (
     <CheckoutProvider

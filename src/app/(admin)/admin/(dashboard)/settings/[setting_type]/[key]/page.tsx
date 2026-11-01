@@ -2,6 +2,7 @@ import InitSetting from "@/components/admin/features/settings/InitSetting";
 import SettingEditor from "@/components/admin/features/settings/SettingEditor";
 import { adminConfigs } from "@/constants/settings";
 import { getConfigsByKey } from "@/services/configs";
+import { withDefaultShippingMethods } from "@/lib/shipping-methods";
 import React from "react";
 
 const page = async ({
@@ -16,7 +17,16 @@ const page = async ({
     return <div>Invalid setting type {setting_type}</div>;
   }
 
-  const config = await getConfigsByKey(key, setting_type);
+  const storedConfig = await getConfigsByKey(key, setting_type);
+  // Config "order": hiện cả phương thức mới trong code (vd: dineIn) để admin
+  // chỉnh label/mô tả; bấm lưu sẽ ghi luôn vào DB.
+  const config =
+    storedConfig && setting_type === "app" && key === "order"
+      ? {
+          ...storedConfig,
+          value: withDefaultShippingMethods(storedConfig.value),
+        }
+      : storedConfig;
 
   const meta = settings.meta[key as keyof typeof settings.meta];
 
