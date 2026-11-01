@@ -246,8 +246,8 @@ const RevenueReport = () => {
           <div className="flex flex-wrap items-start gap-4">
             <div className={cn(card, "flex-[999_1_560px] min-w-0")}>
               <h2 className="font-semibold mb-2">Doanh thu từng ngày</h2>
-              <div className="overflow-x-auto max-h-96 overflow-y-auto">
-                <table className="table table-sm table-pin-rows">
+              <div className="overflow-x-auto">
+                <table className="table table-sm">
                   <thead>
                     <tr>
                       <th>Ngày</th>
@@ -289,7 +289,7 @@ const RevenueReport = () => {
               </div>
             </div>
 
-            <div className={cn(card, "flex-[1_1_320px] min-w-0")}>
+            <div className={cn(card, "flex-[1_1_420px] min-w-0")}>
               <h2 className="font-semibold mb-2">Theo phương thức thanh toán</h2>
               {report.byPayment.length === 0 ? (
                 <p className="text-sm text-gray-500">
