@@ -4,6 +4,7 @@ import { createUnauthorizedResponse } from "@/lib/auth-responses";
 import { adminRoutes } from "@/constants/route";
 import { AUTH_COOKIE_KEYS } from "@/constants/auth";
 import { routing } from "@/i18n/routing";
+import { isLinkPreviewBot } from "@/lib/link-preview-bot";
 
 /**
  * next-intl middleware cho các route web user.
@@ -12,6 +13,16 @@ import { routing } from "@/i18n/routing";
  * chỉ locale không mặc định (vi) mới có prefix. Path `/en/...` bị redirect bỏ prefix về `/...`.
  */
 const intlMiddleware = createIntlMiddleware(routing);
+
+/**
+ * Bản dành cho bot lấy preview link: tắt nhận diện ngôn ngữ (cookie /
+ * Accept-Language) để ngôn ngữ preview chỉ phụ thuộc URL người gửi chọn:
+ * `/menu/all` → en, `/vi/menu/all` → vi. Khách thật vẫn dùng `intlMiddleware`.
+ */
+const linkPreviewIntlMiddleware = createIntlMiddleware({
+  ...routing,
+  localeDetection: false,
+});
 
 /**
  * Đường dẫn trỏ tới file tĩnh / metadata route (có phần mở rộng ở segment cuối):
@@ -105,6 +116,11 @@ export async function proxy(request: NextRequest) {
     STATIC_FILE_PATHNAME.test(pathname)
   ) {
     return NextResponse.next();
+  }
+
+  // Bot preview link (Zalo, Facebook, ...): ngôn ngữ theo URL, không redirect theo Accept-Language.
+  if (isLinkPreviewBot(request.headers.get("user-agent"))) {
+    return linkPreviewIntlMiddleware(request);
   }
 
   // Everything else = web user routes → next-intl middleware (AC-02.1, EC-01, EC-02)
