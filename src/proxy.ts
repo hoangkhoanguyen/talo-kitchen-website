@@ -5,6 +5,24 @@ import { adminRoutes } from "@/constants/route";
 import { AUTH_COOKIE_KEYS } from "@/constants/auth";
 import { routing } from "@/i18n/routing";
 import { isLinkPreviewBot } from "@/lib/link-preview-bot";
+import { jwtVerify } from "jose";
+
+/**
+ * Access token còn dùng được không (chữ ký đúng + chưa hết hạn).
+ * Chỉ có cookie thôi là chưa đủ: cookie sống theo hạn refresh token nên token
+ * hết hạn/hỏng vẫn còn cookie. Nếu chỉ xét "có cookie" thì trang login luôn bị
+ * chuyển về dashboard và người dùng không thể đăng nhập lại.
+ */
+async function isAccessTokenUsable(token: string) {
+  const secret = process.env.ACCESS_TOKEN_JWT_SECRET;
+  if (!secret) return false;
+  try {
+    await jwtVerify(token, new TextEncoder().encode(secret));
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * next-intl middleware cho các route web user.
@@ -43,8 +61,8 @@ export async function proxy(request: NextRequest) {
       AUTH_COOKIE_KEYS.ACCESS_TOKEN,
     )?.value;
 
-    if (accessToken) {
-      // User has token, redirect to callback URL or dashboard
+    if (accessToken && (await isAccessTokenUsable(accessToken))) {
+      // User has a valid token, redirect to callback URL or dashboard
       const callbackUrl = searchParams.get("callback_url");
       if (callbackUrl) {
         // Redirect to the original intended page
