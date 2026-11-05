@@ -54,9 +54,11 @@ export function createAccessTokenExpiredResponse(
 export function getAuthErrorCodeFromServiceCode(
   serviceCode?: string,
 ): keyof typeof AUTH_ERROR_CODES {
+  // Mọi lỗi từ service refresh đều là lỗi của REFRESH token (kể cả hết hạn)
+  // → UNAUTHORIZED. Không được trả ACCESS_TOKEN_EXPIRED (code 2) vì client sẽ
+  // hiểu là "hãy refresh" và lặp lại vòng refresh.
   switch (serviceCode) {
     case "TOKEN_EXPIRED":
-      return "ACCESS_TOKEN_EXPIRED";
     case "INVALID_TOKEN":
     case "TOKEN_NOT_FOUND":
     case "TOKEN_REVOKED":

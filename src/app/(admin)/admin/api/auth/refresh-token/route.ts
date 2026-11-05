@@ -5,7 +5,7 @@ import {
   getAuthErrorCodeFromServiceCode,
   createAuthErrorResponse,
 } from "@/lib/auth-responses";
-import { setAuthCookies } from "@/lib/auth";
+import { setAuthCookies, deleteAuthCookies } from "@/lib/auth";
 import { AUTH_COOKIE_KEYS } from "@/constants/auth";
 
 export async function POST(request: NextRequest) {
@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!refreshToken) {
+      await deleteAuthCookies();
       return createUnauthorizedResponse("Refresh token không tìm thấy");
     }
 
@@ -40,6 +41,19 @@ export async function POST(request: NextRequest) {
         { status: 200 },
       );
     } else {
+      // Lỗi hệ thống (DB chậm/mất kết nối lúc đông khách) KHÔNG phải lỗi đăng
+      // nhập → trả 503 để client thử lại, không đá người dùng ra login.
+      if (result.code === "INTERNAL_ERROR") {
+        return NextResponse.json(
+          { success: false, error: result.error, code: -1 },
+          { status: 503 },
+        );
+      }
+
+      // Refresh bị từ chối → xoá cookie để lần tải lại vào thẳng trang login
+      // (proxy chuyển /admin/login về dashboard khi còn cookie access token).
+      await deleteAuthCookies();
+
       // Use auth error utility with proper code mapping
       const authErrorCode = getAuthErrorCodeFromServiceCode(result.code);
       return createAuthErrorResponse(authErrorCode, result.error);
@@ -47,7 +61,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error in refresh token API:", error);
 
-    return createUnauthorizedResponse("Đã xảy ra lỗi server");
+    return NextResponse.json(
+      { success: false, error: "Đã xảy ra lỗi server", code: -1 },
+      { status: 503 },
+    );
   }
 }
 
