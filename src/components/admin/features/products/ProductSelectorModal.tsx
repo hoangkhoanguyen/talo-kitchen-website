@@ -59,6 +59,14 @@ export default ProductSelectorModal;
 
 ProductSelectorModal.displayName = "ProductSelectorModal";
 
+function normalizeText(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/đ/gi, "d")
+    .toLowerCase();
+}
+
 function PickerForm({
   title,
   isPending,
@@ -76,10 +84,21 @@ function PickerForm({
   const [note, setNote] = useState("");
   const [addonQty, setAddonQty] = useState<Record<number, number>>({});
 
+  const [search, setSearch] = useState("");
+
   const product = useMemo(
     () => products.find((p) => p.id === productId),
     [products, productId],
   );
+
+  // Lọc không phân biệt hoa/thường và dấu tiếng Việt; luôn giữ món đang chọn
+  const filteredProducts = useMemo(() => {
+    const keyword = normalizeText(search.trim());
+    if (!keyword) return products;
+    return products.filter(
+      (p) => p.id === productId || normalizeText(p.title).includes(keyword),
+    );
+  }, [products, search, productId]);
 
   const selectedAddons = useMemo(
     () =>
@@ -103,6 +122,14 @@ function PickerForm({
 
         <div>
           <Label>Sản phẩm</Label>
+          <Input
+            type="search"
+            className="mb-2"
+            value={search}
+            disabled={isLoading}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm món theo tên..."
+          />
           <Select
             value={productId ?? ""}
             disabled={isLoading}
@@ -111,8 +138,14 @@ function PickerForm({
               setAddonQty({});
             }}
           >
-            <option value="">{isLoading ? "Đang tải..." : "Chọn sản phẩm"}</option>
-            {products.map((item) => (
+            <option value="">
+              {isLoading
+                ? "Đang tải..."
+                : filteredProducts.length === 0
+                  ? "Không tìm thấy món"
+                  : "Chọn sản phẩm"}
+            </option>
+            {filteredProducts.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.title} - {formatCurrency(item.price)}
               </option>
