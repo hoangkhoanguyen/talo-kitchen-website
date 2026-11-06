@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { LayoutRef, LayoutWithRef, Modal } from "../../ui/layout";
 import { Button } from "../../ui/button";
-import { Input, Label, Select, Textarea } from "../../ui/form";
+import { Input, Label, Textarea } from "../../ui/form";
 import useFetchOrderProductOptions from "@/hooks/admin/features/orders/useFetchOrderProductOptions";
 import {
   MAX_ADDON_QUANTITY,
@@ -67,6 +67,130 @@ function normalizeText(s: string) {
     .toLowerCase();
 }
 
+type ProductOption = { id: number; title: string; price: number };
+
+/**
+ * Ô chọn món kiêm tìm kiếm: gõ để lọc (không phân biệt hoa/thường, dấu),
+ * bấm hoặc ↑/↓ + Enter để chọn. Danh sách hiển thị ngay dưới ô (không
+ * dùng absolute) để không bị cắt trong modal có overflow.
+ */
+function ProductCombobox({
+  products,
+  isLoading,
+  value,
+  onChange,
+}: {
+  products: ProductOption[];
+  isLoading: boolean;
+  value: number | undefined;
+  onChange(id: number | undefined): void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [active, setActive] = useState(0);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  const selected = products.find((p) => p.id === value);
+  const label = (p: ProductOption) => `${p.title} - ${formatCurrency(p.price)}`;
+
+  const filtered = useMemo(() => {
+    const keyword = normalizeText(query.trim());
+    if (!keyword) return products;
+    return products.filter((p) => normalizeText(p.title).includes(keyword));
+  }, [products, query]);
+
+  const choose = (p: ProductOption) => {
+    onChange(p.id);
+    setOpen(false);
+    setQuery("");
+  };
+
+  const moveActive = (next: number) => {
+    setActive(next);
+    listRef.current
+      ?.querySelector<HTMLElement>(`[data-index="${next}"]`)
+      ?.scrollIntoView({ block: "nearest" });
+  };
+
+  return (
+    <div>
+      <Input
+        role="combobox"
+        aria-expanded={open}
+        aria-controls="product-combobox-list"
+        disabled={isLoading}
+        placeholder={
+          isLoading ? "Đang tải..." : selected ? label(selected) : "Gõ để tìm món..."
+        }
+        value={open ? query : selected ? label(selected) : ""}
+        onFocus={() => {
+          setOpen(true);
+          setQuery("");
+          setActive(0);
+        }}
+        onClick={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+          setActive(0);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setOpen(true);
+            moveActive(Math.min(active + 1, filtered.length - 1));
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            moveActive(Math.max(active - 1, 0));
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (open && filtered[active]) choose(filtered[active]);
+          } else if (e.key === "Escape" && open) {
+            e.stopPropagation();
+            setOpen(false);
+          }
+        }}
+      />
+      {open && (
+        <ul
+          id="product-combobox-list"
+          ref={listRef}
+          role="listbox"
+          className="mt-1 max-h-60 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-sm"
+        >
+          {filtered.length === 0 ? (
+            <li className="px-3 py-2 text-sm text-gray-500">Không tìm thấy món</li>
+          ) : (
+            filtered.map((p, i) => (
+              <li
+                key={p.id}
+                data-index={i}
+                role="option"
+                aria-selected={p.id === value}
+                // mousedown + preventDefault để input không blur trước khi chọn
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  choose(p);
+                }}
+                onMouseEnter={() => setActive(i)}
+                className={`flex justify-between gap-3 px-3 py-2 text-sm cursor-pointer ${
+                  i === active ? "bg-gray-100" : ""
+                } ${p.id === value ? "font-semibold" : ""}`}
+              >
+                <span>{p.title}</span>
+                <span className="text-gray-500 whitespace-nowrap">
+                  {formatCurrency(p.price)}
+                </span>
+              </li>
+            ))
+          )}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function PickerForm({
   title,
   isPending,
@@ -84,21 +208,10 @@ function PickerForm({
   const [note, setNote] = useState("");
   const [addonQty, setAddonQty] = useState<Record<number, number>>({});
 
-  const [search, setSearch] = useState("");
-
   const product = useMemo(
     () => products.find((p) => p.id === productId),
     [products, productId],
   );
-
-  // Lọc không phân biệt hoa/thường và dấu tiếng Việt; luôn giữ món đang chọn
-  const filteredProducts = useMemo(() => {
-    const keyword = normalizeText(search.trim());
-    if (!keyword) return products;
-    return products.filter(
-      (p) => p.id === productId || normalizeText(p.title).includes(keyword),
-    );
-  }, [products, search, productId]);
 
   const selectedAddons = useMemo(
     () =>
@@ -122,35 +235,15 @@ function PickerForm({
 
         <div>
           <Label>Sản phẩm</Label>
-          <Input
-            type="search"
-            className="mb-2"
-            value={search}
-            disabled={isLoading}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tìm món theo tên..."
-          />
-          <Select
-            value={productId ?? ""}
-            disabled={isLoading}
-            onChange={(e) => {
-              setProductId(e.target.value ? Number(e.target.value) : undefined);
+          <ProductCombobox
+            products={products}
+            isLoading={isLoading}
+            value={productId}
+            onChange={(id) => {
+              setProductId(id);
               setAddonQty({});
             }}
-          >
-            <option value="">
-              {isLoading
-                ? "Đang tải..."
-                : filteredProducts.length === 0
-                  ? "Không tìm thấy món"
-                  : "Chọn sản phẩm"}
-            </option>
-            {filteredProducts.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title} - {formatCurrency(item.price)}
-              </option>
-            ))}
-          </Select>
+          />
         </div>
 
         <div>
