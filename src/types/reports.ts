@@ -21,6 +21,24 @@ export type RevenueReport = {
 };
 
 // Xuất Excel "Theo đơn": mỗi dòng 1 đơn completed (cùng tập đơn với RevenueReport).
+export type RevenueOrderAddon = {
+  name: string;
+  quantity: number; // số topping / 1 phần món
+  price: number;
+  total: number;
+};
+
+export type RevenueOrderItem = {
+  name: string;
+  quantity: number;
+  price: number; // đơn giá đã chốt
+  total: number; // quantity * price (chưa gồm topping)
+  note: string;
+  addons: RevenueOrderAddon[];
+  // Chỉ có khi includeDisabled (talo_kitchen); tài khoản thường không bao giờ có field này
+  isDisabled?: boolean;
+};
+
 export type RevenueOrderRow = {
   createdAt: string; // "YYYY-MM-DD HH:mm" giờ VN (đã quy đổi trong SQL)
   code: string;
@@ -31,6 +49,7 @@ export type RevenueOrderRow = {
   shippingFee: number;
   revenue: number;
   internalNote: string;
+  items: RevenueOrderItem[];
   // Chỉ có khi includeDisabled (talo_kitchen); tài khoản thường không bao giờ có field này
   isDisabled?: boolean;
 };
