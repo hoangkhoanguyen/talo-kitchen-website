@@ -3,10 +3,12 @@ import Filter from "../../shared/Filter";
 import { ORDER_STATUS, ORDER_TYPE } from "@/constants/orders";
 import { OrderStatus } from "@/types/orders";
 import { EShippingMethod } from "@/types/app-configs";
+import useFetchAllCategories from "@/hooks/admin/features/categories/useFetchAllCategories";
 
 interface FilterQuery {
   status: string[];
   order_type: string[];
+  category_id: number[];
   start_date: string;
   end_date: string;
 }
@@ -19,6 +21,7 @@ const OrderFilter = ({
   setQuery(value: FilterQuery & { page?: number }): void;
 }) => {
   const [query, setQuery] = useState<FilterQuery>(initQuery);
+  const { data: categories } = useFetchAllCategories();
   // const [urlQuery, setURLQuery] = useState<FilterQuery>(initQuery);
 
   const onChangeQuery = <K extends keyof FilterQuery>(
@@ -41,6 +44,7 @@ const OrderFilter = ({
     setQuery({
       status: [],
       order_type: [],
+      category_id: [],
       start_date: "",
       end_date: "",
     });
@@ -101,6 +105,33 @@ const OrderFilter = ({
               className="checkbox"
             />
             <span>{ORDER_TYPE[type].label}</span>
+          </label>
+        ))}
+      </fieldset>
+
+      <fieldset className="fieldset bg-base-100 border-base-300 rounded-box w-full border p-4">
+        <legend className="fieldset-legend">Danh mục</legend>
+        {categories?.map((category) => (
+          <label className="label" key={category.id}>
+            <input
+              type="checkbox"
+              checked={query.category_id.includes(category.id)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  onChangeQuery("category_id", [
+                    ...query.category_id,
+                    category.id,
+                  ]);
+                } else {
+                  onChangeQuery(
+                    "category_id",
+                    query.category_id.filter((id) => id !== category.id),
+                  );
+                }
+              }}
+              className="checkbox"
+            />
+            <span>{category.name}</span>
           </label>
         ))}
       </fieldset>

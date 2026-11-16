@@ -12,6 +12,7 @@ const useOrdersParams = () => {
     search: parseAsString.withDefault(""),
     status: parseAsArrayOf(parseAsString).withDefault([]),
     order_type: parseAsArrayOf(parseAsString).withDefault([]),
+    category_id: parseAsArrayOf(parseAsInteger).withDefault([]),
     start_date: parseAsString.withDefault(""),
     end_date: parseAsString.withDefault(""),
   });
