@@ -140,6 +140,42 @@ function addOrdersSheet(
     row.getCell(4).numFmt = TEXT_FORMAT;
     formatMoney(row, [7, 8]);
     row.getCell(9).alignment = { wrapText: true, vertical: "top" };
+
+    // Chi tiết món của đơn: header nhỏ + mỗi món 1 dòng (topping là dòng con)
+    if (order.items.length) {
+      const itemHeader = sheet.addRow(["", "", "Món", "SL", "Đơn giá", "Thành tiền"]);
+      itemHeader.font = { italic: true, color: { argb: "FF666666" } };
+      for (const item of order.items) {
+        const itemRow = sheet.addRow([
+          "",
+          "",
+          safeText(item.name),
+          item.quantity,
+          item.price,
+          item.total,
+          "",
+          "",
+          safeText(item.note),
+          ...(showDisabledColumn ? [item.isDisabled ? "Có" : ""] : []),
+        ]);
+        formatMoney(itemRow, [5, 6]);
+        itemRow.getCell(3).alignment = { indent: 1 };
+        itemRow.getCell(9).alignment = { wrapText: true, vertical: "top" };
+        for (const addon of item.addons) {
+          const addonRow = sheet.addRow([
+            "",
+            "",
+            `• ${addon.name}`,
+            addon.quantity,
+            addon.price,
+            addon.total,
+          ]);
+          formatMoney(addonRow, [5, 6]);
+          addonRow.getCell(3).alignment = { indent: 2 };
+          addonRow.font = { color: { argb: "FF666666" } };
+        }
+      }
+    }
   }
 
   const totalRow = sheet.addRow([

@@ -36,6 +36,7 @@ import {
   computeOrderTotal,
   filterVisibleItems,
 } from "@/lib/order-edit";
+import { buildCategoryCondition } from "@/lib/order-category-filter";
 import { getEffectivePrice, withEffectivePrice } from "@/lib/pricing";
 import { getActivePriceRules } from "@/services/price-programs";
 // Disabled cache imports - using direct DB calls now
@@ -295,9 +296,11 @@ export async function getAdminOrderTable({
   start_date,
   status,
   order_type,
+  category_id = [],
   includeDisabled = false,
 }: {
   includeDisabled?: boolean;
+  category_id?: number[];
   limit?: number;
   page?: number;
   search: string | null;
@@ -349,6 +352,13 @@ export async function getAdminOrderTable({
       if (order_type.length) {
         conditions.push(inArray(fields.orderType, order_type as any));
       }
+
+      const categoryCondition = buildCategoryCondition(
+        category_id,
+        includeDisabled,
+        fields.id,
+      );
+      if (categoryCondition) conditions.push(categoryCondition);
 
       return and(...conditions);
     };

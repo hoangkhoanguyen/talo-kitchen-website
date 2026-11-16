@@ -4,6 +4,7 @@ import { getAdminOrderTable } from "@/services/orders";
 import { NextRequest, NextResponse } from "next/server";
 import { AccessTokenPayload } from "@/lib/auth";
 import { isTaloKitchen } from "@/lib/order-visibility";
+import { parseCategoryIds } from "@/lib/order-category-filter";
 import z from "zod";
 
 const schema = z.object({
@@ -22,6 +23,11 @@ const schema = z.object({
     .nullable()
     .default("")
     .transform((val) => (val ? val.split(",") : [])),
+  category_id: z
+    .string()
+    .nullable()
+    .default("")
+    .transform((val) => parseCategoryIds(val)),
 });
 
 async function getOrdersApi(payload: AccessTokenPayload, req: NextRequest) {
@@ -33,7 +39,10 @@ async function getOrdersApi(payload: AccessTokenPayload, req: NextRequest) {
   const status = req.nextUrl.searchParams.get("status");
   const order_type = req.nextUrl.searchParams.get("order_type");
 
+  const category_id = req.nextUrl.searchParams.get("category_id");
+
   const { success, data: query } = schema.safeParse({
+    category_id,
     page,
     limit,
     search,

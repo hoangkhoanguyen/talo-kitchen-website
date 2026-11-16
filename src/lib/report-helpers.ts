@@ -1,6 +1,10 @@
 // Helper thuần (không DB, không Next) cho báo cáo: tham số xuất Excel, sắp xếp/tổng hợp.
 import { normalizePaymentLabel } from "@/constants/reports";
-import type { ProductSalesRow, RevenueOrderRow } from "@/types/reports";
+import type {
+  ProductSalesRow,
+  RevenueOrderItem,
+  RevenueOrderRow,
+} from "@/types/reports";
 
 export const REPORT_EXPORT_MODES = ["daily", "orders"] as const;
 export type ReportExportMode = (typeof REPORT_EXPORT_MODES)[number];
@@ -64,6 +68,7 @@ export function summarizeRevenueOrders(rows: RevenueOrderRow[]) {
 
 // Dòng thô từ SQL (getRevenueOrders). is_enabled chỉ được SELECT khi includeDisabled.
 export type RawRevenueOrderRow = {
+  order_id?: string | number;
   created_at_vn: string;
   code: string;
   first_name: string | null;
@@ -98,7 +103,69 @@ export function mapRevenueOrderRow(
     shippingFee: Number(row.ship),
     revenue: Number(row.revenue),
     internalNote: row.internal_note ?? "",
+    items: [],
   };
   if (includeDisabled) mapped.isDisabled = row.is_enabled === false;
   return mapped;
+}
+
+// Dòng thô món/topping của đơn (getRevenueOrders). is_enabled chỉ SELECT khi includeDisabled.
+export type RawRevenueItemRow = {
+  order_id: string | number;
+  item_id: string | number;
+  product_name: string;
+  quantity: string | number;
+  price: string | number;
+  note: string | null;
+  is_enabled?: boolean | null;
+  addon_name: string | null;
+  addon_quantity: string | number | null;
+  addon_price: string | number | null;
+};
+
+/**
+ * Gắn món + topping vào từng đơn (theo order_id). Dòng thô đã sắp theo
+ * item_id; mỗi món có thể xuất hiện nhiều dòng (1 dòng/topping, hoặc 1 dòng không topping).
+ * Tài khoản thường: không bao giờ có isDisabled (SQL cũng đã loại món tắt).
+ */
+export function attachItemsToOrders(
+  orders: { id: number; row: RevenueOrderRow }[],
+  rawItems: RawRevenueItemRow[],
+  includeDisabled: boolean,
+) {
+  const byOrder = new Map<number, Map<number, RevenueOrderItem>>();
+  for (const raw of rawItems) {
+    const orderId = Number(raw.order_id);
+    const itemId = Number(raw.item_id);
+    let items = byOrder.get(orderId);
+    if (!items) byOrder.set(orderId, (items = new Map()));
+    let item = items.get(itemId);
+    if (!item) {
+      const quantity = Number(raw.quantity);
+      const price = Number(raw.price);
+      item = {
+        name: raw.product_name,
+        quantity,
+        price,
+        total: quantity * price,
+        note: raw.note ?? "",
+        addons: [],
+      };
+      if (includeDisabled) item.isDisabled = raw.is_enabled === false;
+      items.set(itemId, item);
+    }
+    if (raw.addon_name !== null) {
+      const addonQty = Number(raw.addon_quantity ?? 0);
+      const addonPrice = Number(raw.addon_price ?? 0);
+      item.addons.push({
+        name: raw.addon_name,
+        quantity: addonQty,
+        price: addonPrice,
+        total: addonQty * addonPrice,
+      });
+    }
+  }
+  for (const { id, row } of orders) {
+    row.items = Array.from(byOrder.get(id)?.values() ?? []);
+  }
 }

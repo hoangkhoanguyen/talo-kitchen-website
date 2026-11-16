@@ -6,12 +6,14 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import ExcelJS from "exceljs";
 import {
+  attachItemsToOrders,
   mapRevenueOrderRow,
   parseCategoryIdParam,
   parseReportExportMode,
   sortProductSales,
   summarizeProductSales,
   summarizeRevenueOrders,
+  type RawRevenueItemRow,
   type RawRevenueOrderRow,
 } from "@/lib/report-helpers";
 import {
@@ -301,4 +303,60 @@ test("sheet theo món: nhãn danh mục khi không lọc / danh mục không t�
     findRow(missing.getWorksheet("Thống kê theo món")!, "Danh mục").getCell(2).value,
     "Không tồn tại (#99)",
   );
+});
+
+/* ---------------- chi tiết món theo đơn ---------------- */
+
+const rawItems: RawRevenueItemRow[] = [
+  // Đơn 1: Ly a x2 (có topping), Ly b (đã tắt)
+  { order_id: 1, item_id: 10, product_name: "Ly a", quantity: 2, price: 40000, note: "ít đá", is_enabled: true, addon_name: "Trân châu", addon_quantity: 2, addon_price: 5000 },
+  { order_id: 1, item_id: 11, product_name: "=Ly b", quantity: 1, price: 20000, note: "", is_enabled: false, addon_name: null, addon_quantity: null, addon_price: null },
+];
+
+function reportWithItems(includeDisabled: boolean): RevenueOrdersReport {
+  const raws = rawOrders.map((r, i) => ({ ...r, order_id: i + 1 }));
+  const kept = raws.filter((r) => includeDisabled || r.is_enabled !== false);
+  const rows = kept.map((r) => mapRevenueOrderRow(r, includeDisabled));
+  attachItemsToOrders(
+    rows.map((row, i) => ({ id: Number(kept[i].order_id), row })),
+    // SQL tài khoản thường đã loại món tắt
+    rawItems.filter((it) => includeDisabled || it.is_enabled !== false),
+    includeDisabled,
+  );
+  return { range, summary: summarizeRevenueOrders(rows), orders: rows };
+}
+
+test("món theo đơn: tài khoản thường không thấy món tắt và không có isDisabled", () => {
+  const items = reportWithItems(false).orders[0].items;
+  assert.equal(items.length, 1);
+  assert.equal("isDisabled" in items[0], false);
+  assert.deepEqual(items[0].addons, [{ name: "Trân châu", quantity: 2, price: 5000, total: 10000 }]);
+  assert.equal(items[0].total, 80000);
+});
+
+test("món theo đơn: talo_kitchen thấy cả món tắt, đơn không món → mảng rỗng", () => {
+  const report = reportWithItems(true);
+  assert.deepEqual(report.orders[0].items.map((i) => i.isDisabled), [false, true]);
+  assert.deepEqual(report.orders[1].items, []);
+});
+
+test("workbook theo đơn: dòng món/topping nằm dưới đơn, cột SL/đơn giá/thành tiền là số", () => {
+  for (const includeDisabled of [false, true]) {
+    const wb = createRevenueOrdersWorkbook(
+      reportWithItems(includeDisabled),
+      productReport(),
+      { showDisabledColumn: includeDisabled },
+      exportedAt,
+    );
+    const sheet = wb.getWorksheet("Doanh thu theo đơn")!;
+    const rows = sheetRows(sheet);
+    const orderIdx = rows.findIndex((r) => r[0] === "05/10/2026 23:30");
+    assert.deepEqual(rows[orderIdx + 1].slice(2, 6), ["Món", "SL", "Đơn giá", "Thành tiền"]);
+    assert.deepEqual(rows[orderIdx + 2].slice(2, 6), ["Ly a", 2, 40000, 80000]);
+    assert.deepEqual(rows[orderIdx + 3].slice(2, 6), ["• Trân châu", 2, 5000, 10000]);
+    const flat = JSON.stringify(rows);
+    // Món tắt chỉ có trong file talo_kitchen; tên món bị escape công thức
+    assert.equal(flat.includes("'=Ly b"), includeDisabled);
+    assert.equal(flat.includes("Đang tắt"), includeDisabled);
+  }
 });

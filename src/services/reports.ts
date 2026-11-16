@@ -3,6 +3,7 @@ import { getDb } from "@/db/drizzle";
 import {
   orders,
   orderItems,
+  orderItemAddons,
   productCategories,
   products,
 } from "@/db/schemas";
@@ -13,7 +14,9 @@ import type {
   RevenueReport,
 } from "@/types/reports";
 import {
+  attachItemsToOrders,
   mapRevenueOrderRow,
+  type RawRevenueItemRow,
   sortProductSales,
   summarizeProductSales,
   summarizeRevenueOrders,
@@ -180,6 +183,7 @@ export async function getRevenueOrders({
   const result = await db.execute(sql`
     WITH ${buildOrdersCte(start, end, includeDisabled)}
     SELECT
+      ord.id AS order_id,
       to_char(ord.created_at AT TIME ZONE ${VN_TZ}, 'YYYY-MM-DD HH24:MI') AS created_at_vn,
       ord.code AS code,
       ord.first_name AS first_name,
@@ -196,8 +200,38 @@ export async function getRevenueOrders({
     ORDER BY ord.created_at ASC, ord.id ASC
   `);
 
-  const rows = (Array.from(result) as unknown as RawRevenueOrderRow[]).map(
-    (row) => mapRevenueOrderRow(row, includeDisabled),
+  const rawOrders = Array.from(result) as unknown as RawRevenueOrderRow[];
+  const rows = rawOrders.map((row) => mapRevenueOrderRow(row, includeDisabled));
+
+  // Món + topping của các đơn trên (cùng CTE → cùng tập đơn).
+  // Tài khoản thường: chỉ món đang bật (is_enabled chỉ SELECT khi includeDisabled).
+  const itemFilter = includeDisabled ? sql`` : sql`AND oi.is_enabled = true`;
+  const itemEnabledColumn = includeDisabled
+    ? sql`, oi.is_enabled AS is_enabled`
+    : sql``;
+  const itemResult = await db.execute(sql`
+    WITH ${buildOrdersCte(start, end, includeDisabled)}
+    SELECT
+      oi.order_id AS order_id,
+      oi.id AS item_id,
+      oi.product_name AS product_name,
+      oi.quantity AS quantity,
+      ROUND(oi.price::float8::numeric)::bigint AS price,
+      oi.note AS note,
+      a.addon_name AS addon_name,
+      a.quantity AS addon_quantity,
+      ROUND(a.price::float8::numeric)::bigint AS addon_price
+      ${itemEnabledColumn}
+    FROM o
+    JOIN ${orderItems} oi ON oi.order_id = o.id
+    LEFT JOIN ${orderItemAddons} a ON a.order_item_id = oi.id
+    WHERE true ${itemFilter}
+    ORDER BY oi.order_id ASC, oi.id ASC, a.id ASC
+  `);
+  attachItemsToOrders(
+    rows.map((row, i) => ({ id: Number(rawOrders[i].order_id), row })),
+    Array.from(itemResult) as unknown as RawRevenueItemRow[],
+    includeDisabled,
   );
 
   return {
