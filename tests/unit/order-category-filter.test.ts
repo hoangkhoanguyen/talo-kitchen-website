@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { PgDialect } from "drizzle-orm/pg-core";
+import { mapColumnsInSQLToAlias } from "drizzle-orm";
 import { orders } from "../../src/db/schemas";
 import {
   buildCategoryCondition,
@@ -27,13 +28,21 @@ test("không chọn danh mục → không có điều kiện", () => {
 test("tài khoản thường: chỉ khớp món đang bật (is_enabled)", () => {
   const q = render([1, 2], false)!;
   assert.match(q.sql, /exists/i);
-  assert.match(q.sql, /"is_enabled" = \$/);
-  assert.deepEqual(q.params.filter((p) => typeof p === "number"), [1, 2]);
-  assert.ok(q.params.includes(true));
+  assert.match(q.sql, /oi\.is_enabled = true/);
+  assert.deepEqual(q.params, [1, 2]);
 });
 
 test("talo_kitchen: khớp mọi món, không lọc is_enabled", () => {
   const q = render([1, 2], true)!;
   assert.match(q.sql, /exists/i);
-  assert.doesNotMatch(q.sql, /"is_enabled"/);
+  assert.doesNotMatch(q.sql, /is_enabled/);
+});
+
+// Regression: db.query.orders.findMany({ where }) đổi mọi Column trong where
+// thành cột của bảng orders. Subquery không được chứa Column của bảng khác.
+test("findMany alias: chỉ orders.id là cột có alias, phần còn lại giữ nguyên", () => {
+  const cond = buildCategoryCondition([1], false, orders.id)!;
+  const q = dialect.sqlToQuery(mapColumnsInSQLToAlias(cond, "orders"));
+  assert.match(q.sql, /oi\.order_id = "orders"\."id"/);
+  assert.doesNotMatch(q.sql, /"orders"\."(order_id|category_id|product_id)"/);
 });
